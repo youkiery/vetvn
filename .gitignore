@@ -1,13 +1,3 @@
-/uploads/
-/admin/
-/bin/
-/assets/
-/data/
-/includes/
-/install/
-/vendor/
-/PHPExcel
-/results_
 /composer.json
 /config.php
 /COPYRIGHT.txt
