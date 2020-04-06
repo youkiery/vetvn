@@ -20,4 +20,5 @@
 /web.config
 /PHPExcel.php
 /.htaccess
+/.gitignore
 /excel
