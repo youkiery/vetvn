@@ -28,8 +28,8 @@ $sys_info['support_cache'] = array();
 $sys_info['php_compress_methods'] = array('deflate' => 'gzdeflate','gzip' => 'gzencode','x-gzip' => 'gzencode','compress' => 'gzcompress','x-compress' => 'gzcompress');
 $sys_info['server_headers'] = array('server'=>'Apache/2.4.33 (Win32) OpenSSL/1.0.2o PHP/5.6.36','x-powered-by'=>'PHP/5.6.36','content-length'=>'0','content-type'=>'text/html; charset=UTF-8');
 
-ini_set('display_errors', '0');
-ini_set('display_startup_errors', '0');
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
 ini_set('log_errors', '0');
 ini_set('session.cookie_httponly', '1');
 ini_set('session.gc_maxlifetime', '3600');
