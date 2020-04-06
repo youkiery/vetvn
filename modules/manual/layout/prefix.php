@@ -1,0 +1,1 @@
+<script type="text/javascript" src="/modules/<?php echo $module_file; ?>/src/script.js?v=<?php echo round(time() / 5); ?>"></script>

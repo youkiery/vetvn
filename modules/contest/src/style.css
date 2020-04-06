@@ -1,0 +1,113 @@
+.row-x::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.control-label {
+  font-weight: bold;
+}
+
+input[type=checkbox] {
+  background: white;
+}
+
+hr {
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+.cell-center {
+  text-align: center;
+  vertical-align: inherit;
+}
+
+[class*="col-"] {
+  float: left;
+  padding: 5px;
+}
+
+.col-1 {width: 8.33%;}
+.col-2 {width: 16.66%;}
+.col-3 {width: 25%;}
+.col-4 {width: 33.33%;}
+.col-5 {width: 41.66%;}
+.col-6 {width: 50%;}
+.col-7 {width: 58.33%;}
+.col-8 {width: 66.66%;}
+.col-9 {width: 75%;}
+.col-10 {width: 83.33%;}
+.col-11 {width: 91.66%;}
+.col-12 {width: 100%;}
+
+#ui-datepicker-div {
+  z-index: 10000 !important;
+}
+
+#msgshow {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  background: white;
+  padding: 10px;
+  z-index: 100;
+  border: 1px solid gray;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  display: none;
+  z-index: 10000;
+}
+
+.relative {
+  position: relative;
+}
+
+.suggest {
+  position: absolute;
+  width: 100%;
+  background: #fff;
+  max-height: 400px;
+  overflow-y: scroll;
+  z-index: 1;
+  display: none;
+}
+
+.suggest-item {
+  border-bottom: 1px solid gray;
+  padding: 10px;
+}
+
+.suggest-item:hover {
+  background: #8f8;
+}
+
+.redbg {
+  background: lightsalmon;
+}
+
+.yellowbg {
+  background: lightpink;
+}
+
+label.filebutton {
+  widows: 300px;
+  height: 200px;
+  overflow:hidden;
+  position:relative;
+}
+
+.fileinput {
+  z-index: 999;
+  line-height: 0;
+  font-size: 50px;
+  position: absolute;
+  top: -2px;
+  left: -700px;
+  opacity: 0;
+  filter: alpha(opacity = 0);
+  -ms-filter: "alpha(opacity=0)";
+  cursor: pointer;
+  _cursor: hand;
+  margin: 0;
+  padding:0;
+}
