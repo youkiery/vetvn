@@ -13,7 +13,7 @@ if (!defined('NV_SYSTEM') and !defined('NV_ADMIN') and !defined('NV_WYSIWYG')) {
     exit();
 }
 
-error_reporting(0);
+// error_reporting(0);
 
 define('NV_MAINFILE', true);
 
@@ -32,7 +32,7 @@ require NV_ROOTDIR . '/includes/constants.php';
 $server_name = trim((isset($_SERVER['HTTP_HOST']) and ! empty($_SERVER['HTTP_HOST'])) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME']);
 $server_name = preg_replace('/^[a-z]+\:\/\//i', '', $server_name);
 $server_name = preg_replace('/(\:[0-9]+)$/', '', $server_name);
-$server_protocol = strtolower(preg_replace('/^([^\/]+)\/*(.*)$/', '\\1', $_SERVER['SERVER_PROTOCOL'])) . (($_SERVER['HTTPS'] == 'on') ? 's' : '');
+$server_protocol = strtolower(preg_replace('/^([^\/]+)\/*(.*)$/', '\\1', $_SERVER['SERVER_PROTOCOL'])) . (( !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 's' : '');
 $server_port = ($_SERVER['SERVER_PORT'] == '80' or $_SERVER['SERVER_PORT'] == '443') ? '' : (':' . $_SERVER['SERVER_PORT']);
 if (filter_var($server_name, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) === false) {
     $my_current_domain = $server_protocol . '://' . $server_name . $server_port;
@@ -120,7 +120,7 @@ $client_info['ip'] = NV_CLIENT_IP;
 require NV_ROOTDIR . '/includes/timezone.php';
 
 // Ket noi voi class Error_handler
-$ErrorHandler = new NukeViet\Core\Error($global_config);
+// $ErrorHandler = new NukeViet\Core\Error($global_config);
 
 if (empty($global_config['allow_sitelangs'])) {
     trigger_error('Error! Language variables is empty!', 256);
