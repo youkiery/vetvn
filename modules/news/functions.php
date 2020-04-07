@@ -17,9 +17,20 @@ define("PATH2", NV_ROOTDIR . '/modules/' . $module_file . '/template/user/' . $o
 
 require NV_ROOTDIR . '/modules/' . $module_file . '/global.functions.php';
 $buy_sex = array('Sao cũng được', 'Đực', 'Cái');
+$fc = array('sendinfo');
+$fa = array('login', 'signup', 'recover', 'checking-key', 'change-pass', 'send-contact', 'filter', 'send-review');
+$action = $nv_Request->get_string('action', 'post', '');
 
-if (!empty($action = $nv_Request->get_string('action', 'post', '')) && !in_array($action, array('login', 'signup', 'recover', 'checking-key', 'change-pass', 'send-contact', 'filter', 'send-review')) && empty($userinfo = getUserInfo())) {
-  die('{"status": -1}');
+// kiểm tra các post ajax
+if (empty($action)) {
+  // nếu thuộc mảng fc thì tiếp tục
+  // nếu không, kiểm tra các post có phải là các action trong fa hoặc là thành viên
+  if (in_array($op, $fc)) {
+    // bỏ qua
+  }
+  else if ( !in_array($action, $fa) && empty($userinfo = getUserInfo())) {
+    die('{"status": -1}');
+  }
 }
 
 function defaultDogList() {

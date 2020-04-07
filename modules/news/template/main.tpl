@@ -20,6 +20,7 @@
               <!-- BEGIN: nolog -->
               <a href="/{module_file}/login"> Đăng nhập </a> |
               <!-- END: nolog -->
+              <a href="/{module_file}/sendinfo"> Gửi thông tin chứng nhận </a> | 
               <a href="/{module_file}/private"> Cá nhân </a> | 
               <a href="/{module_file}/center"> Trang trại </a>
                | <a href="/manual/huong-dan-su-dung/tim-kiem-thu-cung-su-dung-tim-kiem-1.html#content"> Hướng dẫn </a> / <a href="/manual/huong-dan-cap-giay/quy-trinh-cap-giay-chung-nhan-cho-cho-giong-thuoc-cac-trai-25.html#content"> Cấp giấy </a>
