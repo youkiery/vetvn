@@ -22,7 +22,7 @@ $fa = array('login', 'signup', 'recover', 'checking-key', 'change-pass', 'send-c
 $action = $nv_Request->get_string('action', 'post', '');
 
 // kiểm tra các post ajax
-if (empty($action)) {
+if (!empty($action)) {
   // nếu thuộc mảng fc thì tiếp tục
   // nếu không, kiểm tra các post có phải là các action trong fa hoặc là thành viên
   if (in_array($op, $fc)) {

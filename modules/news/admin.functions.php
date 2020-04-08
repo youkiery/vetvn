@@ -16,7 +16,7 @@ define("PATH", NV_ROOTDIR . "/modules/" . $module_file . '/template/admin/');
 
 require NV_ROOTDIR . '/modules/' . $module_file . '/global.functions.php';
 require NV_ROOTDIR . '/modules/' . $module_file . '/theme.php';
-$select_array = array('breed' => 'Loài', 'disease' => 'Bệnh', 'origin' => 'Nguồn gốc', 'request' => 'Yêu cầu', 'species' => 'Giống');
+$select_array = array('breed' => 'Loài', 'disease' => 'Bệnh', 'origin' => 'Nguồn gốc', 'request' => 'Yêu cầu', 'species' => 'Giống', 'species2' => 'Giống loài', 'color' => 'Màu lông', 'type' => 'Kiểu lông');
 $trade_array = array('1' => 'Cần bán', '2' => 'Cần phối');
 
 function tradeList($filter = array('owner' => '', 'mobile' => '', 'address' => '', 'name' => '', 'species' => '', 'breed' => '', 'status' => 0 , 'type' => 0, 'page' => 1, 'limit' => 10)) {
