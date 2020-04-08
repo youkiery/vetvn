@@ -21,7 +21,6 @@ $action = $nv_Request->get_string('action', 'post', '');
 $userinfo = getUserinfo();
 if (empty($userinfo) || $userinfo['active'] == 0) {
 	header('location: /'. $module_name .'/login/');
-	die();
 }
 else {
   if (!empty($userinfo['center'])) {

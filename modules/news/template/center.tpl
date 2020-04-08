@@ -883,27 +883,34 @@
   <div style="float: left; width: 250px; height: 250px; overflow: hidden;" class="thumbnail" id="avatar">
   </div>
   <div style="float: left; margin-left: 10px;">
-    <p> Tên: {fullname} </p>
-    <p> Điện thoại: {mobile} </p>
-    <p> Địa chỉ: {address} </p>
+    <div class="form-group"> Tên: {fullname} </div>
+    <div class="form-group"> Điện thoại: {mobile} </div>
+    <div class="form-group"> Địa chỉ: {address} </div>
 
-    <button class="btn btn-info" onclick="editUser({userid})">
-      Chỉnh sửa thông tin
-    </button>
-    <button class="btn btn-warning" onclick="privateConfirm()">
-      Huỷ ký trại
-    </button>
-    <div></div>
-    <button class="btn btn-info" onclick="changePassword()">
-      Đổi mật khẩu
-    </button>
-    <button class="btn btn-info" onclick="changeMail()">
-      Email
-    </button>
-    <div></div>
-    <button class="btn btn-info" onclick="buy()">
-      Cần mua
-    </button>
+    <div class="form-group">
+      <button class="btn btn-info" onclick="editUser({userid})">
+        Chỉnh sửa thông tin
+      </button>
+      <button class="btn btn-warning" onclick="privateConfirm()">
+        Huỷ ký trại
+      </button>
+    </div>
+
+    <div class="form-group">
+      <button class="btn btn-info" onclick="changeMail()">
+        Email
+      </button>
+      <button class="btn btn-info" onclick="changePassword()">
+        Đổi mật khẩu
+      </button>
+    </div>
+
+    <div class="form-group">
+      <button class="btn btn-info" onclick="buy()">
+        Cần mua
+      </button>
+      <a class="btn btn-info" href="/news/sendinfo"> Yêu cầu cấp chứng nhận </a>
+    </div>
   </div>
   <div style="clear: left;"></div>
   <p> <a href="/{module_file}/trading"> Quản lý mua, bán, phối</a> <span style="font-weight: bold; color: red;">{intro_count}</span></p>

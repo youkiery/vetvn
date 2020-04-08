@@ -11,6 +11,13 @@ if (!defined('NV_IS_FORM')) {
 	die('Stop!!!');
 }
 
+$userinfo = getUserinfo();
+if (empty($userinfo) || $userinfo['active'] == 0) {
+	header('location: /'. $module_name .'/login/');
+}
+$userinfo['address'] = xdecrypt($userinfo['address']);
+$userinfo['mobile'] = xdecrypt($userinfo['mobile']);
+
 $page_title = 'Gửi thông tin chứng nhận';
 $action = $nv_Request->get_string('action', 'post', '');
 if (!empty($action)) {
@@ -27,10 +34,29 @@ if (!empty($action)) {
 			$data['birthtime'] = totime($data['birthtime']);
 
 			// insert vào bảng
-			$sql = 'insert into `'. PREFIX .'_sendinfo` (name, sex, birthtime, species, color, type, breeder, owner, image) values("'. $data['name'] .'", "'. $data['sex'] .'", "'. $data['birthtime'] .'", "'. $data['species'] .'", "'. $data['color'] .'", "'. $data['type'] .'", "'. $data['breeder'] .'", "'. $data['owner'] .'", "'. implode(',', $image) .'")';
+			$sql = 'insert into `'. PREFIX .'_sendinfo` (userid, name, sex, birthtime, species, color, type, breeder, owner, image) values("'. $userinfo['id'] .'", "'. $data['name'] .'", "'. $data['sex'] .'", "'. $data['birthtime'] .'", "'. $data['species'] .'", "'. $data['color'] .'", "'. $data['type'] .'", "'. $data['breeder'] .'", "'. $data['owner'] .'", "'. implode(',', $image) .'")';
 			if ($db->query($sql)) {
 				// thông báo
 				$result['status'] = 1;
+				$result['html'] = sendinfoList();
+			}
+		break;
+		case 'edit-info':
+			$id = $nv_Request->get_int('id', 'post');
+			$data = $nv_Request->get_array('data', 'post');
+
+			// check các remind
+			$data['species'] = checkRemind($data['species'], 'species2');
+			$data['color'] = checkRemind($data['color'], 'color');
+			$data['type'] = checkRemind($data['type'], 'type');
+			$data['birthtime'] = totime($data['birthtime']);
+
+			// cập nhật bảng
+			$sql = 'update `'. PREFIX .'_sendinfo` set name = "'. $data['name'] .'", sex = "'. $data['sex'] .'", birthtime = "'. $data['birthtime'] .'", species = "'. $data['species'] .'", color = "'. $data['color'] .'", type = "'. $data['type'] .'", breeder = "'. $data['breeder'] .'", owner = "'. $data['owner'] .'" where id = ' . $id;
+			if ($db->query($sql)) {
+				// thông báo
+				$result['status'] = 1;
+				$result['html'] = sendinfoList();
 			}
 		break;
 		case 'get-remind':
@@ -52,13 +78,29 @@ if (!empty($action)) {
 			$xtpl->parse('main');
       $result['status'] = 1;
 			$result['html'] = $xtpl->text();
-    break;
+		break;
+		case 'get-info':
+			$id = $nv_Request->get_int('id', 'post');
+
+			$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
+			$query = $db->query($sql);
+			$info = $query->fetch();
+			$info['birthtime'] = date('d/m/Y', $info['birthtime']);
+			$info['species'] = getRemindId($info['species'])['name'];
+			$info['color'] = getRemindId($info['color'])['name'];
+			$info['type'] = getRemindId($info['type'])['name'];
+			$info['image'] = explode(',', $info['image']);
+			$result['status'] = 1;
+			$result['data'] = $info;
+		break;
 	}
 	echo json_encode($result);
 	die();
 }
 
 $xtpl = new XTemplate("main.tpl", PATH2);
+$xtpl->assign('modal', sendinfoModal());
+$xtpl->assign('content', sendinfoList());
 
 $xtpl->parse("main");
 $contents = $xtpl->text("main");

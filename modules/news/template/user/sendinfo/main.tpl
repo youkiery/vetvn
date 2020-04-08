@@ -1,15 +1,6 @@
 <!-- BEGIN: main -->
 <link rel="stylesheet" href="/modules/news/src/jquery-ui.min.css">
 <style>
-  .start-content {
-    max-width: 450px;
-    margin: auto;
-    padding-top: 50px;
-    border: 1px solid lightgray;
-    padding: 15px;
-    border-radius: 20px;
-  }
-
   .text-red {
     font-weight: bold;
     font-size: 1.2em;
@@ -30,98 +21,30 @@
   }
 </style>
 
+{modal}
+
 <div class="container">
   <div id="msgshow"></div>
-  <div style="text-align: right;">
-    {FILE "../../heading.tpl"}
+  <a href="/">
+    <img src="/themes/default/images/banner.png" style="width: 200px;">
+  </a>
+
+  <div style="float: right;">
+    <a href="/{module_file}/logout"> Đăng xuất </a>
   </div>
 
-  <div style="display: none;" id="notify">
-    <p class="text-center" style="font-size: 1.2em;">
-      Đã gửi thông tin thành công <br>
-      <a href="/"> Trở về trang chủ </a>, 
-      <a href="/news/sendinfo/"> Gửi thông tin mới </a>
-    </p>
+  <div style="clear: both;"></div>
+
+  <div class="form-group" style="float: right;">
+    <button class="btn btn-success" onclick="sendinfoModal()">
+      Thêm yêu cầu
+    </button>
   </div>
 
-  <div class="start-content" id="content">
-    <div class="text-center">
-      <a href="/">
-        <img src="/themes/default/images/banner.png" style="width: 200px;">
-      </a>
-    </div>
+  <div style="clear: both;"></div>
 
-    <div class="xxx rows">
-      <div class="col-3"> Tên thú cưng </div>
-      <div class="col-9"> <input type="text" class="form-control" id="name"> </div>
-    </div>
-    <div class="text-red" id="name-error"></div>
-
-    <div class="xxx rows">
-      <p class="col-3"> Giới tính </p>
-      <div class="col-9">
-        <label> <input type="radio" name="sex" value="0" checked> Đực </label>
-        <label> <input type="radio" name="sex" value="1"> Cái </label>
-      </div>
-    </div>
-    <div class="text-red" id="sex-error"></div>
-
-    <div class="xxx rows">
-      <div class="col-3"> Ngày sinh </div>
-      <div class="col-9"> <input type="text" class="form-control date" id="birthtime"> </div>
-    </div>
-    <div class="text-red" id="birthtime-error"></div>
-
-    <div class="xxx rows">
-      <div class="col-3"> Giống loài </div>
-      <div class="col-9 relative">
-        <input type="text" class="form-control" id="species2">
-        <div class="suggest" id="species2-suggest"></div>
-      </div>
-    </div>
-    <div class="text-red" id="species2-error"></div>
-
-    <div class="xxx rows">
-      <div class="col-3"> Màu lông </div>
-      <div class="col-3 relative">
-        <input type="text" class="form-control" id="color">
-        <div class="suggest" id="color-suggest"></div>
-      </div>
-      <div class="col-3"> Kiểu lông </div>
-      <div class="col-3 relative">
-        <input type="text" class="form-control" id="type">
-        <div class="suggest" id="type-suggest"></div>
-      </div>
-    </div>
-    <div class="text-red" id="color-error"></div>
-    <div class="text-red" id="type-error"></div>
-
-    <div class="xxx rows">
-      <div class="col-3"> Người nhân giống </div>
-      <div class="col-9"> <textarea class="form-control" id="breeder" rows="3"></textarea> </div>
-    </div>
-    <div class="text-red" id="breeder-error"></div>
-
-    <div class="xxx rows">
-      <div class="col-3"> Chủ nuôi </div>
-      <div class="col-9"> <textarea class="form-control" id="owner" rows="3"></textarea> </div>
-    </div>
-    <div class="text-red" id="owner-error"></div>
-
-    <div class="text-center">
-      <span id="image-list"></span>
-      <label class="text-center thumb">
-        <img style="width: 100px; height: 100px;" src="/assets/images/upload.png">
-        <div style="width: 50px; height: 50px; display: none;" id="image"></div>
-      </label>
-    </div>
-    <div style="clear: both;"></div>
-
-    <div class="text-center">
-      <button class="btn btn-success" onclick="sendInfo()">
-        Gửi thông tin
-      </button>
-    </div>
+  <div id="content">
+    {content}
   </div>
 </div>
 
@@ -150,6 +73,9 @@
     contentType: 'image/jpeg',
   };
 
+  var global = {
+    id: 0
+  }
   var notify = {
     'name': 'Nhập tên thú cưng trước khi gửi',
     'birthtime': 'Chọn ngày sinh trước khi gửi',
@@ -194,7 +120,7 @@
     list.forEach((item, index) => {
       html += `
       <div class="thumb">
-        <button type="button" class="close" onclick="removeImage(`+ index + `)">&times;</button>
+        <button type="button" class="close insert" onclick="removeImage(`+ index + `)">&times;</button>
         <img src="`+ item + `">
       </div>`
     })
@@ -210,6 +136,31 @@
 
   function selectRemind(name, id) {
     $("#" + id).val(name)
+  }
+
+  function sendinfoModal() {
+    $(".insert").show()
+    $(".edit").hide()
+    $("#sendinfo-modal").modal('show')
+  }
+
+  function edit(id) {
+    vhttp.checkelse('', {action: 'get-info', id: id} ).then(data => {
+      global['id'] = id
+      $("#name").val(data['data']['name'])
+      $("[name=sex][value="+ data['data']['sex'] +"]").prop('checked', true)
+      $("#birthtime").val(data['data']['birthtime'])
+      $("#species2").val(data['data']['species'])
+      $("#color").val(data['data']['color'])
+      $("#type").val(data['data']['type'])
+      $("#breeder").val(data['data']['breeder'])
+      $("#owner").val(data['data']['owner'])
+      vimage.data['image'] = data['data']['image']
+      refreshImage(vimage.data['image'])
+      $(".insert").hide()
+      $(".edit").show()
+      $("#sendinfo-modal").modal('show')
+    })
   }
 
   function checkData() {
@@ -238,9 +189,20 @@
     else {
       upload('image').then(list => {
         vhttp.checkelse('', { action: 'send-info', data: sdata, image: list }).then(data => {
-          $("#notify").show()
-          $("#content").hide()
+          $("#content").html(data['html'])
+          $("#sendinfo-modal").modal('hide')
         })
+      })
+    }
+  }
+
+  function editInfo() {
+    sdata = checkData()
+    if (!sdata['name']) textError(sdata)
+    else {
+      vhttp.checkelse('', { action: 'edit-info', data: sdata, id: global['id'] }).then(data => {
+        $("#content").html(data['html'])
+        $("#sendinfo-modal").modal('hide')
       })
     }
   }

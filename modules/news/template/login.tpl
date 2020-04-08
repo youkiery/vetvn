@@ -42,7 +42,7 @@
       </div>
 
       <div class="text-center">
-        <button class="btn btn-info" onclick="login()">
+        <button class="btn btn-info" onclick="login(event)">
           Đăng nhập
         </button>
       </div>

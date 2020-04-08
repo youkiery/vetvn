@@ -17,6 +17,7 @@ define("PATH2", NV_ROOTDIR . '/modules/' . $module_file . '/template/user/' . $o
 
 require NV_ROOTDIR . '/modules/' . $module_file . '/global.functions.php';
 $buy_sex = array('Sao cũng được', 'Đực', 'Cái');
+$sex_data = array(0 => 'Đực', 'Cái');
 $fc = array('sendinfo');
 $fa = array('login', 'signup', 'recover', 'checking-key', 'change-pass', 'send-contact', 'filter', 'send-review');
 $action = $nv_Request->get_string('action', 'post', '');
@@ -449,4 +450,36 @@ function generateRandomString($length = 8) {
         $randomString .= $characters[rand(0, $charactersLength - 1)];
     }
     return $randomString;
+}
+
+function sendinfoModal() {
+  global $userinfo;
+  $xtpl = new XTemplate('modal.tpl', PATH2);
+  // var_dump($userinfo);die();
+
+  $str = $userinfo['fullname'] .', '. $userinfo['address'] . ', ' . $userinfo['a1'] . ', ' . $userinfo['a2'];
+  $xtpl->assign('info', mytrim($str));
+
+  $xtpl->parse('main');
+  return $xtpl->text();
+}
+
+function sendinfoList() {
+  global $db, $userinfo, $sex_data;
+  $xtpl = new XTemplate('list.tpl', PATH2);
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where userid = ' . $userinfo['id'] . ' order by id desc';
+  $query = $db->query($sql);
+  while ($row = $query->fetch()) {
+    $species = getRemindId($row['species']);
+    $xtpl->assign('id', $row['id']);
+    $xtpl->assign('name', $row['name']);
+    $xtpl->assign('species', $species['name']);
+    $xtpl->assign('sex', $sex_data[$row['sex']]);
+    $xtpl->assign('birthtime', date('d/m/Y', $row['birthtime']));
+    if (!$row['active']) $xtpl->parse('main.row.edit');
+    $xtpl->parse('main.row');
+  }
+
+  $xtpl->parse('main');
+  return $xtpl->text();
 }

@@ -216,6 +216,13 @@ function getRemindIdv2($name, $type) {
 	return 0;
 }
 
+function getRemindId($id) {
+  global $db;
+  $sql = 'select * from `'. PREFIX .'_remind` where id = ' . $id;
+  $query = $db->query($sql);
+  return $query->fetch();
+}
+
 function getRemind($type = '') {
 	global $db;
 	$list = array();
@@ -538,6 +545,13 @@ function totime($time) {
     $time = time();
   }
   return $time;
+}
+
+function mytrim($str) {
+  $limit = strlen($str);
+  if ($str[$limit - 1] == " ") $str = substr($str, $limit - 1, 1); 
+  if ($str[0] == " ") $str = substr($str, 0, 1); 
+  return $str;
 }
 
 function deuft8($str) {
