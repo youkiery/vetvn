@@ -14,6 +14,9 @@
     <td> {sex} </td>
     <td> {birthtime} </td>
     <td> 
+      <!-- BEGIN: confirm -->
+      {status}
+      <!-- END: confirm -->
       <!-- BEGIN: edit -->
       <button class="btn btn-info btn-sm" onclick="edit({id})">
         sửa

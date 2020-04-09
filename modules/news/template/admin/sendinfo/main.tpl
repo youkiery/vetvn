@@ -21,6 +21,7 @@
     max-height: 100px;
     width: auto;
   }
+
   .btn {
     min-height: unset;
   }
@@ -126,20 +127,36 @@
   function sendinfoModal() {
     $(".insert").show()
     $(".edit").hide()
+    global['pet'] = {
+      0: 0,
+      1: 0
+    }
+    $("#father").val('')
+    $("#mother").val('')
+    $("#name").val('')
+    $("[name=sex][value=0]").prop('checked', true)
+    $("#birthtime").val('')
+    $("#species2").val('')
+    $("#color").val('')
+    $("#type").val('')
+    $("#breeder").val('')
+    $("#owner").val('')
+    vimage.data['image'] = []
+    refreshImage(vimage.data['image'])
     $("#sendinfo-modal").modal('show')
   }
 
   function edit(id) {
-    vhttp.checkelse('', {action: 'get-info', id: id} ).then(data => {
+    vhttp.checkelse('', { action: 'get-info', id: id }).then(data => {
       global['id'] = id
       global['pet'] = {
-        0: data['father'],
-        1: data['mother']
+        0: data['data']['father'],
+        1: data['data']['mother']
       }
       $("#father").val(data['data']['fathername'])
       $("#mother").val(data['data']['mothername'])
       $("#name").val(data['data']['name'])
-      $("[name=sex][value="+ data['data']['sex'] +"]").prop('checked', true)
+      $("[name=sex][value=" + data['data']['sex'] + "]").prop('checked', true)
       $("#birthtime").val(data['data']['birthtime'])
       $("#species2").val(data['data']['species'])
       $("#color").val(data['data']['color'])

@@ -409,7 +409,7 @@ function userRowList($filter = array('username' => '', 'fullname' => '', 'mobile
   $xtpl = new XTemplate('user-list.tpl', PATH);
   $xtpl->assign('module_file', $module_file);
 
-  $sql = 'select id, username, fullname, address, mobile from `'. PREFIX .'_user` where fullname like "%'. $filter['fullname'] .'%" and username like "%'. $filter['username'] .'%" ' . ($filter['status'] > 0 ? ' and active = ' . ($filter['status'] - 1) : '');
+  $sql = 'select id, username, fullname, address, mobile, active from `'. PREFIX .'_user` where fullname like "%'. $filter['fullname'] .'%" and username like "%'. $filter['username'] .'%" ' . ($filter['status'] > 0 ? ' and active = ' . ($filter['status'] - 1) : '');
   $query = $db->query($sql);
   // $count = $query->fetch()['count'];
   // $xtpl->assign('nav', navList($count, $filter['page'], $filter['limit']));
@@ -424,7 +424,7 @@ function userRowList($filter = array('username' => '', 'fullname' => '', 'mobile
   while ($row = $query->fetch()) {
     $row['address'] = xdecrypt($row['address']);
     $row['mobile'] = xdecrypt($row['mobile']);
-    if ((empty($filter['mobile'] || (mb_strpos($row['mobile'], $filter['mobile']) !== false))) && (empty($filter['address'] || (mb_strpos($row['address'], $filter['address']) !== false)))) {
+    if ((empty($filter['mobile']) || (mb_strpos($row['mobile'], $filter['mobile']) !== false)) && (empty($filter['address']) || (mb_strpos($row['address'], $filter['address']) !== false))) {
       $count ++;
 
       if ($count > $from && $count < $end) {

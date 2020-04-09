@@ -116,12 +116,14 @@ if (!empty($action)) {
 			$species = checkRemind($species, 'species');
 			$breed = checkRemind($breed, 'breed');
 
-			$sql = 'update `'. PREFIX .'_sendinfo` set active = 1 where id = ' . $id;
-			$sql2 = 'insert into `'. PREFIX .'_pet` (name, dateofbirth, species, breed, sex, color, microchip, miear, image, active, userid, breeder, origin, fid, mid, type, graph, sell, breeding, time, ceti, price, ctime, youtube) values("'. $info['name'] .'", '. $info['birthtime'] .', '. $species .', '. $breed .', '. $info['sex'] .', "'. $color .'", "'. $micro .'", "", "'. $info['image'] .'", 1, '. $info['userid'] .', 0, "", "", "", 1, "", 0, 0, '. time() .', 0, 0, 0, "")';
-			if ($db->query($sql) && $db->query($sql2)) {
+			$sql = 'insert into `'. PREFIX .'_pet` (name, dateofbirth, species, breed, sex, color, microchip, miear, image, active, userid, breeder, origin, fid, mid, type, graph, sell, breeding, time, ceti, price, ctime, youtube) values("'. $info['name'] .'", '. $info['birthtime'] .', '. $species .', '. $breed .', '. $info['sex'] .', "'. $color .'", "'. $micro .'", "", "'. $info['image'] .'", 1, '. $info['userid'] .', 0, "", "", "", 1, "", 0, 0, '. time() .', 0, 0, 0, "")';
+			if ($db->query($sql)) {
 				// thông báo
-				$result['status'] = 1;
-				$result['html'] = sendinfoContent();
+				$sql = 'update `'. PREFIX .'_sendinfo` set active = 1, activetime = '. time() .', petid = '. $db->lastInsertId() .' where id = ' . $id;
+				if ($db->query($sql)) {
+					$result['status'] = 1;
+					$result['html'] = sendinfoContent();
+				}
 			}
 		break;
 	}

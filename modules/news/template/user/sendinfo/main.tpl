@@ -35,17 +35,34 @@
 
   <div style="clear: both;"></div>
 
-  <div class="form-group" style="float: right;">
+  <div class="form-group">
+    <a href="/news/login">
+      Trở về
+    </a>
+  </div>
+  <div class="form-group rows">
+    <div class="col-6">
+      <form class="input-group">
+        <input type="text" class="form-control" name="keyword" value="{keyword}" placeholder="Nhập tên thú cưng...">
+        <div class="input-group-btn">
+          <button class="btn btn-info">
+            Tìm kiếm
+          </button>
+      </form>
+    </div>
+  </div>
+  <div class="col-6" style="text-align: right;">
     <button class="btn btn-success" onclick="sendinfoModal()">
       Thêm yêu cầu
     </button>
   </div>
+</div>
 
-  <div style="clear: both;"></div>
+<div style="clear: both;"></div>
 
-  <div id="content">
-    {content}
-  </div>
+<div id="content">
+  {content}
+</div>
 </div>
 
 <script src="/modules/core/vhttp.js"></script>
@@ -74,7 +91,15 @@
   };
 
   var global = {
-    id: 0
+    id: 0,
+    pet: {
+      0: 0,
+      1: 0
+    },
+    petobj: {
+      0: 'father',
+      1: 'mother'
+    }
   }
   var notify = {
     'name': 'Nhập tên thú cưng trước khi gửi',
@@ -110,6 +135,20 @@
         })
       })
     }, 500, 300)
+    vremind.install('#father', '#father-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-pet', type: 0, keyword: input, id: global['id'] }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
+    vremind.install('#mother', '#mother-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-pet', type: 1, keyword: input, id: global['id'] }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
     vimage.install('image', 640, 640, (list) => {
       refreshImage(list)
     })
@@ -138,17 +177,46 @@
     $("#" + id).val(name)
   }
 
+  function selectPet(name, type, id) {
+    $("#" + global['petobj'][type]).val(name)
+    global['pet'][type] = id
+  }
+
   function sendinfoModal() {
     $(".insert").show()
     $(".edit").hide()
+    global['pet'] = {
+      0: 0,
+      1: 0
+    }
+    $("#father").val('')
+    $("#mother").val('')
+    $("#name").val('')
+    $("[name=sex][value=0]").prop('checked', true)
+    $("#birthtime").val('')
+    $("#species2").val('')
+    $("#color").val('')
+    $("#type").val('')
+    $("#breeder").val('')
+    $("#owner").val('')
+    vimage.data['image'] = []
+    refreshImage(vimage.data['image'])
     $("#sendinfo-modal").modal('show')
   }
 
   function edit(id) {
-    vhttp.checkelse('', {action: 'get-info', id: id} ).then(data => {
+    vhttp.checkelse('', { action: 'get-info', id: id }).then(data => {
       global['id'] = id
+      global['pet'] = {
+        0: data['data']['father'],
+        1: data['data']['mother']
+      }
+      console.log(global['pet']);
+
+      $("#father").val(data['data']['fathername'])
+      $("#mother").val(data['data']['mothername'])
       $("#name").val(data['data']['name'])
-      $("[name=sex][value="+ data['data']['sex'] +"]").prop('checked', true)
+      $("[name=sex][value=" + data['data']['sex'] + "]").prop('checked', true)
       $("#birthtime").val(data['data']['birthtime'])
       $("#species2").val(data['data']['species'])
       $("#color").val(data['data']['color'])
@@ -172,7 +240,9 @@
       color: $("#color").val(),
       type: $("#type").val(),
       breeder: $("#breeder").val(),
-      owner: $("#owner").val()
+      owner: $("#owner").val(),
+      father: global['pet'][0],
+      mother: global['pet'][1]
     }
 
     for (const key in notify) {
@@ -224,10 +294,10 @@
       checker = 0
       image_data = []
       source.forEach(item => {
-        index ++
+        index++
         name = index + '-' + Math.floor((new Date()).getTime() / 1000)
         file = item.substr(item.indexOf(',') + 1);
-        
+
         var uploadTask = storageRef.child('images/' + name).putString(file, 'base64', metadata);
         uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
           function (snapshot) {
@@ -243,14 +313,14 @@
             }
           }, function (error) {
             console.log(error);
-            checker ++
+            checker++
             if (checker == limit) {
               resolve(image_data)
             }
           }, function () {
             uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
               image_data.push(downloadURL)
-              checker ++
+              checker++
               if (checker == limit) {
                 resolve(image_data)
               }

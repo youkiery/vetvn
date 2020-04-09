@@ -465,9 +465,9 @@ function sendinfoModal() {
 }
 
 function sendinfoList() {
-  global $db, $userinfo, $sex_data;
+  global $db, $userinfo, $sex_data, $filter;
   $xtpl = new XTemplate('list.tpl', PATH2);
-  $sql = 'select * from `'. PREFIX .'_sendinfo` where userid = ' . $userinfo['id'] . ' order by id desc';
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where name like "%'. $filter['keyword'] .'%" and userid = ' . $userinfo['id'] . ' order by id desc';
   $query = $db->query($sql);
   while ($row = $query->fetch()) {
     $species = getRemindId($row['species']);
@@ -477,6 +477,10 @@ function sendinfoList() {
     $xtpl->assign('sex', $sex_data[$row['sex']]);
     $xtpl->assign('birthtime', date('d/m/Y', $row['birthtime']));
     if (!$row['active']) $xtpl->parse('main.row.edit');
+    else {
+      $xtpl->assign('status', 'Đã cấp giấy');
+      $xtpl->parse('main.row.confirm');
+    }
     $xtpl->parse('main.row');
   }
 

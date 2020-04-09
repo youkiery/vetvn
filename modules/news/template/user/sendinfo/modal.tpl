@@ -64,6 +64,37 @@
         </div>
         <div class="text-red" id="owner-error"></div>
 
+        <div class="rows">
+          <div class="col-3">
+            Bố
+          </div>
+          <div class="col-3 relative">
+            <!-- <div class="input-group"> -->
+              <input type="text" class="form-control" id="father">
+              <!-- <div class="input-group-btn">
+                <button class="btn btn-success">
+                  <span class="glyphicon glyphicon-plus"></span>
+                </button>
+              </div> -->
+            <!-- </div> -->
+            <div class="suggest" id="father-suggest"> </div>
+          </div>
+          <div class="col-3">
+            Mẹ
+          </div>
+          <div class="col-3 relative">
+            <!-- <div class="input-group"> -->
+              <input type="text" class="form-control" id="mother">
+              <!-- <div class="input-group-btn">
+                <button class="btn btn-success">
+                  <span class="glyphicon glyphicon-plus"></span>
+                </button>
+              </div> -->
+            <!-- </div> -->
+            <div class="suggest" id="mother-suggest"> </div>
+          </div>
+        </div>
+
         <div class="text-center">
           <span id="image-list"></span>
           <label class="insert text-center thumb">
