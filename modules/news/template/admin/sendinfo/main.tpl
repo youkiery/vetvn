@@ -1,6 +1,7 @@
 <!-- BEGIN: main -->
 <link rel="stylesheet" href="/modules/news/src/jquery-ui.min.css">
 <link rel="stylesheet" href="/modules/news/src/style.css">
+<link rel="stylesheet" href="/modules/news/src/glyphicons.css">
 <style>
   .text-red {
     font-weight: bold;
@@ -41,7 +42,15 @@
 <script src="/modules/news/src/jquery.ui.datepicker-vi.js"></script>
 <script>
   var global = {
-    id: 0
+    id: 0,
+    pet: {
+      0: 0,
+      1: 0
+    },
+    petobj: {
+      0: 'father',
+      1: 'mother'
+    }
   }
   var notify = {
     'name': 'Nhập tên thú cưng trước khi gửi',
@@ -77,6 +86,20 @@
         })
       })
     }, 500, 300)
+    vremind.install('#father', '#father-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-pet', type: 0, keyword: input, id: global['id'] }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
+    vremind.install('#mother', '#mother-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-pet', type: 1, keyword: input, id: global['id'] }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
   })
 
   function refreshImage(list) {
@@ -95,6 +118,11 @@
     $("#" + id).val(name)
   }
 
+  function selectPet(name, type, id) {
+    $("#" + global['petobj'][type]).val(name)
+    global['pet'][type] = id
+  }
+
   function sendinfoModal() {
     $(".insert").show()
     $(".edit").hide()
@@ -104,6 +132,12 @@
   function edit(id) {
     vhttp.checkelse('', {action: 'get-info', id: id} ).then(data => {
       global['id'] = id
+      global['pet'] = {
+        0: data['father'],
+        1: data['mother']
+      }
+      $("#father").val(data['data']['fathername'])
+      $("#mother").val(data['data']['mothername'])
       $("#name").val(data['data']['name'])
       $("[name=sex][value="+ data['data']['sex'] +"]").prop('checked', true)
       $("#birthtime").val(data['data']['birthtime'])
@@ -129,7 +163,9 @@
       color: $("#color").val(),
       type: $("#type").val(),
       breeder: $("#breeder").val(),
-      owner: $("#owner").val()
+      owner: $("#owner").val(),
+      father: global['pet'][0],
+      mother: global['pet'][1]
     }
 
     for (const key in notify) {

@@ -29,12 +29,38 @@ if (!empty($action)) {
 			$data['birthtime'] = totime($data['birthtime']);
 
 			// cập nhật bảng
-			$sql = 'update `'. PREFIX .'_sendinfo` set name = "'. $data['name'] .'", sex = "'. $data['sex'] .'", birthtime = "'. $data['birthtime'] .'", species = "'. $data['species'] .'", color = "'. $data['color'] .'", type = "'. $data['type'] .'", breeder = "'. $data['breeder'] .'", owner = "'. $data['owner'] .'" where id = ' . $id;
+			$sql = 'update `'. PREFIX .'_sendinfo` set name = "'. $data['name'] .'", sex = "'. $data['sex'] .'", birthtime = "'. $data['birthtime'] .'", species = "'. $data['species'] .'", color = "'. $data['color'] .'", type = "'. $data['type'] .'", breeder = "'. $data['breeder'] .'", owner = "'. $data['owner'] .'", father = '. $data['father'] .', mother = '. $data['mother'] .' where id = ' . $id;
 			if ($db->query($sql)) {
 				// thông báo
 				$result['status'] = 1;
 				$result['html'] = sendinfoContent();
 			}
+		break;
+		case 'get-pet':
+			$id = $nv_Request->get_int('id', 'post', '');
+			$type = $nv_Request->get_string('type', 'post', '');
+			$keyword = $nv_Request->get_string('keyword', 'post', '');
+
+			$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
+			$query = $db->query($sql);
+			$info = $query->fetch();
+
+			$sql = 'select * from `'. PREFIX .'_pet` where name like "%'. $keyword .'%" and userid = '. $info['userid'] .' and sex = '. $type .' order by name limit 20';
+			$query = $db->query($sql);
+			$xtpl = new XTemplate('pet.tpl', PATH2);
+			$xtpl->assign('type', $type);
+			
+			$check = true;
+			while ($pet = $query->fetch()) {
+				$check = false;
+				$xtpl->assign('id', $pet['id']);
+				$xtpl->assign('name', $pet['name']);
+				$xtpl->parse('main.row');
+			}
+			if ($check) $xtpl->parse('main.no');
+			$xtpl->parse('main');
+      $result['status'] = 1;
+			$result['html'] = $xtpl->text();
 		break;
 		case 'get-remind':
 			$keyword = $nv_Request->get_string('keyword', 'post', '');
@@ -62,6 +88,12 @@ if (!empty($action)) {
 			$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
 			$query = $db->query($sql);
 			$info = $query->fetch();
+
+			$father = getPetById($info['father'])['name'];
+			$mother = getPetById($info['mother'])['name'];
+
+			$info['fathername'] = $father;
+			$info['mothername'] = $mother;
 			$info['birthtime'] = date('d/m/Y', $info['birthtime']);
 			$info['species'] = getRemindId($info['species'])['name'];
 			$info['color'] = getRemindId($info['color'])['name'];
