@@ -13,11 +13,13 @@ if (! defined('NV_ADMIN') or ! defined('NV_MAINFILE') or ! defined('NV_IS_MODADM
 
 define('NV_IS_ADMIN_FORM', true);
 define("PATH", NV_ROOTDIR . "/modules/" . $module_file . '/template/admin/');
+define("PATH2", NV_ROOTDIR . "/modules/" . $module_file . '/template/admin/' . $op);
 
 require NV_ROOTDIR . '/modules/' . $module_file . '/global.functions.php';
 require NV_ROOTDIR . '/modules/' . $module_file . '/theme.php';
 $select_array = array('breed' => 'Loài', 'disease' => 'Bệnh', 'origin' => 'Nguồn gốc', 'request' => 'Yêu cầu', 'species' => 'Giống', 'species2' => 'Giống loài', 'color' => 'Màu lông', 'type' => 'Kiểu lông');
 $trade_array = array('1' => 'Cần bán', '2' => 'Cần phối');
+$sex_data = array(0 => 'Đực', 'Cái');
 
 function tradeList($filter = array('owner' => '', 'mobile' => '', 'address' => '', 'name' => '', 'species' => '', 'breed' => '', 'status' => 0 , 'type' => 0, 'page' => 1, 'limit' => 10)) {
   global $db, $module_file, $sex_array, $trade_array;
@@ -517,7 +519,7 @@ function userDogRow($filter = array('owner' => '', 'mobile' => '', 'name' => '',
   while ($row = $query->fetch()) {
     $owner = getUserInfo($row['userid']);
     $owner['mobile'] = xdecrypt($owner['mobile']);
-    if (empty($filter['mobile'] || (mb_strpos($owner['mobile'], $filter['mobile']) !== false))) {
+    if (empty($filter['mobile']) || (mb_strpos($owner['mobile'], $filter['mobile']) !== false)) {
       $count ++;
 
       if ($count > $from && $count < $end) {
@@ -629,4 +631,36 @@ function checkLogin($username, $password = '') {
     return $checker;
   }
   return false;
+}
+
+function sendinfoModal() {
+  global $userinfo;
+  $xtpl = new XTemplate('modal.tpl', PATH2);
+  $xtpl->parse('main');
+  return $xtpl->text();
+}
+
+function sendinfoContent() {
+  global $db, $userinfo, $sex_data;
+  $xtpl = new XTemplate('list.tpl', PATH2);
+  $sql = 'select * from `'. PREFIX .'_sendinfo` order by id desc';
+  $query = $db->query($sql);
+  while ($row = $query->fetch()) {
+    $user = checkUserinfo($row['userid'], 1);
+    $species = getRemindId($row['species']);
+    $xtpl->assign('id', $row['id']);
+    $xtpl->assign('user', $user['fullname']);
+    $xtpl->assign('mobile', xdecrypt($user['mobile']));
+    $xtpl->assign('name', $row['name']);
+    $xtpl->assign('species', $species['name']);
+    $xtpl->assign('sex', $sex_data[$row['sex']]);
+    $xtpl->assign('birthtime', date('d/m/Y', $row['birthtime']));
+    if (!$row['active']) {
+      $xtpl->parse('main.row.done');
+    }
+    $xtpl->parse('main.row');
+  }
+
+  $xtpl->parse('main');
+  return $xtpl->text();
 }

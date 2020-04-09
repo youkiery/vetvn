@@ -13,6 +13,7 @@ if (!defined('NV_ADMIN')) {
 
 $submenu['user'] = "Quản lý người dùng";
 $submenu['pet'] = "Quản lý thú cưng";
+$submenu['sendinfo'] = "Quản lý yêu cầu";
 $submenu['request'] = "Yêu cầu tiêm phòng";
 $submenu['remind'] = "Danh sách gợi nhớ";
 $submenu['disease'] = "Gợi nhớ loại tiêm phòng";
@@ -26,4 +27,4 @@ $submenu['ceti-print'] = "In giấy chứng nhận";
 $submenu['config'] = "Cấu hình";
 // $submenu['center'] = "Quản lý yêu cầu trang trại";
 
-$allow_func = array('main', 'user', 'pet', 'request', 'remind', 'disease', 'intro', 'trade', 'buy', 'config', 'revenue', 'manager', 'review', 'ceti-print', 'ceti-detail'); 
+$allow_func = array('main', 'user', 'pet', 'request', 'remind', 'disease', 'intro', 'trade', 'buy', 'config', 'revenue', 'manager', 'review', 'ceti-print', 'ceti-detail', 'sendinfo'); 

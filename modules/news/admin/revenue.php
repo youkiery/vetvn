@@ -79,7 +79,7 @@ if (!empty($action)) {
 
       if ($db->query($sql)) {
         if ($filter['type'] == 1) {
-          $result['html'] = revenue($filter);
+          $result['html'] = revenue2($filter);
         } 
         else {
           $result['html'] = paylist($filter);
