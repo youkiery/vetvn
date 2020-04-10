@@ -72,7 +72,7 @@ if (!empty($action)) {
 			$query = $db->query($sql);
 			$info = $query->fetch();
 
-			$sql = 'select * from `'. PREFIX .'_pet` where name like "%'. $keyword .'%" and userid = '. $info['userid'] .' and sex = '. $type .' order by name limit 20';
+			$sql = 'select * from `'. PREFIX .'_pet` where name like "%'. $keyword .'%" and userid = '. $userinfo['id'] .' and sex = '. $type .' order by name limit 20';
 			$query = $db->query($sql);
 			$xtpl = new XTemplate('pet.tpl', PATH2);
 			$xtpl->assign('type', $type);

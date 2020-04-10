@@ -221,6 +221,7 @@
   function doneSubmit() {
     vhttp.checkelse('', { action: 'done', id: global['id'], micro: $("#done-micro").val() }).then(data => {
       $("#content").html(data['html'])
+      $("#done-modal").modal('hide')
     })
   }
 </script>

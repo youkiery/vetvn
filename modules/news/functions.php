@@ -478,6 +478,7 @@ function sendinfoList() {
     $xtpl->assign('birthtime', date('d/m/Y', $row['birthtime']));
     if (!$row['active']) $xtpl->parse('main.row.edit');
     else {
+      $xtpl->assign('activetime', date('d/m/Y', $row['activetime']));
       $xtpl->assign('status', 'Đã cấp giấy');
       $xtpl->parse('main.row.confirm');
     }

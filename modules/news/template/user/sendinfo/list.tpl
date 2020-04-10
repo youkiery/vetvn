@@ -15,7 +15,7 @@
     <td> {birthtime} </td>
     <td> 
       <!-- BEGIN: confirm -->
-      {status}
+      {status}: {activetime}
       <!-- END: confirm -->
       <!-- BEGIN: edit -->
       <button class="btn btn-info btn-sm" onclick="edit({id})">

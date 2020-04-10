@@ -664,3 +664,94 @@ function sendinfoContent() {
   $xtpl->parse('main');
   return $xtpl->text();
 }
+
+function petContent($filter = array('owner' => '', 'mobile' => '', 'name' => '', 'species' => '', 'breed' => '', 'micro' => '', 'miear' => '', 'status' => 0, 'page' => 1, 'limit' => 10)) {
+  global $db, $user_info, $module_file, $sex_array;
+  $index = ($filter['page'] - 1) * $filter['limit'] + 1;
+  $xtpl = new XTemplate('list.tpl', PATH2);
+  $xtpl->assign('module_file', $module_file);
+
+  $x = $_SERVER['HTTP_REFERER'];
+  $y = substr($x, 0, strpos($x, '/', 8));
+
+  $xtpl->assign('url', $y);
+
+  $sql = 'select * from `'. PREFIX .'_pet` where name like "%'. $filter['name'] .'%" and species like "%'. $filter['species'] .'%" and breed like "%'. $filter['breed'] .'%" and microchip like "%'. $filter['micro'] .'%" and miear like "%'. $filter['miear'] .'%" ' . ($filter['status'] > 0 ? ' and active = ' . ($filter['status'] - 1) : '') . ' order by id desc';
+  $query = $db->query($sql);
+  // $count = $query->fetch()['count'];
+
+  $from = ($filter['page'] - 1) * $filter['limit'];
+  $end = $from + $filter['limit'] + 1;
+  $count = 0;
+
+  while ($row = $query->fetch()) {
+    $owner = getUserInfo($row['userid']);
+    $owner['mobile'] = xdecrypt($owner['mobile']);
+    if (empty($filter['mobile']) || (mb_strpos($owner['mobile'], $filter['mobile']) !== false)) {
+      $count ++;
+
+      if ($count > $from && $count < $end) {
+        $xtpl->assign('index', $count);
+        $xtpl->assign('id', $row['id']);
+        $xtpl->assign('price', $row['price']);
+        $xtpl->assign('name', $row['name']);
+        $xtpl->assign('owner', $owner['fullname']);
+        $xtpl->assign('mobile', $owner['mobile']);
+        $xtpl->assign('userid', $row['userid']);
+        $xtpl->assign('id', $row['id']);
+        $xtpl->assign('microchip', $row['microchip']);
+        $xtpl->assign('breed', $row['breed']);
+        $xtpl->assign('sex', $sex_array[$row['sex']]);
+        $xtpl->assign('dob', cdate($row['dateofbirth']));
+        $sql = 'select * from `'. PREFIX .'_lock` where petid = ' . $row['id'];
+        $query2 = $db->query($sql);
+        if (!empty($query2->fetch())) {
+          $xtpl->parse('main.row.unlock');
+        }
+        else {
+          $xtpl->parse('main.row.lock');
+        }
+        if ($row['active']) {
+          $xtpl->assign('ceti_btn', 'btn-info');
+          if ($row['ceti'] == 1) {
+            $xtpl->assign('ceti_btn', 'btn-warning');
+          }
+          $xtpl->parse('main.row.uncheck');
+        }
+        else {
+          $xtpl->parse('main.row.check');
+        }
+        $xtpl->parse('main.row');
+      }
+    }
+  }
+  $xtpl->assign('nav', navList($count, $filter['page'], $filter['limit']));
+
+  $xtpl->parse('main');
+  return $xtpl->text();
+}
+
+function petModal() {
+  global $position;
+  $xtpl = new XTemplate('modal.tpl', PATH2);
+
+  foreach ($position as $l1i => $l1) {
+    $xtpl->assign('l1name', $l1->{'name'});
+    $xtpl->assign('l1id', $l1i);
+    $xtpl->parse('main.l1');
+    foreach ($l1->{'district'} as $l2i => $l2) {
+      $xtpl->assign('l2name', $l2);
+      $xtpl->assign('l2id', $l2i);
+      $xtpl->parse('main.l2.l2c');
+    }
+  
+    $xtpl->assign('active', '');
+    if ($l1i == '1') {
+      $xtpl->assign('active', 'display: none');
+    }
+    $xtpl->parse('main.l2');
+  }
+  
+  $xtpl->parse('main');
+  return $xtpl->text();
+}

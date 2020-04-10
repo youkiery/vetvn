@@ -293,6 +293,7 @@
       index = 0
       checker = 0
       image_data = []
+      if (!source.length) resolve([])
       source.forEach(item => {
         index++
         name = index + '-' + Math.floor((new Date()).getTime() / 1000)
