@@ -466,12 +466,19 @@ function sendinfoList() {
   global $db, $userinfo, $sex_data, $filter;
   $xtpl = new XTemplate('list.tpl', PATH2);
   $filter['status'] --;
-  $sql = 'select * from `'. PREFIX .'_sendinfo` where name like "%'. $filter['keyword'] .'%" and userid = ' . $userinfo['id'] . ' '. ($filter['status'] >= 0 ? ' and active = ' . $filter['status'] : '') .' order by id desc';
+  $sql = 'select count(*) as count from `'. PREFIX .'_sendinfo` where name like "%'. $filter['keyword'] .'%" and userid = ' . $userinfo['id'] . ' '. ($filter['status'] >= 0 ? ' and active = ' . $filter['status'] : '');
+  $query = $db->query($sql);
+  $number = $query->fetch()['count'];
+
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where name like "%'. $filter['keyword'] .'%" and userid = ' . $userinfo['id'] . ' '. ($filter['status'] >= 0 ? ' and active = ' . $filter['status'] : '') .' order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
+
+  $index = ($filter['page'] - 1) * $filter['limit'] + 1;
   $query = $db->query($sql);
   while ($row = $query->fetch()) {
     $species = getRemindId($row['species']);
     $user = checkUserinfo($row['userid'], 1);
     $user['mobile'] = xdecrypt($user['mobile']);
+    $xtpl->assign('index', $index++);
     $xtpl->assign('id', $row['id']);
     $xtpl->assign('fullname', $user['fullname']);
     $xtpl->assign('mobile', $user['mobile']);
@@ -484,6 +491,7 @@ function sendinfoList() {
     $xtpl->parse('main.row');
   }
 
+  $xtpl->assign('nav', nav_generater('/news/sendinfo?', $number, $filter['page'], $filter['limit']));
   $xtpl->parse('main');
   return $xtpl->text();
 }

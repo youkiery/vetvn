@@ -15,6 +15,8 @@ $page_title = "Quản lý yêu cầu";
 
 $action = $nv_Request->get_string('action', 'post', '');
 $filter = array(
+	'page' => $nv_Request->get_int('page', 'get', 1),
+	'limit' => $nv_Request->get_int('limit', 'get', 10),
 	'keyword' => $nv_Request->get_string('keyword', 'get', ''),
 	'status' => $nv_Request->get_int('status', 'get', 0)
 );

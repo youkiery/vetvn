@@ -16,8 +16,8 @@
         <div class="xxx rows">
           <p class="col-3"> Giới tính </p>
           <div class="col-9">
-            <label> <input type="radio" name="sex" value="0" checked> Đực </label>
-            <label> <input type="radio" name="sex" value="1"> Cái </label>
+            <label style="width: 45%; display: inline-block;"> <input type="radio" name="sex" value="0" checked> Đực </label>
+            <label style="width: 45%; display: inline-block;"> <input type="radio" name="sex" value="1"> Cái </label>
           </div>
         </div>
         <div class="text-red" id="sex-error"></div>

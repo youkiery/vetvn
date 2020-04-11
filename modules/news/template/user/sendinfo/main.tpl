@@ -19,6 +19,8 @@
     max-height: 100px;
     width: auto;
   }
+
+  .btn { min-height: unset; }
 </style>
 
 {modal}
@@ -41,36 +43,33 @@
     </a>
   </div>
   <div class="form-group rows">
-    <div class="col-8">
-      <form>
-        <input type="hidden" name="nv" value="news">
-        <input type="hidden" name="op" value="sendinfo">
-        <div class="input-group">
-          <input type="text" class="form-control" name="keyword" value="{keyword}" placeholder="Nhập tên thú cưng...">
-          <div class="input-group-btn">
-            <button class="btn btn-info">
-              Tìm kiếm
-            </button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>
-            <input name="status" type="radio" value="0" {status0}> Tất cả
-          </label>
-          <label>
-            <input name="status" type="radio" value="1" {status1}> Đợi cấp
-          </label>
-          <label>
-            <input name="status" type="radio" value="2" {status2}> Đã cấp
-          </label>
-        </div>
-      </form>
-    </div>
-    <div class="col-4" style="text-align: right;">
-      <button class="btn btn-success" onclick="sendinfoModal()">
-        Thêm yêu cầu
-      </button>
-    </div>
+    <form>
+      <input type="hidden" name="nv" value="news">
+      <input type="hidden" name="op" value="sendinfo">
+      <div class="col-4">
+        <input type="text" class="form-control" name="keyword" value="{keyword}" placeholder="Nhập tên thú cưng...">
+      </div>
+      <div class="col-4">
+        <select name="status" class="form-control">
+          <option value="0" {status0}> Tất cả </option>
+          <option value="1" {status1}> Đợi cấp </option>
+          <option value="2" {status2}> Đã cấp </option>
+        </select>
+      </div>
+      <div class="col-4">
+        <button class="btn btn-info">
+          Tìm kiếm
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div style="clear: both;"></div>
+
+  <div class="form-group" style="text-align: right;">
+    <button class="btn btn-success" onclick="sendinfoModal()">
+      Thêm yêu cầu
+    </button>
   </div>
 
   <div style="clear: both;"></div>
@@ -83,7 +82,7 @@
 <script src="/modules/core/vhttp.js"></script>
 <script src="/modules/core/vimage.js"></script>
 <script src="/modules/core/vremind-5.js"></script>
-<script src="/modules/news/src/jquery.ui.datepicker-vi.js"></script>
+<script src="/modules/core/src/jquery.ui.datepicker-vi.js"></script>
 <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-storage.js"></script>
 <script>

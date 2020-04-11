@@ -644,7 +644,8 @@ function sendinfoContent() {
   global $db, $userinfo, $sex_data, $filter;
   $xtpl = new XTemplate('list.tpl', PATH2);
   $filter['status'] --;
-  $sql = 'select * from `'. PREFIX .'_sendinfo` '. ($filter['status'] >= 0 ? ' where active = ' . $filter['status'] : '') .' order by id desc';
+
+  $sql = 'select * from `'. PREFIX .'_sendinfo` '. ($filter['status'] >= 0 ? ' where active = ' . $filter['status'] : '') .' order by id';
   $query = $db->query($sql);
   $list = array();
   while ($row = $query->fetch()) {
@@ -659,21 +660,27 @@ function sendinfoContent() {
     }
   }
 
-  foreach ($list as $row) {
-    $species = getRemindId($row['species']);
-    $xtpl->assign('id', $row['id']);
-    $xtpl->assign('user', $row['user']['fullname']);
-    $xtpl->assign('mobile', $row['user']['mobile']);
-    $xtpl->assign('name', $row['name']);
-    $xtpl->assign('species', $species['name']);
-    $xtpl->assign('sex', $sex_data[$row['sex']]);
-    $xtpl->assign('birthtime', date('d/m/Y', $row['birthtime']));
-    if (!$row['active']) {
-      $xtpl->parse('main.row.done');
+  $from = ($filter['page'] - 1) * $filter['limit'];
+  $end = $from + $filter['limit'];
+  for ($i = $from; $i < $end; $i++) { 
+    if (!empty($row = $list[$i])) {
+      $species = getRemindId($row['species']);
+      $xtpl->assign('index', $i + 1);
+      $xtpl->assign('id', $row['id']);
+      $xtpl->assign('user', $row['user']['fullname']);
+      $xtpl->assign('mobile', $row['user']['mobile']);
+      $xtpl->assign('name', $row['name']);
+      $xtpl->assign('species', $species['name']);
+      $xtpl->assign('sex', $sex_data[$row['sex']]);
+      $xtpl->assign('birthtime', date('d/m/Y', $row['birthtime']));
+      if (!$row['active']) {
+        $xtpl->parse('main.row.done');
+      }
+      $xtpl->parse('main.row');
     }
-    $xtpl->parse('main.row');
   }
 
+  $xtpl->assign('nav', nav_generater('/admin32/index.php?nv=news&op=sendinfo', count($list), $filter['page'], $filter['limit']));
   $xtpl->parse('main');
   return $xtpl->text();
 }

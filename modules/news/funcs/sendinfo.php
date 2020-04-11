@@ -19,6 +19,8 @@ $userinfo['address'] = xdecrypt($userinfo['address']);
 $userinfo['mobile'] = xdecrypt($userinfo['mobile']);
 
 $filter = array(
+	'page' => $nv_Request->get_int('page', 'get', 1),
+	'limit' => $nv_Request->get_int('limit', 'get', 10),
 	'keyword' => $nv_Request->get_string('keyword', 'get', ''),
 	'status' => $nv_Request->get_int('status', 'get', 0)
 );
@@ -137,7 +139,7 @@ if (!empty($action)) {
 
 $xtpl = new XTemplate("main.tpl", PATH2);
 $xtpl->assign('keyword', $filter['keyword']);
-$xtpl->assign('status' . $filter['status'], 'checked');
+$xtpl->assign('status' . $filter['status'], 'selected');
 $xtpl->assign('modal', sendinfoModal());
 $xtpl->assign('content', sendinfoList());
 

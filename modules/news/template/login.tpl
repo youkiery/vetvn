@@ -18,7 +18,7 @@
 
     <div style="margin-top: 20px;"></div>
 
-    <form onsubmit="login(event)">
+    <form>
       <div class="row">
         <label>
           <div class="col-sm-4">
@@ -42,7 +42,7 @@
       </div>
 
       <div class="text-center">
-        <button class="btn btn-info" onclick="login(event)">
+        <button class="btn btn-info" onclick="login()">
           Đăng nhập
         </button>
       </div>
@@ -85,8 +85,7 @@
     return false
   }
 
-  function login(e) {
-    e.preventDefault()
+  function login() {
     if (loginData = checkLogin()) {
       freeze()
       $.post(

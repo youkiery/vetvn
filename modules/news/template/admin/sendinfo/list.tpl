@@ -1,16 +1,18 @@
 <!-- BEGIN: main -->
 <table class="table table-bordered">
   <tr>
-    <th> Người dùng </th>
-    <th> Số điện thoại </th>
-    <th> Tên thú cưng </th>
-    <th> Giống loài </th>
-    <th> Giới tính </th>
-    <th> Ngày sinh </th>
+    <th class="cell-center"> STT </th>
+    <th class="cell-center"> Người dùng </th>
+    <th class="cell-center"> Số điện thoại </th>
+    <th class="cell-center"> Tên thú cưng </th>
+    <th class="cell-center"> Giống loài </th>
+    <th class="cell-center"> Giới tính </th>
+    <th class="cell-center"> Ngày sinh </th>
     <th> </th>
   </tr>
   <!-- BEGIN: row -->
-  <tr>
+  <tr style="font-size: 0.9em;">
+    <td> {index} </td>
     <td> {user} </td>
     <td> {mobile} </td>
     <td> {name} </td>
@@ -30,4 +32,5 @@
   </tr>
   <!-- END: row -->
 </table>
+{nav}
 <!-- END: main -->
