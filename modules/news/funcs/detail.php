@@ -63,6 +63,11 @@ if (!empty($row = $query->fetch())) {
       $xtpl->assign('ig' . $lv2['ns'], parseInfo($lv2));
     }
     foreach ($lv1['m'] as $lv2) {
+      if (empty($lv2['ns'])) $lv2 = array(
+        'ns' => $lv2,
+        'id' => 0,
+        'name' => ''
+      );
       $xtpl->assign($lv2['ns'], parseLink($lv2));
       $xtpl->assign('ig' . $lv2['ns'], parseInfo($lv2));
     }
@@ -137,11 +142,12 @@ if (!empty($row = $query->fetch())) {
   //     }
   //   }
   // }
+  //   var_dump($bay);die();
 
-  $xtpl->assign('grand', implode('<br>', $bay['grand']));
-  $xtpl->assign('parent', implode('<br>', $bay['parent']));
-  $xtpl->assign('sibling', implode('<br>', $bay['sibling']));
-  $xtpl->assign('child', implode('<br>', $bay['child']));
+  // $xtpl->assign('grand', implode('<br>', $bay['grand']));
+  // $xtpl->assign('parent', implode('<br>', $bay['parent']));
+  // $xtpl->assign('sibling', implode('<br>', $bay['sibling']));
+  // $xtpl->assign('child', implode('<br>', $bay['child']));
 
 	$xtpl->parse("main.detail");
 }
@@ -152,6 +158,7 @@ else {
 $pet = getPetById($id);
 try {
   $youtube = json_decode($pet['youtube']);
+  if (empty($youtube)) $youtube = array();
   foreach ($youtube as $url) {
     $rx = '~
       ^(?:https?://)?

@@ -163,13 +163,11 @@ function parseLink2($info) {
 }
 
 function parseInfo($info) {
-  $age = round( time() - $info['dateofbirth']) / 60 / 60 / 24 / 365.25;
-  if ($age < 1) {
-    $age = 1;
-  }
-
-  // die( - $info['dob'] . "");
   if (!empty($info['id'])) {
+    $age = round( time() - $info['dateofbirth']) / 60 / 60 / 24 / 365.25;
+    if ($age < 1) {
+      $age = 1;
+    }
     return 'Tên: '. $info['name'] .'<br>Tuổi: '. $age .'<br>Giống: '. $info['species'] .'<br>Loài: '. $info['breed'] .'<br>';
   }
   return '';
@@ -467,20 +465,21 @@ function sendinfoModal() {
 function sendinfoList() {
   global $db, $userinfo, $sex_data, $filter;
   $xtpl = new XTemplate('list.tpl', PATH2);
-  $sql = 'select * from `'. PREFIX .'_sendinfo` where name like "%'. $filter['keyword'] .'%" and userid = ' . $userinfo['id'] . ' order by id desc';
+  $filter['status'] --;
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where name like "%'. $filter['keyword'] .'%" and userid = ' . $userinfo['id'] . ' '. ($filter['status'] >= 0 ? ' and active = ' . $filter['status'] : '') .' order by id desc';
   $query = $db->query($sql);
   while ($row = $query->fetch()) {
     $species = getRemindId($row['species']);
+    $user = checkUserinfo($row['userid'], 1);
+    $user['mobile'] = xdecrypt($user['mobile']);
     $xtpl->assign('id', $row['id']);
+    $xtpl->assign('fullname', $user['fullname']);
+    $xtpl->assign('mobile', $user['mobile']);
     $xtpl->assign('name', $row['name']);
-    $xtpl->assign('species', $species['name']);
-    $xtpl->assign('sex', $sex_data[$row['sex']]);
-    $xtpl->assign('birthtime', date('d/m/Y', $row['birthtime']));
     if (!$row['active']) $xtpl->parse('main.row.edit');
-    else {
-      $xtpl->assign('activetime', date('d/m/Y', $row['activetime']));
-      $xtpl->assign('status', 'Đã cấp giấy');
-      $xtpl->parse('main.row.confirm');
+    else if (!empty($row['petid'])) {
+      $xtpl->assign('petid', $row['petid']);
+      $xtpl->parse('main.row.info');
     }
     $xtpl->parse('main.row');
   }

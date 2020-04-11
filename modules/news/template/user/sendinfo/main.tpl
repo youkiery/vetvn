@@ -41,28 +41,43 @@
     </a>
   </div>
   <div class="form-group rows">
-    <div class="col-6">
-      <form class="input-group">
-        <input type="text" class="form-control" name="keyword" value="{keyword}" placeholder="Nhập tên thú cưng...">
-        <div class="input-group-btn">
-          <button class="btn btn-info">
-            Tìm kiếm
-          </button>
+    <div class="col-8">
+      <form>
+        <input type="hidden" name="nv" value="news">
+        <input type="hidden" name="op" value="sendinfo">
+        <div class="input-group">
+          <input type="text" class="form-control" name="keyword" value="{keyword}" placeholder="Nhập tên thú cưng...">
+          <div class="input-group-btn">
+            <button class="btn btn-info">
+              Tìm kiếm
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>
+            <input name="status" type="radio" value="0" {status0}> Tất cả
+          </label>
+          <label>
+            <input name="status" type="radio" value="1" {status1}> Đợi cấp
+          </label>
+          <label>
+            <input name="status" type="radio" value="2" {status2}> Đã cấp
+          </label>
+        </div>
       </form>
     </div>
+    <div class="col-4" style="text-align: right;">
+      <button class="btn btn-success" onclick="sendinfoModal()">
+        Thêm yêu cầu
+      </button>
+    </div>
   </div>
-  <div class="col-6" style="text-align: right;">
-    <button class="btn btn-success" onclick="sendinfoModal()">
-      Thêm yêu cầu
-    </button>
+
+  <div style="clear: both;"></div>
+
+  <div id="content">
+    {content}
   </div>
-</div>
-
-<div style="clear: both;"></div>
-
-<div id="content">
-  {content}
-</div>
 </div>
 
 <script src="/modules/core/vhttp.js"></script>

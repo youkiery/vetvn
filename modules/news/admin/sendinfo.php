@@ -14,6 +14,10 @@ if (!defined('NV_IS_ADMIN_FORM')) {
 $page_title = "Quản lý yêu cầu";
 
 $action = $nv_Request->get_string('action', 'post', '');
+$filter = array(
+	'keyword' => $nv_Request->get_string('keyword', 'get', ''),
+	'status' => $nv_Request->get_int('status', 'get', 0)
+);
 
 if (!empty($action)) {
 	$result = array('status' => 0);
@@ -132,6 +136,8 @@ if (!empty($action)) {
 }
 $xtpl = new XTemplate("main.tpl", PATH2);
 
+$xtpl->assign('keyword', $filter['keyword']);
+$xtpl->assign('status' . $filter['status'], 'checked');
 $xtpl->assign('content', sendinfoContent());
 $xtpl->assign('modal', sendinfoModal());
 $xtpl->parse("main");

@@ -13,7 +13,6 @@ if (!defined('NV_ADMIN')) {
 
 $submenu['user'] = "Quản lý người dùng";
 $submenu['pet'] = "Quản lý thú cưng";
-$submenu['sendinfo'] = "Quản lý yêu cầu";
 $submenu['request'] = "Yêu cầu tiêm phòng";
 $submenu['remind'] = "Danh sách gợi nhớ";
 $submenu['disease'] = "Gợi nhớ loại tiêm phòng";
@@ -23,6 +22,7 @@ $submenu['buy'] = "Duyệt mua";
 $submenu['revenue'] = "Quản lý thu chi";
 $submenu['manager'] = "Danh sách quản lý";
 $submenu['review'] = "Danh sách góp ý";
+$submenu['sendinfo'] = "Quản lý Giấy chứng nhận";
 $submenu['ceti-print'] = "In giấy chứng nhận";
 $submenu['config'] = "Cấu hình";
 // $submenu['center'] = "Quản lý yêu cầu trang trại";

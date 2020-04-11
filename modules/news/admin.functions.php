@@ -641,16 +641,29 @@ function sendinfoModal() {
 }
 
 function sendinfoContent() {
-  global $db, $userinfo, $sex_data;
+  global $db, $userinfo, $sex_data, $filter;
   $xtpl = new XTemplate('list.tpl', PATH2);
-  $sql = 'select * from `'. PREFIX .'_sendinfo` order by id desc';
+  $filter['status'] --;
+  $sql = 'select * from `'. PREFIX .'_sendinfo` '. ($filter['status'] >= 0 ? ' where active = ' . $filter['status'] : '') .' order by id desc';
   $query = $db->query($sql);
+  $list = array();
   while ($row = $query->fetch()) {
     $user = checkUserinfo($row['userid'], 1);
+    $user['mobile'] = xdecrypt($user['mobile']);
+    $c1 = empty($filter['keyword']);
+    $c2 = strpos($user['mobile'], $filter['keyword']) !== false;
+    $c3 = mb_strpos($row['name'], $filter['keyword']) !== false;
+    if ($c1 || (!$c1 && ($c2 || $c3))) {
+      $row['user'] = $user;
+      $list []= $row;
+    }
+  }
+
+  foreach ($list as $row) {
     $species = getRemindId($row['species']);
     $xtpl->assign('id', $row['id']);
-    $xtpl->assign('user', $user['fullname']);
-    $xtpl->assign('mobile', xdecrypt($user['mobile']));
+    $xtpl->assign('user', $row['user']['fullname']);
+    $xtpl->assign('mobile', $row['user']['mobile']);
     $xtpl->assign('name', $row['name']);
     $xtpl->assign('species', $species['name']);
     $xtpl->assign('sex', $sex_data[$row['sex']]);

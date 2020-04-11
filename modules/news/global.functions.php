@@ -503,6 +503,11 @@ function getPetRelation($petid) {
 function getPetGrand($parent) {
   global $db;
 
+  if (empty($parent['f']['fid'])) $parent['f']['fid'] = 0;
+  if (empty($parent['f']['mid'])) $parent['f']['mid'] = 0;
+  if (empty($parent['m']['fid'])) $parent['m']['fid'] = 0;
+  if (empty($parent['m']['mid'])) $parent['m']['mid'] = 0;
+
   $grand = array('i' => array('f' => getPetById($parent['f']['fid']), 'm' => getPetById($parent['f']['mid'])), 'e' => array('f' => getPetById($parent['m']['fid']), 'm' => getPetById($parent['m']['mid'])));
   $grand['i']['f']['ns'] = 'igrandpa';
   $grand['i']['m']['ns'] = 'igrandma';
