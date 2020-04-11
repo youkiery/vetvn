@@ -14,7 +14,7 @@ if (!defined('NV_MAINFILE')) {
 define("PREFIX", $db_config['prefix'] . "_" . $module_name);
 define('PERMISSION_MODULE', 1);
 
-include_once(NV_ROOTDIR . "/modules/". $module_name ."/src/Aes.php");
+include_once(NV_ROOTDIR . "/modules/core/src/Aes.php");
 use PhpAes\Aes;
 $aes = new Aes('abcdefgh01234567', 'CBC', '1234567890abcdef');
 
