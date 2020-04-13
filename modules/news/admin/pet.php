@@ -602,7 +602,7 @@ if (!empty($action)) {
 }
 
 $xtpl = new XTemplate("main.tpl", PATH2);
-include_once(PATH2 . '/position.php');
+include_once(LAYOUT . '/position.php');
 
 $xtpl->assign('modal', petModal());
 $xtpl->assign('position', json_encode($position));
@@ -613,6 +613,6 @@ $xtpl->parse("main");
 $contents = $xtpl->text("main");
 
 include (NV_ROOTDIR . "/includes/header.php");
-include (NV_ROOTDIR . "/modules/" . $module_file . "/layout/prefix.php");
+include (LAYOUT . "/prefix.php");
 echo nv_admin_theme($contents);
 include (NV_ROOTDIR . "/includes/footer.php");

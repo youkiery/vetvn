@@ -12,6 +12,7 @@ if (!defined('NV_MAINFILE')) {
 }
 
 define("PREFIX", $db_config['prefix'] . "_" . $module_name);
+define("LAYOUT", NV_ROOTDIR . "/modules/" . $module_file . "/layout");
 define('PERMISSION_MODULE', 1);
 
 include_once(NV_ROOTDIR . "/modules/core/src/Aes.php");

@@ -11,13 +11,13 @@
 
 <div class="container">
   <div id="msgshow"></div>
-  <div class="text-center start-content" style="max-width: 450px; margin: auto; padding-top: 50px; border: 1px solid lightgray; padding: 15px; border-radius: 20px;">
+  <div class="text-center start-content"
+    style="max-width: 450px; margin: auto; padding-top: 50px; border: 1px solid lightgray; padding: 15px; border-radius: 20px;">
     <a href="/">
       <img src="/themes/default/images/banner.png" style="width: 200px; margin: 20px 20px;">
     </a>
 
     <div style="margin-top: 20px;"></div>
-
 
     <div class="modal" id="recover-pass" role="dialog">
       <div class="modal-dialog">
@@ -51,47 +51,47 @@
 
     <!-- BEGIN: checking -->
     <!-- <form onsubmit="return checkingSubmit(event)"> -->
-      <label class="row">
-        <div class="col-sm-3">
-          Nhập mã xác nhận
-        </div>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" id="checking-key" autocomplete="off">
-        </div>
-      </label>
-      <div id="checking-error" style="color: red;"></div>
-      <button class="btn btn-info" onclick="checkingSubmit()">
-        Xác nhận
-      </button>
+    <label class="row">
+      <div class="col-sm-3">
+        Nhập mã xác nhận
+      </div>
+      <div class="col-sm-9">
+        <input type="text" class="form-control" id="checking-key" autocomplete="off">
+      </div>
+    </label>
+    <div id="checking-error" style="color: red;"></div>
+    <button class="btn btn-info" onclick="checkingSubmit()">
+      Xác nhận
+    </button>
     <!-- </form> -->
     <!-- END: checking -->
 
     <!-- BEGIN: checked -->
     <!-- <form> -->
-      <label class="row">
-        <div class="col-sm-3">
-          Mật khẩu mới
-        </div>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" id="pass-v1" autocomplete="off">
-        </div>
-      </label>
-
-      <label class="row">
-        <div class="col-sm-3">
-          Xác nhận mật khẩu
-        </div>
-        <div class="col-sm-9">
-          <input type="text" class="form-control" id="pass-v2" autocomplete="off">
-        </div>
-      </label>
-      <div id="pass-error" style="color: red; font-weight: bold;"></div>
-
-      <div class="text-center">
-        <button class="btn btn-info" onclick="changePasswordSubmit()">
-          Đổi mật khẩu
-        </button>
+    <label class="row">
+      <div class="col-sm-3">
+        Mật khẩu mới
       </div>
+      <div class="col-sm-9">
+        <input type="text" class="form-control" id="pass-v1" autocomplete="off">
+      </div>
+    </label>
+
+    <label class="row">
+      <div class="col-sm-3">
+        Xác nhận mật khẩu
+      </div>
+      <div class="col-sm-9">
+        <input type="text" class="form-control" id="pass-v2" autocomplete="off">
+      </div>
+    </label>
+    <div id="pass-error" style="color: red; font-weight: bold;"></div>
+
+    <div class="text-center">
+      <button class="btn btn-info" onclick="changePasswordSubmit()">
+        Đổi mật khẩu
+      </button>
+    </div>
     <!-- </form> -->
     <!-- END: checked -->
     <!-- BEGIN: nonchecked -->
@@ -100,8 +100,11 @@
     <div></div>
     <!-- END: nonchecked -->
     <!-- BEGIN: end -->
-      Đường link đã hết hiệu lực, xin hãy gửi yêu cầu khác
+    Đường link đã hết hiệu lực, xin hãy gửi yêu cầu khác
     <!-- END: end -->
+    <p>
+      <a href="/news/login"> Đăng nhập ngay! </a>
+    </p>
   </div>
 </div>
 
@@ -116,12 +119,12 @@
 
   function recoverPassSubmit() {
     var keyword = $("#keyword").val().trim()
-    
+
     if (keyword.length) {
       freeze()
       $.post(
         global['url'],
-        {action: 'recover', keyword: keyword},
+        { action: 'recover', keyword: keyword },
         (response, status) => {
           if (status == 'success') {
             window.location.reload()
@@ -147,7 +150,7 @@
       freeze()
       $.post(
         global['url'],
-        {action: 'change-pass', npass: pass1},
+        { action: 'change-pass', npass: pass1 },
         (response, status) => {
           window.location.reload()
         }
@@ -166,7 +169,7 @@
         { action: 'checking-key', keyword: keyword },
         (response, status) => {
           checkResult(response, status).then(data => {
-            window.location.reload()            
+            window.location.reload()
           }, () => {
             $("#checking-error").text("Mã xác nhận sai");
           })

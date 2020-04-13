@@ -107,7 +107,7 @@
           </div>
           <div class="col-sm-8">
             <!-- BEGIN: l2 -->
-            <select class="form-control al2" id="al2{l1id}" style="display: {active}">
+            <select class="form-control al2" id="al2{l1id}" {active}>
               <!-- BEGIN: l2c -->
               <option value="{l2id}"> {l2name} </option>
               <!-- END: l2c -->

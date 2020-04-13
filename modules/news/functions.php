@@ -34,10 +34,10 @@ if (!empty($action)) {
   }
 }
 
-function defaultDogList() {
+function mainContent() {
     global $db, $sex_array, $module_file;
     $index = 1;
-    $xtpl = new XTemplate('dog-list.tpl', PATH2);
+    $xtpl = new XTemplate('list.tpl', PATH2);
     $xtpl->assign('module_file', $module_file);
   
     $sql = 'select * from `'. PREFIX .'_pet` where active > 0 order by time desc limit 12';

@@ -16,85 +16,41 @@ define('BUILDER_EDIT', 1);
 
 $page_title = "Đăng nhập";
 
-$action = $nv_Request->get_string('action', 'post', '');
+$xtpl = new XTemplate("main.tpl", PATH2);
 $userinfo = getUserInfo();
 
-if (!empty($userinfo) && $userinfo['active'] == 1) {
-  if ($userinfo['center']) {
-    header('location: /'. $module_name .'/center');
-  }
-  header('location: /'. $module_name .'/private');
-}
-if (!empty($action)) {
-	$result = array('status' => 0);
-	switch ($action) {
-		case 'login':
-			$data = $nv_Request->get_array('data', 'post');
-
-      if (!empty($data['username'])) {
-				$data['username'] = strtolower($data['username']);
-        if (!checkUsername($data['username'])) {
-  				$result['error'] = 'Tài khoản không tồn tại';
-        }
-        else if (empty($checker = checkLogin($data['username'], $data['password']))) {
-					$result['error'] = 'Mật khẩu không đúng';
-				}
-        else {
-          if ($checker['active'] <= 0) {
-  					$result['error'] = 'Tài khoản chưa được cấp quyền đăng nhập';
-          }
-          else {
-            $_SESSION['username'] = $data['username'];
-            $_SESSION['password'] = $data['password'];
-          }
-        }
-			}
-      else {
-        $result['error'] = 'Các trường không được để trống';
-      }
-      $result['status'] = 1;
-		break;
+if (!empty($userinfo)) {
+	if ($userinfo['active'] == 1) {
+		if ($userinfo['center']) {
+			header('location: /'. $module_name .'/center');
+		}
+		header('location: /'. $module_name .'/private');
 	}
-	echo json_encode($result);
-	die();
+	else $xtpl->assign('error', 'Tài khoản chưa có quyền truy cập');
 }
 
-$id = $nv_Request->get_int('id', 'get', 0);
-$global = array();
-$global['login'] = 0;
-
-$xtpl = new XTemplate("login.tpl", "modules/". $module_name ."/template");
-
-if (count($userinfo) > 0) {
-	// logged
-  $userinfo['mobile'] = xdecrypt($userinfo['mobile']);
-  $userinfo['address'] = xdecrypt($userinfo['address']);
-	$xtpl->assign('fullname', $userinfo['fullname']);
-	$xtpl->assign('mobile', $userinfo['mobile']);
-	$xtpl->assign('address', $userinfo['address']);
-	$xtpl->assign('image', $userinfo['image']);
-	$xtpl->assign('list', userDogRowByList($userinfo['id']));
-
-	if (!empty($user_info) && !empty($user_info['userid']) && (in_array('1', $user_info['in_groups']) || in_array('2', $user_info['in_groups']))) {
-		$xtpl->assign('userlist', userRowList());
-	
-		$xtpl->parse('main.log.user');
-		$xtpl->parse('main.log.mod');
-		$xtpl->parse('main.log.mod2');
-	}
-
-	$xtpl->parse('main.log');
-}
-else {
-	$xtpl->parse('main.nolog');
-}
-
-$xtpl->assign('origin', '/' . $module_name . '/' . $op . '/');
+$username = $nv_Request->get_string('username', 'post', '');
+$password = $nv_Request->get_string('password', 'post', '');
 $xtpl->assign('module_file', $module_file);
 $xtpl->assign('module_name', $module_name);
 
-if (!empty($userinfo) && $userinfo['active'] == 0) {
-  $xtpl->assign('error', 'Tài khoản chưa có quyền truy cập');
+if (!empty($username)) {
+	$xtpl->assign('username', $username);
+	$username = strtolower($username);
+	if (!checkUsername($username)) {
+		$xtpl->assign('error', 'Tài khoản không tồn tại');
+	}
+	else if (empty($checker = checkLogin($username, $password))) {
+		$xtpl->assign('error', 'Sai mật khẩu');
+	}
+	else {
+		if ($checker['active'] == 0) $xtpl->assign('error', 'Tài khoản chưa có quyền truy cập');
+		else {
+			$_SESSION['username'] = $username;
+			$_SESSION['password'] = $password;
+			header('location: /news/private');
+		}
+	}
 }
 
 $xtpl->parse("main");

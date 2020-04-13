@@ -1,5 +1,4 @@
 <!-- BEGIN: main -->
-
 <style>
   label {
     width: 100%;
@@ -18,14 +17,14 @@
 
     <div style="margin-top: 20px;"></div>
 
-    <form>
+    <form method="post">
       <div class="row">
         <label>
           <div class="col-sm-4">
             Tên đăng nhập 
           </div>
           <div class="col-sm-8">
-            <input type="text" class="form-control" id="username" autocomplete="off">
+            <input type="text" class="form-control" name="username" id="username" value="{username}" autocomplete="off">
           </div>
         </label>
       </div>
@@ -36,7 +35,7 @@
             Mật khẩu 
           </div>
           <div class="col-sm-8">
-            <input type="password" class="form-control" id="password">
+            <input type="password" class="form-control" name="password" id="password">
           </div>
         </label>
       </div>
@@ -56,9 +55,6 @@
 </div>
 
 <script>
-  var global = {
-    url: '{origin}'
-  }
   var username = $("#username")
   var password = $("#password")
   var error = $("#error")
@@ -71,41 +67,6 @@
     }
 
     error.text(text)
-  }
-
-  function checkLogin() {
-    var data = {
-      username: username.val(),
-      password: password.val()
-    }
-
-    if (data['username']) {
-      return data
-    }
-    return false
-  }
-
-  function login() {
-    if (loginData = checkLogin()) {
-      freeze()
-      $.post(
-        global['url'],
-        {action: 'login', data: loginData},
-        (response, status) => {
-          checkResult(response, status).then(data => {
-            if (data['error']) {
-              displayError(data['error'])
-            }
-            else {
-              window.location.reload() 
-            }
-          }, () => {  })
-        }
-      )
-    }
-    else {
-      displayError('Chưa điền đủ thông tin')
-    }
   }
 </script>
 <!-- END: main -->
