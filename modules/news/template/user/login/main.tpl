@@ -41,7 +41,7 @@
       </div>
 
       <div class="text-center">
-        <button class="btn btn-info" onclick="login()">
+        <button class="btn btn-info">
           Đăng nhập
         </button>
       </div>
