@@ -310,17 +310,6 @@
           <div class="row">
             <label>
               <div class="col-sm-4">
-                Tên đăng nhập <span style="color: red;" class="glyphicon glyphicon-afterisk"> * </span>
-              </div>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" id="username" autocomplete="off">
-              </div>
-            </label>
-          </div>
-
-          <div class="row">
-            <label>
-              <div class="col-sm-4">
                 Họ và tên <span style="color: red;" class="glyphicon glyphicon-afterisk"> * </span>
               </div>
               <div class="col-sm-8">

@@ -296,7 +296,7 @@ if (!empty($action)) {
 			if (!empty($row = $query->fetch())) {
         $row['address'] = xdecrypt($row['address']);
         $row['mobile'] = xdecrypt($row['mobile']);
-				$result['data'] = array('fullname' => $row['fullname'], 'mobile' => $row['mobile'], 'address' => $row['address'], 'username' => $row['username'], 'politic' => $row['politic']);
+				$result['data'] = array('fullname' => $row['fullname'], 'mobile' => $row['mobile'], 'address' => $row['address'], 'politic' => $row['politic']);
 				$result['more'] = array('al1' => $row['a1'], 'al2' => $row['a2'], 'al3' => $row['a3']);
 				$result['image'] = $row['image'];
 				$result['status'] = 1;
@@ -708,7 +708,7 @@ $id = $nv_Request->get_int('id', 'get', 0);
 $global = array();
 $global['login'] = 0;
 
-$xtpl = new XTemplate("private.tpl", PATH2);
+$xtpl = new XTemplate("main.tpl", PATH2);
 
 include_once(LAYOUT . '/position.php');
 
@@ -721,7 +721,7 @@ $userinfo['address'] = xdecrypt($userinfo['address']);
 $xtpl->assign('userid', $userinfo['id']);
 $xtpl->assign('fullname', $userinfo['fullname']);
 $xtpl->assign('mobile', $userinfo['mobile']);
-$xtpl->assign('address', $userinfo['address']);
+$xtpl->assign('address', $userinfo['address'] . ', ' . $userinfo['a2'] . ', ' . $userinfo['a1']);
 $xtpl->assign('image', $userinfo['image']);
 $xtpl->assign('remind', json_encode(getRemind()));
 $xtpl->assign('list', userDogRowByList($userinfo['id']));

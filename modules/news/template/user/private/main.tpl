@@ -5,9 +5,6 @@
   .modal {
     overflow-y: auto;
   }
-  .btn {
-    min-height: unset;
-  }
 </style>
 
 <div class="container">
@@ -52,18 +49,19 @@
         Đổi mật khẩu
       </button>
     </div>
+
+    <div class="form-group">
+      <a class="btn btn-info" href="/news/sendinfo"> Yêu cầu cấp chứng nhận </a>
+    </div>
   </div>
   <div style="clear: left;"></div>
-  <div class="form-group">
-      <a class="btn btn-info btn-sm" style="margin: 5px;" href="/news/sendinfo"> Yêu cầu cấp chứng nhận </a>
-      <a class="btn btn-info btn-sm" style="margin: 5px;" href="/{module_file}/trading"> Quản lý mua, bán, phối</a>
-      <a class="btn btn-info btn-sm" style="margin: 5px;" href="/{module_file}/transfer"> Danh sách chuyển nhượng </a>
-      <a class="btn btn-info btn-sm" style="margin: 5px;" href="/{module_file}/reserve"> Danh sách bán, mất</a>
-      <a class="btn btn-info btn-sm" style="margin: 5px;" href="/{module_file}/contact"> Danh sách khách hàng </a>
-      <!-- BEGIN: xter -->
-      <p> <a class="btn btn-info" style="margin: 5px;" href="/{module_file}/statistic"> Danh sách thu chi</a> </p>
-      <!-- END: xter -->
-  </div>
+  <p> <a href="/{module_file}/trading"> Quản lý mua, bán, phối</a> <span style="font-weight: bold; color: red;">{intro_count}</span></p>
+  <p> <a href="/{module_file}/transfer"> Danh sách chuyển nhượng <span style="font-weight: bold; color: red;">{transfer_count}</span> </a> </p>
+  <p> <a href="/{module_file}/reserve"> Danh sách bán, mất</a> </p>
+  <p> <a href="/{module_file}/contact"> Danh sách khách hàng </a> </p>
+  <!-- BEGIN: xter -->
+  <p> <a href="/{module_file}/statistic"> Danh sách thu chi</a> </p>
+  <!-- END: xter -->
   <h2> Danh sách thú cưng </h2>
 
   <form onsubmit="filterS(event)">
@@ -291,6 +289,13 @@
     )    
   }
 
+  function buy() {
+    $("#buy-sex-0").prop('checked', true)
+    $("#buy-age-check").prop('checked', true)
+    $("#buy-age").prop('disabled', true)
+    $("#user-buy").modal('show')
+  }
+
   $("#buy-age-check").change(() => {
     if ($("#buy-age-check").prop('checked')) {
       $("#buy-age").prop('disabled', true)
@@ -356,6 +361,20 @@
       price: price,
       note: $("#buy-note").val()
     }
+  }
+
+  function buySubmit() {
+    data = checkBuyData()
+    freeze()
+    $.post(
+      global['url'],
+      {action: 'buy', data: data},
+      (response, status) => {
+        checkResult(response, status).then(data => {
+          $("#user-buy").modal('hide')
+        }, () => {})
+      }
+    )    
   }
 
   function sellSubmit() {
