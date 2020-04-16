@@ -16,6 +16,7 @@
     <td> 
       <!-- BEGIN: edit -->
       <button class="btn btn-info btn-xs" onclick="edit({id})"> sửa </button>  
+      <button class="btn btn-info btn-xs" onclick="preview({id})"> chi tiết </button>  
       <!-- END: edit -->
       <!-- BEGIN: info -->
       <a href="/news/detail/?id={petid}" class="btn btn-info btn-xs"> chi tiết </a>

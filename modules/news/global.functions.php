@@ -217,6 +217,16 @@ function getRemindIdv2($name, $type) {
 	return 0;
 }
 
+function getUserinfoId($id) {
+  $user = getContactId($id);
+  if (!empty($user)) return $user;
+  $user = getUserinfo();
+  $user['address'] = xdecrypt($user['address']);
+  $user['mobile'] = xdecrypt($user['mobile']);
+  $user['address'] = $user['address'] . ', ' . $user['a2'] . ', ' . $user['a1'];
+  return $user;
+}
+
 function getRemindId($id) {
   global $db;
   $sql = 'select * from `'. PREFIX .'_remind` where id = ' . $id;
@@ -244,6 +254,17 @@ function getRemind($type = '') {
 	}
 
 	return $list;
+}
+
+function getContactId($id) {
+  global $db;
+
+  if ($id > 0) {
+    $sql = 'select * from `'. PREFIX .'_contact` where id = ' . $id;
+    $query = $db->query($sql);
+    if ($row = $query->fetch()) return $row;
+  }
+  return 0;
 }
 
 function checkUserinfo($userid, $type) {

@@ -21,6 +21,9 @@
   }
 
   .btn { min-height: unset; }
+  .suggest_item2 {
+    height: 59px !important;
+  }
 </style>
 
 {modal}
@@ -113,15 +116,20 @@
     petobj: {
       0: 'father',
       1: 'mother'
-    }
+    },
+    user: {
+      name: '{name}',
+      mobile: '{mobile}'
+    },
+    breeder: 0,
+    owner: 0
   }
   var notify = {
     'name': 'Nhập tên thú cưng trước khi gửi',
     'birthtime': 'Chọn ngày sinh trước khi gửi',
     'species': 'Chọn giống loài trước khi gửi',
     'color': 'Chọn màu lông trước khi gửi',
-    'type': 'Chọn kiểu lông trước khi gửi',
-    'owner': 'Nhập thông tin chủ nuôi trước khi gửi'
+    'type': 'Chọn kiểu lông trước khi gửi'
   }
   var sex_data = ['Đực', 'Cái']
   var image_data = []
@@ -145,6 +153,20 @@
     vremind.install('#type', '#type-suggest', (input) => {
       return new Promise(resolve => {
         vhttp.checkelse('', { action: 'get-remind', keyword: input, type: 'type' }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
+    vremind.install('#breeder', '#breeder-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-user', keyword: input, type: 'breeder' }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
+    vremind.install('#owner', '#owner-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-user', keyword: input, type: 'owner' }).then(data => {
           resolve(data['html'])
         })
       })
@@ -225,7 +247,9 @@
         0: data['data']['father'],
         1: data['data']['mother']
       }
-      console.log(global['pet']);
+
+      parseUser('breeder', data['data']['breeder'])
+      parseUser('owner', data['data']['owner'])
 
       $("#father").val(data['data']['fathername'])
       $("#mother").val(data['data']['mothername'])
@@ -235,8 +259,6 @@
       $("#species2").val(data['data']['species'])
       $("#color").val(data['data']['color'])
       $("#type").val(data['data']['type'])
-      $("#breeder").val(data['data']['breeder'])
-      $("#owner").val(data['data']['owner'])
       vimage.data['image'] = data['data']['image']
       refreshImage(vimage.data['image'])
       $(".insert").hide()
@@ -253,8 +275,8 @@
       species: $("#species2").val(),
       color: $("#color").val(),
       type: $("#type").val(),
-      breeder: $("#breeder").val(),
-      owner: $("#owner").val(),
+      breeder: global['breeder'],
+      owner: global['owner'],
       father: global['pet'][0],
       mother: global['pet'][1]
     }
@@ -298,6 +320,80 @@
     $('html, body').animate({
       scrollTop: $("#" + label + "-error").offset().top
     }, 1000);
+  }
+
+  function clearUser(name) {
+    global[name] = 0
+    $("#" + name).val('')
+    $("#" + name + "-suggest").html('')
+    $("#" + name + '-name').text(global['user']['name'])
+    $("#" + name + '-mobile').text(global['user']['mobile'])
+  }
+
+  function parseUser(name, data) {
+    $("#"+ name).val('')
+    if (data['id']) {
+      global[name] = data['id']
+      $("#"+ name +"-name").text(data['fullname'])
+      $("#"+ name +"-mobile").text(data['mobile'])
+    }
+    else {
+      global[name] = 0
+      $("#"+ name +"-name").text(global['user']['name'])
+      $("#"+ name +"-mobile").text(global['user']['mobile'])
+    }
+  }
+
+  function selectUser(name, id, fullname, mobile) {
+    global[name] = id
+    $("#" + name).val('')
+    $("#" + name + '-name').text(fullname)
+    $("#" + name + '-mobile').text(mobile)
+  }
+
+  function insertUser(name) {
+    global['modal'] = name
+    $("#user-name").val('')
+    $("#user-mobile").val('')
+    $("#user-address").val('')
+    $("#user-politic").val('')
+    $("#user-modal").modal('show')
+  }
+
+  function preview(id) {
+    vhttp.checkelse('', { action: 'get-preview', id: id }).then(data => {
+      $("#info-image").attr('src', data['data']['image'])
+      $("#info-name").text(data['data']['name'])
+      $("#info-sex").text(data['data']['sex'])
+      $("#info-birthtime").text(data['data']['birthtime'])
+      $("#info-species").text(data['data']['species'])
+      $("#info-color").text(data['data']['color'])
+      $("#info-type").text(data['data']['type'])
+      $("#info-breeder").text(data['data']['breeder'])
+      $("#info-owner").text(data['data']['owner'])
+      $("#info-modal").modal('show')
+    })
+  }
+
+  function checkUserData() {
+    data = {
+      name: $("#user-name").val(),
+      mobile: $("#user-mobile").val(),
+      address: $("#user-address").val(),
+      politic: $("#user-politic").val(),
+    }
+    return data
+  }
+
+  function insertUserSubmit() {
+    sdata = checkUserData()
+    vhttp.checkelse('', { action: 'insert-user', data: sdata }).then(data => {
+      global[global['modal']] = data['id']
+      $("#"+ global['modal'] +"").val('')
+      $("#"+ global['modal'] +"-name").text(sdata['name'])
+      $("#"+ global['modal'] +"-mobile").text(sdata['mobile'])
+      $("#user-modal").modal('hide')
+    })
   }
 
   function upload(id) {

@@ -463,25 +463,46 @@ function sendinfoModal() {
 }
 
 function sendinfoList() {
-  global $db, $userinfo, $sex_data, $filter;
+  global $db, $userinfo, $sex_data, $filter, $userinfo;
   $xtpl = new XTemplate('list.tpl', PATH2);
   $filter['status'] --;
-  $sql = 'select count(*) as count from `'. PREFIX .'_sendinfo` where name like "%'. $filter['keyword'] .'%" and userid = ' . $userinfo['id'] . ' '. ($filter['status'] >= 0 ? ' and active = ' . $filter['status'] : '');
-  $query = $db->query($sql);
-  $number = $query->fetch()['count'];
 
-  $sql = 'select * from `'. PREFIX .'_sendinfo` where name like "%'. $filter['keyword'] .'%" and userid = ' . $userinfo['id'] . ' '. ($filter['status'] >= 0 ? ' and active = ' . $filter['status'] : '') .' order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where userid = ' . $userinfo['id'] . ' '. ($filter['status'] >= 0 ? ' and active = ' . $filter['status'] : '') .' order by id desc';
 
-  $index = ($filter['page'] - 1) * $filter['limit'] + 1;
   $query = $db->query($sql);
+  $list = array();
+  $number = 0;
+
+  // nếu filter.keyword rỗng, không thực hiện lọc
+  // kiểm tra owner, nếu không tồn tại dùng thông tin userinfo
+
   while ($row = $query->fetch()) {
+    $owner = getContactId($row['owner']);
+    if (empty($owner)) {
+      $row['fullname'] = $userinfo['fullname'];
+      $row['mobile'] = $userinfo['mobile'];
+    }
+    else {
+      $row['fullname'] = $owner['fullname'];
+      $row['mobile'] = $owner['mobile'];
+    }
+    if (empty($filter['keyword'])) $list []= $row;
+    else if ((mb_strpos($row['fullname'], $filter['keyword']) !== false) || (strpos($row['mobile'], $filter['keyword']) !== false)) {
+      $list []= $row;
+    }
+  }
+
+  $from = ($filter['page'] - 1) * $filter['limit'];
+  $end = $from + $filter['limit'];
+  for ($i = $from; $i < $end; $i++) { 
+    if (empty($list[$i])) break;
+    else $row = $list[$i];
+
     $species = getRemindId($row['species']);
-    $user = checkUserinfo($row['userid'], 1);
-    $user['mobile'] = xdecrypt($user['mobile']);
-    $xtpl->assign('index', $index++);
+    $xtpl->assign('index', $i+1);
     $xtpl->assign('id', $row['id']);
-    $xtpl->assign('fullname', $user['fullname']);
-    $xtpl->assign('mobile', $user['mobile']);
+    $xtpl->assign('fullname', $row['fullname']);
+    $xtpl->assign('mobile', $row['mobile']);
     $xtpl->assign('name', $row['name']);
     if (!$row['active']) $xtpl->parse('main.row.edit');
     else if (!empty($row['petid'])) {

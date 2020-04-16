@@ -124,11 +124,71 @@ if (!empty($action)) {
 
 			$info['fathername'] = $father;
 			$info['mothername'] = $mother;
+			$info['breeder'] = getContactId(intval($info['breeder']));
+			$info['owner'] = getContactId(intval($info['owner']));
 			$info['birthtime'] = date('d/m/Y', $info['birthtime']);
 			$info['species'] = getRemindId($info['species'])['name'];
 			$info['color'] = getRemindId($info['color'])['name'];
 			$info['type'] = getRemindId($info['type'])['name'];
 			$info['image'] = explode(',', $info['image']);
+			$result['status'] = 1;
+			$result['data'] = $info;
+		break;
+		case 'get-user':
+			$keyword = $nv_Request->get_string('keyword', 'post', '');
+			$type = $nv_Request->get_string('type', 'post', '');
+
+			$xtpl = new XTemplate("user.tpl", PATH2);
+			$sql = 'select * from `'. PREFIX .'_contact` where (fullname like "%'. $keyword .'%" or address like "%'. $keyword .'%" or mobile like "%'. $keyword .'%") and userid = ' . $userinfo['id'];
+			$query = $db->query($sql);
+			
+			$check = true;
+			while ($row = $query->fetch()) {
+				$check = false;
+				$xtpl->assign('name', $type);			
+				$xtpl->assign('id', $row['id']);			
+				$xtpl->assign('fullname', $row['fullname']);					
+				$xtpl->assign('mobile', $row['mobile']);					
+				$xtpl->parse('main.row');
+			}
+			if ($check) $xtpl->parse('main.no');
+			$xtpl->parse('main');
+			$result['status'] = 1;
+			$result['html'] = $xtpl->text();
+		break;
+		case 'insert-user':
+			$data = $nv_Request->get_array('data', 'post');
+
+			$sql = 'select * from `'. PREFIX .'_contact` where mobile = "'. $data['mobile'] .'"';
+			$query = $db->query($sql);
+			if (empty($query->fetch)) {
+				$sql = 'insert into `'. PREFIX .'_contact` (fullname, address, mobile, politic, userid) values ("'. $data['name'] .'", "'. $data['address'] .'", "'. $data['mobile'] .'", "'. $data['politic'] .'", '. $userinfo['id'] .')';
+
+				if ($db->query($sql)) {
+					$result['status'] = 1;
+					$result['id'] = $db->lastInsertId();
+				}
+			}
+		break;
+		case 'get-preview':
+			$id = $nv_Request->get_int('id', 'post');
+
+			$sql = 'select * from `'. PREFIX .'_sendinfo` where id = '. $id;
+			$query = $db->query($sql);
+			$info = $query->fetch();
+
+			$breeder = getUserinfoId($info['breeder']);
+			$owner = getUserinfoId($info['owner']);
+			$image = explode(',', $info['image']);
+			$info['image'] = $image[0];
+			$info['breeder'] = $breeder['address'];
+			$info['owner'] = $owner['address'];
+			$info['sex'] = $sex_data[$info['sex']];
+			$info['birthtime'] = date('d/m/Y', $info['birthtime']);
+			$info['species'] = getRemindId($info['species'])['name'];
+			$info['color'] = getRemindId($info['color'])['name'];
+			$info['type'] = getRemindId($info['type'])['name'];
+
 			$result['status'] = 1;
 			$result['data'] = $info;
 		break;
@@ -138,6 +198,8 @@ if (!empty($action)) {
 }
 
 $xtpl = new XTemplate("main.tpl", PATH2);
+$xtpl->assign('name', $userinfo['fullname']);
+$xtpl->assign('mobile', $userinfo['mobile']);
 $xtpl->assign('keyword', $filter['keyword']);
 $xtpl->assign('status' . $filter['status'], 'selected');
 $xtpl->assign('modal', sendinfoModal());
