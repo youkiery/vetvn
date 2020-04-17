@@ -33,8 +33,6 @@ if (!empty($action)) {
 $xtpl = new XTemplate("main.tpl", PATH2);
 
 $id = $nv_Request->get_int('id', 'get', 0);
-$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
-$query = $db->query($sql);
 
 $page_title = "Thông tin thú cưng";
 $pet = getPetRelation($id);
@@ -86,34 +84,33 @@ else {
 }
 
 // kiểm tra hiển thị youtube
-try {
-  $pet = getPetById($id);
-  $youtube = json_decode($pet['youtube']);
-  if (empty($youtube)) $youtube = array();
-  foreach ($youtube as $url) {
-    $rx = '~
-      ^(?:https?://)?
-      (?:www[.])?
-      (?:youtube[.]com/watch[?]v=|youtu[.]be/)
-      ([^&]{11})
-        ~x';
-    $has_match = preg_match($rx, $url);
-    // $has_match = true;
+// try {
+//   $youtube = json_decode($pet['youtube']);
+//   if (empty($youtube)) $youtube = array();
+//   foreach ($youtube as $url) {
+//     $rx = '~
+//       ^(?:https?://)?
+//       (?:www[.])?
+//       (?:youtube[.]com/watch[?]v=|youtu[.]be/)
+//       ([^&]{11})
+//         ~x';
+//     $has_match = preg_match($rx, $url);
+//     // $has_match = true;
 
-    if (!empty($url) && $has_match) {
-      $http_check = strpos($url, 'http://');
-      // var_dump($http_check);die();
-      if ($http_check == false) {
-        $url = 'http://' . $url;
-      }
-      $xtpl->assign('youtube', str_replace('watch?v=', 'embed/', $url));
-      $xtpl->parse('main.youtube');
-    }
-  }
-}
-catch (Exception $e) {
-  // echo 'Caught exception: ',  $e->getMessage(), "\n";
-}
+//     if (!empty($url) && $has_match) {
+//       $http_check = strpos($url, 'http://');
+//       // var_dump($http_check);die();
+//       if ($http_check == false) {
+//         $url = 'http://' . $url;
+//       }
+//       $xtpl->assign('youtube', str_replace('watch?v=', 'embed/', $url));
+//       $xtpl->parse('main.youtube');
+//     }
+//   }
+// }
+// catch (Exception $e) {
+//   // echo 'Caught exception: ',  $e->getMessage(), "\n";
+// }
 
 $xtpl->assign('module_file', $module_file);
 $xtpl->parse("main");

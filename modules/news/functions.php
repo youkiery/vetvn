@@ -444,6 +444,15 @@ function contactModal() {
   return $xtpl->text();
 }
 
+function infoModal() {
+  global $userinfo;
+  $xtpl = new XTemplate('modal.tpl', PATH2);
+  $xtpl->assign('today', date('d/m/Y', time()));
+  $xtpl->assign('v', parseVaccineType($userinfo['id']));
+  $xtpl->parse('main');
+  return $xtpl->text();
+}
+
 // function contactContent($userid, $filter = array('page' => 1, 'limit' => 10)) {
 //   global $db;
 

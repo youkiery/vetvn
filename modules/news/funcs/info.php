@@ -21,13 +21,13 @@ if (empty($userinfo)) {
 	die();
 }
 
+$id = $nv_Request->get_int('id', 'get', 0);
 $action = $nv_Request->get_string('action', 'post', '');
 
 if (!empty($action)) {
 	$result = array('status' => 0);
 	switch ($action) {
     case 'youtube':
-			$id = $nv_Request->get_string('id', 'post');
 			$data = $nv_Request->get_array('data', 'post');
       $sql = 'update `'. PREFIX .'_pet` set youtube = \''. json_encode($data) .'\' where id = ' . $id;
       if ($db->query($sql)) {
@@ -37,16 +37,13 @@ if (!empty($action)) {
     break;
     case 'save-graph':
 			$data = $nv_Request->get_string('data', 'post');
-			$id = $nv_Request->get_string('id', 'post');
       $result['notify'] = 'Có lỗi xảy ra';
 
-      if (!empty($id)) {
-        $sql = 'update `'. PREFIX .'_pet` set graph = "'. $data .'" where id = ' . $id;
+        $sql = 'update `'. PREFIX .'_sendinfo` set intro = "'. $data .'" where id = ' . $id;
         if ($db->query($sql)) {
           $result['status'] = 1;
           $result['notify'] = 'Đã lưu';
         }
-      } 
 
     break;
 		case 'insert-disease-suggest':
@@ -438,57 +435,61 @@ if (!empty($action)) {
 	die();
 }
 
-$id = $nv_Request->get_int('id', 'get', 0);
-$xtpl = new XTemplate("info.tpl", "modules/". $module_name ."/template");
-
-$sql = 'select * from `'. PREFIX .'_pet` where id = ' . $id;
-$query = $db->query($sql);
+$xtpl = new XTemplate("main.tpl", PATH2);
 
 $page_title = "Quản lý thú cưng";
+$pet = getPetRelation($id);
 
-if (!empty($row = $query->fetch())) {
-  $page_title = $row['name'] . " - Quản lý thú cưng";
-	$xtpl->assign('name', $row['name']);
-	$xtpl->assign('dob', cdate($row['dateofbirth']));
-	$xtpl->assign('breed', $row['breed']);
-	$xtpl->assign('species', $row['species']);
-	$xtpl->assign('sex', $sex_array[$row['sex']]);
-	$xtpl->assign('color', $row['color']);
-	$xtpl->assign('microchip', $row['microchip']);
-	$xtpl->assign('image', $row['image']);
-	$xtpl->assign('graph', $row['graph']);
-  $xtpl->assign('breeder', breederList($id));
-  $xtpl->assign('vaccine', vaccineList($id));
-  $xtpl->assign('disease', diseaseList($id));
+if (!empty($pet['data']['id'])) {
+  $page_title = $pet['data']['name'] . " - Thông tin thú cưng";
+  // echo json_encode($pet);die();
 
-  $relation = getPetRelation($id);
+  $owner = getOwnerById($pet['data']['userid'], $pet['data']['type']);
+	$xtpl->assign('owner', $pet['data']['owner']['fullname']);
+	$xtpl->assign('politic', $pet['data']['owner']['politic']);
+	$xtpl->assign('name', $pet['data']['name']);
+	$xtpl->assign('dob', $pet['data']['birthtime']);
+	$xtpl->assign('species', $pet['data']['species']);
+	$xtpl->assign('color', $pet['data']['color']);
+	$xtpl->assign('type', $pet['data']['type']);
+  $xtpl->assign('sex', $pet['data']['sex']);
+	$xtpl->assign('micro', $pet['data']['micro']);
+	$xtpl->assign('image', $pet['data']['image']);
+  $xtpl->assign('intro', $pet['data']['intro']);
   
-  foreach ($relation['grand'] as $lv1) {
-    foreach ($lv1 as $lv2) {
-      $xtpl->assign($lv2['ns'], parseLink2($lv2));
-      $xtpl->assign('ig' . $lv2['ns'], parseInfo($lv2));
-    }
-    foreach ($lv1['m'] as $lv2) {
-      $xtpl->assign($lv2['ns'], parseLink2($lv2));
-      $xtpl->assign('ig' . $lv2['ns'], parseInfo($lv2));
-    }
-  }
-  foreach ($relation['parent'] as $lv1) {
-    $xtpl->assign($lv1['ns'], parseLink2($lv1));
-    $xtpl->assign('ig' . $lv1['ns'], parseInfo($lv1));
+  if (!empty($pet['data']['certify'])) {
+    $xtpl->parse('main.row.ddc');
   }
 
-  $xtpl->assign('grand', implode('<br>', $bay['grand']));
-  $xtpl->assign('parent', implode('<br>', $bay['parent']));
-  $xtpl->assign('sibling', implode('<br>', $bay['sibling']));
-  $xtpl->assign('child', implode('<br>', $bay['child']));
+  // Bố
+  $xtpl->assign('papa', parseLink($pet['father']['data']));
+  $xtpl->assign('igpapa', parseInfo($pet['father']['data']));
+  // Ông nội
+  $xtpl->assign('igrandpa', parseLink($pet['father']['father']));
+  $xtpl->assign('igigrandpa', parseInfo($pet['father']['father']));
+  // Bà nội
+  $xtpl->assign('igrandma', parseLink($pet['father']['mother']));
+  $xtpl->assign('igigrandma', parseInfo($pet['father']['mother']));
+  // mẹ
+  $xtpl->assign('mama', parseLink($pet['mother']['data']));
+  $xtpl->assign('igmama', parseInfo($pet['mother']['data']));
+  // ông ngoại
+  $xtpl->assign('egrandpa', parseLink($pet['mother']['father']));
+  $xtpl->assign('igegrandpa', parseInfo($pet['mother']['father']));
+  // bà ngoại
+  $xtpl->assign('egrandma', parseLink($pet['mother']['mother']));
+  $xtpl->assign('igegrandma', parseInfo($pet['mother']['mother']));
+
+	$xtpl->parse("main.detail");
+}
+else {
+	$xtpl->parse("main.error");
 }
 
 $xtpl->assign('today', date('d/m/Y', time()));
 $xtpl->assign('recall', date('d/m/Y', time() + 60 * 60 * 24 * 21));
 $xtpl->assign('url', '/' . $module_name . '/' . $op . '/');
 $xtpl->assign('remind', json_encode(getRemind()));
-$xtpl->assign('v', parseVaccineType($userinfo['id']));
 $xtpl->assign('id', $id);
 
 $request = 'breeder';
@@ -496,7 +497,7 @@ if (!empty($_REQUEST['target']) && in_array($_REQUEST['target'], array('vaccine'
   $request = $_REQUEST['target'];
 }
 
-switch ($_REQUEST['target']) {
+switch ($request) {
   case 'vaccine':
     $xtpl->assign('a2', 'class="active"');
     $xtpl->assign('al2', 'in active');
@@ -511,15 +512,35 @@ switch ($_REQUEST['target']) {
   break;
 }
 
-$pet = getPetById($id);
-try {
-  json_encode($pet['youtube']);
-}
-catch(Exception $e) {
-  $pet['youtube'] = '[""]';
-}
-$xtpl->assign('youtube', $pet['youtube']);
+// try {
+//   $youtube = json_decode($pet['youtube']);
+//   if (empty($youtube)) $youtube = array();
+//   foreach ($youtube as $url) {
+//     $rx = '~
+//       ^(?:https?://)?
+//       (?:www[.])?
+//       (?:youtube[.]com/watch[?]v=|youtu[.]be/)
+//       ([^&]{11})
+//         ~x';
+//     $has_match = preg_match($rx, $url);
+//     // $has_match = true;
 
+//     if (!empty($url) && $has_match) {
+//       $http_check = strpos($url, 'http://');
+//       // var_dump($http_check);die();
+//       if ($http_check == false) {
+//         $url = 'http://' . $url;
+//       }
+//       $xtpl->assign('youtube', str_replace('watch?v=', 'embed/', $url));
+//       $xtpl->parse('main.youtube');
+//     }
+//   }
+// }
+// catch (Exception $e) {
+//   // echo 'Caught exception: ',  $e->getMessage(), "\n";
+// }
+
+$xtpl->assign('modal', infoModal());
 $xtpl->assign('module_file', $module_file);
 $xtpl->parse("main");
 $contents = $xtpl->text("main");
