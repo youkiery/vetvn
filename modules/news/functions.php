@@ -866,3 +866,120 @@ function reserveList($userid, $filter = array('page' => 1, 'limit' => 10)) {
   $xtpl->parse('main');
   return $xtpl->text();
 }
+
+function statisticCollect() {
+  global $db, $sex_array, $filter;
+
+  $index = ($filter['page'] - 1) * $filter['limit'] + 1;
+  $xtpl = new XTemplate('list.tpl', PATH2);
+
+  $sql = 'select count(*) as count from `'. PREFIX .'_certify`';
+  $query = $db->query($sql);
+  $count = $query->fetch()['count'];
+
+  $sql = 'select * from `'. PREFIX .'_certify` order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
+  $query = $db->query($sql);
+  // $data = getUserPetList($filter);
+
+  while ($row = $query->fetch()) {
+    $pet = getPetinfoId($row['petid']);
+    $user = getUserinfoId($pet['userid']);
+    $xtpl->assign('id', $pet['id']);
+    $xtpl->assign('name', $pet['name']);
+    $xtpl->assign('fullname', $user['fullname']);
+    $xtpl->assign('microchip', $pet['micro']);
+    $xtpl->assign('sex', $pet['sex']);
+    $xtpl->assign('species', $pet['species']);
+    $xtpl->assign('price', number_format($row['price'], 0, '', ','));
+    $xtpl->assign('time', date('d/m/Y', $row['time']));
+    $xtpl->parse('main.row');
+  }
+
+  $xtpl->assign('nav', nav_generater('/news/statistic/?type=' . $filter['type'], $count, $filter['page'], $filter['limit']));
+  $xtpl->parse('main');
+  return $xtpl->text();
+}
+
+function statisticPay() {
+  global $db, $sex_array, $filter;
+  $index = ($filter['page'] - 1) * $filter['limit'] + 1;
+  $xtpl = new XTemplate('pay-list.tpl', PATH2);
+
+  $sql = 'select count(*) as count from `'. PREFIX .'_pay`';
+  $query = $db->query($sql);
+  $count = $query->fetch()['count'];
+
+  $sql = 'select * from `'. PREFIX .'_pay` order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
+  $query = $db->query($sql);
+  // $data = getUserPetList($filter);
+
+  while ($row = $query->fetch()) {
+    $owner = getUserInfo($row['userid']);
+    $xtpl->assign('index', $index++);
+    $xtpl->assign('id', $row['id']);
+    $xtpl->assign('price', number_format($row['price'], 0, '', ','));
+    $xtpl->assign('content', $row['content']);
+    $xtpl->assign('name', $owner['fullname']);
+    $xtpl->assign('time', date('d/m/Y', ($row['time'])));
+    $xtpl->parse('main.row');
+  }
+  $xtpl->assign('nav', nav_generater('/news/statistic/?type=' . $filter['type'], $count, $filter['page'], $filter['limit']));
+  $xtpl->parse('main');
+  return $xtpl->text();
+}
+
+function statisticContent($filter = array('from' => '', 'to' => '')) {
+  global $db;
+
+  $xtpl = new XTemplate('content.tpl', PATH2);
+
+  $check = 0;
+  if (empty($filter['from'])) {
+    $check += 1;
+  }
+  if (empty($filter['end'])) {
+    $check += 2;
+  }
+
+  $xtra = '';
+  switch ($check) {
+    case 1:
+      $filter['end'] = totime($filter['end']) + 60 * 60 * 24 - 1;
+      $xtra = 'where time < ' . $filter['end'];
+      $xtpl->assign('to', 'đến ngày ' . date('d/m/Y', $filter['end']));
+      break;
+    case 2:
+      $filter['from'] = totime($filter['from']);
+      $xtra = 'where time > ' . $filter['from'];
+      $xtpl->assign('from', 'từ ngày ' . date('d/m/Y', $filter['from']));
+      break;
+    case 0:
+      $filter['from'] = totime($filter['from']);
+      $filter['end'] = totime($filter['end']) + 60 * 60 * 24 - 1;
+      $xtpl->assign('from', 'từ ngày ' . date('d/m/Y', $filter['from']));
+      $xtpl->assign('to', 'đến ngày ' . date('d/m/Y', $filter['end']));
+      $xtra = 'where time between ' . $filter['from'] . ' and ' . $filter['end'];
+      break;
+  }
+
+  $p1 = 0;
+  $sql = 'select sum(price) as p from `'. PREFIX .'_certify` ' . $xtra;
+  $query = $db->query($sql);
+  if ($row = $query->fetch()) {
+    $p1 = $row['p'];
+  }
+  
+  $p2 = 0;
+  $sql2 = 'select sum(price) as p from `'. PREFIX .'_pay` ' . $xtra;
+  $query = $db->query($sql2);
+  if ($row = $query->fetch()) {
+    $p2 = $row['p'];
+  }
+
+  $xtpl->assign('total_revenue', number_format($p1, 0, '', ','));
+  $xtpl->assign('total_pay', number_format($p2, 0, '', ','));
+  $xtpl->assign('sum', number_format($p1 - $p2, 0, '', ','));
+
+  $xtpl->parse('main');
+  return $xtpl->text();
+}

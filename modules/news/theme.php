@@ -63,39 +63,6 @@ function adminCetiList() {
   return $xtpl->text();
 }
 
-function revenue($filter = array('page' => 1, 'limit' => 10)) {
-  global $db, $sex_array;
-
-  $index = ($filter['page'] - 1) * $filter['limit'] + 1;
-  $xtpl = new XTemplate('statistic-list.tpl', PATH);
-
-  $sql = 'select count(*) as count from `'. PREFIX .'_pet` where ceti = 1';
-  $query = $db->query($sql);
-  $count = $query->fetch()['count'];
-  $xtpl->assign('nav', navList($count, $filter['page'], $filter['limit'], 'goPage'));
-
-  $sql = 'select * from `'. PREFIX .'_pet` where ceti = 1 order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
-  $query = $db->query($sql);
-  // $data = getUserPetList($filter);
-
-  while ($row = $query->fetch()) {
-    // echo ($row['userid'] . '<br>');
-    $owner = getOwnerById($row['userid']);
-    $xtpl->assign('index', $index++);
-    $xtpl->assign('id', $row['id']);
-    $xtpl->assign('price', number_format($row['price'], 0, '', ','));
-    $xtpl->assign('name', $row['name']);
-    $xtpl->assign('owner', $owner['fullname']);
-    $xtpl->assign('id', $row['id']);
-    $xtpl->assign('microchip', $row['microchip']);
-    $xtpl->assign('breed', $row['breed']);
-    $xtpl->assign('sex', $sex_array[$row['sex']]);
-    $xtpl->parse('main.row');
-  }
-  $xtpl->parse('main');
-  return $xtpl->text();
-}
-
 function revenue2($filter = array('page' => 1, 'limit' => 10)) {
   global $db, $sex_array;
 
@@ -135,36 +102,6 @@ function revenue2($filter = array('page' => 1, 'limit' => 10)) {
   $xtpl->parse('main');
   return $xtpl->text();
 }
-
-function paylist($filter = array('page' => 1, 'limit' => 10)) {
-  global $db, $sex_array;
-
-  $index = ($filter['page'] - 1) * $filter['limit'] + 1;
-  $xtpl = new XTemplate('pay-list.tpl', PATH);
-
-  $sql = 'select count(*) as count from `'. PREFIX .'_pay`';
-  $query = $db->query($sql);
-  $count = $query->fetch()['count'];
-  $xtpl->assign('nav', navList2($count, $filter['page'], $filter['limit'], 'goPage2'));
-
-  $sql = 'select * from `'. PREFIX .'_pay` order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
-  $query = $db->query($sql);
-  // $data = getUserPetList($filter);
-
-  while ($row = $query->fetch()) {
-    $owner = getUserInfo($row['userid']);
-    $xtpl->assign('index', $index++);
-    $xtpl->assign('id', $row['id']);
-    $xtpl->assign('price', number_format($row['price'], 0, '', ','));
-    $xtpl->assign('content', $row['content']);
-    $xtpl->assign('name', $owner['fullname']);
-    $xtpl->assign('time', date('d/m/Y', ($row['time'])));
-    $xtpl->parse('main.row');
-  }
-  $xtpl->parse('main');
-  return $xtpl->text();
-}
-
 
 function vaccineList($petid) {
   global $db, $vaccine_array, $module_file;
@@ -449,62 +386,6 @@ function breedingList($filter = array('species' => '', 'breed' => '', 'keyword' 
     }
     $xtpl->parse('main.row');
   }
-  $xtpl->parse('main');
-  return $xtpl->text();
-}
-
-function statistic($filter = array('from' => '', 'to' => '')) {
-  global $db;
-
-  $xtpl = new XTemplate('statistic-content.tpl', PATH);
-
-  $check = 0;
-  if (empty($filter['from'])) {
-    $check += 1;
-  }
-  if (empty($filter['end'])) {
-    $check += 2;
-  }
-
-  $xtra = '';
-  switch ($check) {
-    case 1:
-      $filter['end'] = totime($filter['end']) + 60 * 60 * 24 - 1;
-      $xtra = 'where time < ' . $filter['end'];
-      $xtpl->assign('to', 'đến ngày ' . date('d/m/Y', $filter['end']));
-      break;
-    case 2:
-      $filter['from'] = totime($filter['from']);
-      $xtra = 'where time > ' . $filter['from'];
-      $xtpl->assign('from', 'từ ngày ' . date('d/m/Y', $filter['from']));
-      break;
-    case 0:
-      $filter['from'] = totime($filter['from']);
-      $filter['end'] = totime($filter['end']) + 60 * 60 * 24 - 1;
-      $xtpl->assign('from', 'từ ngày ' . date('d/m/Y', $filter['from']));
-      $xtpl->assign('to', 'đến ngày ' . date('d/m/Y', $filter['end']));
-      $xtra = 'where time between ' . $filter['from'] . ' and ' . $filter['end'];
-      break;
-  }
-
-  $p1 = 0;
-  $sql = 'select sum(price) as p, ctime as time from `'. PREFIX .'_pet` ' . $xtra;
-  $query = $db->query($sql);
-  if ($row = $query->fetch()) {
-    $p1 = $row['p'];
-  }
-  
-  $p2 = 0;
-  $sql2 = 'select sum(price) as p from `'. PREFIX .'_pay` ' . $xtra;
-  $query = $db->query($sql2);
-  if ($row = $query->fetch()) {
-    $p2 = $row['p'];
-  }
-
-  $xtpl->assign('total_revenue', number_format($p1, 0, '', ','));
-  $xtpl->assign('total_pay', number_format($p2, 0, '', ','));
-  $xtpl->assign('sum', number_format($p1 - $p2, 0, '', ','));
-
   $xtpl->parse('main');
   return $xtpl->text();
 }

@@ -14,75 +14,21 @@ define('BUILDER_EDIT', 2);
 
 $page_title = "Quản lý thu chi";
 
+$filter = array(
+  'page' => $nv_Request->get_int('page', 'get', 1),
+  'limit' => $nv_Request->get_int('limit', 'get', 12),
+  'type' => $nv_Request->get_int('type', 'get', 1)
+);
+
 $action = $nv_Request->get_string('action', 'post', '');
 
 if (!empty($action)) {
 	$result = array('status' => 0);
 	switch ($action) {
-    case 'filter':
-      $filter = $nv_Request->get_array('filter', 'post');
-
-      if ($db->query($sql)) {
-        if ($filter['type'] == 1) {
-          $result['html'] = revenue($filter);
-        } 
-        else {
-          $result['html'] = paylist($filter);
-        }
-        if ($result['html']) {
-          $result['status'] = 1;
-        }
-      }
-    break;
-    case 'get':
-      $id = $nv_Request->get_string('id', 'post', 0);
-
-      $sql = 'select * from `' . PREFIX . '_pet` where id = ' . $id;
-      $query = $db->query($sql);
-
-      if (!empty($row = $query->fetch())) {
-        $result['data'] = array('name' => $row['name'], 'dob' => date('d/m/Y', $row['dateofbirth']), 'species' => $row['species'], 'breed' => $row['breed'], 'color' => $row['color'], 'microchip' => $row['microchip'], 'parentf' => $row['fid'], 'parentm' => $row['mid'], 'miear' => $row['miear'], 'origin' => $row['origin']);
-        $result['more'] = array('breeder' => $row['breeder'], 'sex' => intval($row['sex']), 'm' => getPetNameId($row['mid']), 'f' => getPetNameId($row['fid']), 'userid' => $row['userid'], 'username' => getOwnerById($row['userid'], $row['type'])['fullname']);
-        $result['image'] = $row['image'];
-        $result['status'] = 1;
-      } else {
-        $result['notify'] = 'Có lỗi xảy ra';
-      }
-      break;
-    case 'pet':
-      $userid = $nv_Request->get_string('userid', 'post', '');
-			$keyword = $nv_Request->get_string('keyword', 'post', '');
-      $html = '';
-
-      if (!empty(getOwnerById($userid))) {
-        $sql = 'select * from `'. PREFIX .'_pet` where name like "%'. $keyword .'%"';
-        $query = $db->query($sql);
-
-        while ($row = $query->fetch()) {
-          $html .= '
-            <div class="suggest_item" onclick="pickPet(\''. $row['name'] .'\', '. $row['id'] .')">
-              <p>
-              '. $row['name'] .'
-              </p>
-            </div>
-          ';
-        }
-
-        if (empty($html)) {
-          $html = 'Không có kết quả trùng khớp';
-        }
-      }
-      else {
-        $html = 'Chưa chọn chủ thú cưng';
-      }
-
-			$result['status'] = 1;
-			$result['html'] = $html;
-		break;
     case 'statistic':
       $filter = $nv_Request->get_array('filter', 'post');
 
-      $html = statistic($filter);
+      $html = statisticContent($filter);
       if (!empty($html)) {
         $result['status'] = 1;
         $result['html'] = $html;
@@ -93,9 +39,14 @@ if (!empty($action)) {
 	die();
 }
 
-$xtpl = new XTemplate("statistic.tpl", PATH);
+$xtpl = new XTemplate("main.tpl", PATH2);
 
-$xtpl->assign('content', revenue());
+if ($filter['type'] == 1) {
+  $xtpl->assign('content', statisticCollect());
+}
+else {
+  $xtpl->assign('content', statisticPay());
+}
 
 $sql = 'select * from `'. PREFIX .'_user` where view = 1';
 $query = $db->query($sql);
@@ -106,8 +57,8 @@ while ($row = $query->fetch()) {
   $xtpl->parse('main.user');
 }
 
-$xtpl->assign('statistic', statistic());
-$xtpl->assign('url', '/' . $module_name . '/' . $op . '/');
+$xtpl->assign('type' . $filter['type'], 'selected');
+$xtpl->assign('statistic_content', statisticContent());
 $xtpl->assign('module_file', $module_file);
 $xtpl->parse("main");
 $contents = $xtpl->text("main");

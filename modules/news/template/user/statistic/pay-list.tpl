@@ -9,8 +9,8 @@
     <th> STT </th>
     <th> Người chi </th>
     <th> Nội dung </th>
-    <th> Giá tiền </th>
-    <th> Thời gian </th>
+    <th> Số tiền </th>
+    <th> Ngày chi </th>
   </tr>
   <!-- BEGIN: row -->
   <tbody>

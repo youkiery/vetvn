@@ -1,5 +1,5 @@
 <!-- BEGIN: main -->
-<link rel="stylesheet" href="/themes/default/src/glyphicons.css">
+<link rel="stylesheet" href="/modules/core/src/glyphicons.css">
 <script type="text/javascript" src="/themes/default/src/jquery-ui.min.js"></script> 
 <script type="text/javascript" src="/themes/default/src/jquery.ui.datepicker-vi.js"></script>
 
@@ -40,22 +40,27 @@
           </form>
 
           <div id="statistic">
-            {statistic}
+            {statistic_content}
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <label>
-    <input type="radio" name="type" id="filter-type-1" checked> Danh sách thu
-  </label>
-  <label>
-    <input type="radio" name="type" id="filter-type-2"> Danh sách chi
-  </label>
-  <button class="btn btn-info" onclick="filter()">
-    Lọc
-  </button>
+  <form>
+  <div class="form-group input-group">
+      <select class="form-control" name="type">
+        <option value="1" {type1}> Danh sách thu </option>
+        <option value="2" {type2}> Danh sách chi </option>
+      </select>
+      <div class="input-group-btn">
+        <button class="btn btn-info">
+          Lọc
+        </button>
+      </div>
+    </div>
+  </form>
+
   <button class="btn btn-info" style="float: right;" onclick="showStatistic()">
     Thống kê
   </button>
