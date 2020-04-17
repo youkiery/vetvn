@@ -89,17 +89,80 @@ function selectPetidOfOwner($userid) {
   return implode(', ', $list);
 }
 
-function getTradeById($id) {
-  global $db;
 
-  $sql = 'select * from `'. PREFIX .'_trade` where petid = ' . $id;
-  $query = $db->query($sql);
-
-  while ($row = $query->fetch()) {
-    $list[$row['type']] = $row;
+function parseAgeTime($datetime) {
+  $str = '';
+  $time = time() - $datetime;
+  $year = floor($time / 60 / 60 / 24 / 365.25);
+  $time -= $year * 60 * 60 * 24 * 365.25;
+  $month = round($time / 60 / 60 / 24 / 30);
+  if ($year > 0) {
+    $str .= $year . ' năm ';
   }
-  return $list;
+  if ($year > 0 && $month == 0) {
+    $str .= '';
+  }
+  else if ($year == 0 && $month == 0) {
+    $month = 1;
+  }
+  $str .= $month . ' tháng';
+  return $str;
 }
+
+function cdate($time) {
+  return date('d/m/Y', $time);
+}
+
+function ctime($time) {
+  if (preg_match("/^([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4})$/", $time, $m)) {
+    $time = mktime(0, 0, 0, $m[2], $m[1], $m[3]);
+    if (!$time) {
+      $time = time();
+    }
+  }
+  else {
+    $time = time();
+  }
+  return $time;
+}
+
+function setRegno($regno) {
+  global $db, $db_config;
+
+  $sql = 'update `'. $db_config['prefix'] .'_config` set config_value = "'. $regno .'" where config_name = "regno"';
+  $db->query($sql);
+}
+
+function updatePet($data, $id) {
+  global $db;
+  $sql_part = array();
+  foreach ($data as $key => $value) {
+    $sql_part[] = $key . ' = "' . $value . '" ';
+  }
+
+  $sql = 'update `'. PREFIX .'_pet` set ' . implode(', ', $sql_part) . ' where id = ' . $id;
+
+  if ($db->query($sql)) {
+    return true;
+  }
+  return false;
+}
+
+function updateUser($data, $id) {
+  global $db;
+  $sql_part = array();
+  foreach ($data as $key => $value) {
+    $sql_part[] = $key . ' = "' . $value . '" ';
+  }
+
+  $sql = 'update `'. PREFIX .'_user` set ' . implode(', ', $sql_part) . ' where id = ' . $id;
+
+  if ($db->query($sql)) {
+    return true;
+  }
+  return false;
+}
+
 
 function checkMobile($source, $target) {
   if (empty($target)) {
@@ -130,25 +193,6 @@ function checkMobileExist($mobile) {
   return $check;
 }
 
-function parseAgeTime($datetime) {
-  $str = '';
-  $time = time() - $datetime;
-  $year = floor($time / 60 / 60 / 24 / 365.25);
-  $time -= $year * 60 * 60 * 24 * 365.25;
-  $month = round($time / 60 / 60 / 24 / 30);
-  if ($year > 0) {
-    $str .= $year . ' năm ';
-  }
-  if ($year > 0 && $month == 0) {
-    $str .= '';
-  }
-  else if ($year == 0 && $month == 0) {
-    $month = 1;
-  }
-  $str .= $month . ' tháng';
-  return $str;
-}
-
 function checkObj($obj) {
   $check = true;
   foreach ($obj as $key => $value) {
@@ -158,23 +202,6 @@ function checkObj($obj) {
   }
 
   return $check;
-}
-
-function cdate($time) {
-  return date('d/m/Y', $time);
-}
-
-function ctime($time) {
-  if (preg_match("/^([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4})$/", $time, $m)) {
-    $time = mktime(0, 0, 0, $m[2], $m[1], $m[3]);
-    if (!$time) {
-      $time = time();
-    }
-  }
-  else {
-    $time = time();
-  }
-  return $time;
 }
 
 function checkRemind($name, $type) {
@@ -198,6 +225,208 @@ function checkRemind($name, $type) {
 	}
 	return 0;
 }
+function checkRegno() {
+  global $db, $db_config;
+
+  // kiểm tra có trường regno chưa
+  $sql = 'select * from `'. $db_config['prefix'] .'_config` where config_name = "regno"';
+  $query = $db->query($sql);
+  if (!empty($config = $query->fetch())) {
+    // đã có, return
+    return intval($config['config_value']);
+  }
+  $sql = 'insert into `'. $db_config['prefix'] .'_config` (lang, module, config_name, config_value) values("vi", "system", "regno", "0")';
+  $query = $db->query($sql);
+  return 0;
+}
+
+function checkCertify($id) {
+  global $db;
+
+  $sql = 'select * from `'. PREFIX .'_certify` where petid = ' . $id;
+  $query = $db->query($sql);
+  return $query->fetch();
+}
+
+function checkUserinfo($userid, $type) {
+  global $db;
+
+  if ($type == 1) {
+    $sql = 'select * from `'. PREFIX .'_user` where id = ' . $userid;
+    $query = $db->query($sql);
+    return $query->fetch();
+  }
+  else {
+    $sql = 'select * from `'. PREFIX .'_contact` where id = ' . $userid;
+    $query = $db->query($sql);
+    return $query->fetch();
+  }
+  return false;
+}
+
+function checkUser($username, $password) {
+  global $db;
+
+  $sql = 'select * from `'. PREFIX .'_user` where username = "'. $username .'" and password = "'. md5('pet_' . $password) .'"';
+  $query = $db->query($sql);
+
+  if ($row = $query->fetch()) {
+    return $row;
+  }
+  return false;
+}
+
+function checkPetOwner($petid, $userid) {
+  global $db;
+
+  $sql = 'select * from `'. PREFIX .'_pet` where id = "'. $petid .'" and userid = ' . $userid;
+  $query = $db->query($sql);
+
+  if (!empty($row = $query->fetch())) {
+    return 1;
+  }
+  return 0;
+}
+
+function checkPet($name, $userid) {
+  global $db;
+
+  $sql = 'select * from `'. PREFIX .'_pet` where name = "'. $name .'" and userid = ' . $userid;
+  $query = $db->query($sql);
+
+  if (!empty($row = $query->fetch())) {
+    return 1;
+  }
+  return 0;
+}
+
+
+function checkPrvVaccine($data, $id) {
+  global $db;
+
+  $sql = 'select * from `'. PREFIX .'_vaccine` where type = ' . $data['type'] . ' and petid = ' . $id;
+  $query = $db->query($sql);
+  if (!empty($row = $query->fetch())) {
+    return $row['id'];
+  }
+  return false;
+}
+
+function checkDisease($userid, $value) {
+  global $db;
+
+  $disease = getDiseaseById($value);
+  $sql = 'update `'. PREFIX .'_disease_suggest` set rate = rate + 1 where disease = "'. $disease['disease'] .'"';
+  if ($db->query($sql)) {
+    return true;
+  }
+  return false;
+}
+
+function pickVaccineId($id) {
+  global $db;
+
+  $sql = 'select * from `'. PREFIX .'_disease_suggest` where id = ' . $id;
+  $query = $db->query($sql);
+
+  return $query->fetch();
+}
+
+function getPetDeactiveList($keyword = '', $page = 1, $limit = 10) {
+  global $db;
+  $data = array('list' => array(), 'count' => 0);
+
+  $sql = 'select count(*) as count from `'. PREFIX .'_pet` where name like "%'. $keyword .'%" or microchip like "%'.$keyword.'%" and active = 0';
+  $query = $db->query($sql);
+  $data['count'] = $query->fetch()['count'];
+
+  $sql = 'select * from `'. PREFIX .'_pet` where name like "%'. $keyword .'%" or microchip like "%'.$keyword.'%" and active = 0 limit ' . $limit . ' offset ' . (($page - 1) * $limit);
+  $query = $db->query($sql);
+
+  while($row = $query->fetch()) {
+    $data['list'][] = $row;
+  }
+  return $data;
+}
+
+
+function getDiseaseById($id) {
+  global $db;
+
+  $sql = 'select * from `'. PREFIX.'_disease_suggest` where id = ' . $id;
+  $query = $db->query($sql);
+
+  if (empty($row = $query->fetch())) {
+    $row = array('disease' => '');
+  }
+
+  return $row;
+}
+
+
+function getPetById($id) {
+  global $db;
+
+  if (intval($id)) {
+    $sql = 'select * from `'. PREFIX .'_pet` where id = ' . $id;
+    $query = $db->query($sql);
+    if (!empty($row = $query->fetch())) {
+        return $row;
+    }
+  }
+  return false;
+}
+
+function getSign() {
+  global $db;
+
+  $sql = 'select * from `'.  PREFIX.'_sign` where active = 1 order by time desc';
+  $query = $db->query($sql);
+  $list = array();
+
+  while ($row = $query->fetch()) {
+    $list []= $row;
+  }
+  return $list;
+}
+
+function getOwnerById($id, $type = 1) {
+  global $db;
+
+  if (intval($id)) {
+    if ($type == 1) {
+      $sql = 'select * from `'. PREFIX .'_user` where id = ' . $id;
+    }
+    else {
+      $sql = 'select * from `'. PREFIX .'_contact` where id = ' . $id;
+    }
+    // die($sql);
+    $query = $db->query($sql);
+    return $query->fetch();
+  }
+  return false;
+}
+
+function getRequestId($id) {
+  global $db;
+
+  if (intval($id)) {
+    $sql = 'select * from `'. PREFIX .'_request` where id = ' . $id;
+    $query = $db->query($sql);
+    return $query->fetch();
+  }
+  return false;
+}
+
+function getPetNameId($id) {
+  global $db;
+
+  if ($id && !empty($pet = getPetById($id)) && !empty($pet['name'])) {
+    return $pet['name'];
+  }
+  return '';
+}
+
 
 function getRemindIdv2($name, $type) {
 	global $db;
@@ -275,222 +504,19 @@ function getContactId($id, $userid = 0) {
   return 0;
 }
 
-function checkRegno() {
-  global $db, $db_config;
 
-  // kiểm tra có trường regno chưa
-  $sql = 'select * from `'. $db_config['prefix'] .'_config` where config_name = "regno"';
-  $query = $db->query($sql);
-  if (!empty($config = $query->fetch())) {
-    // đã có, return
-    return intval($config['config_value']);
-  }
-  $sql = 'insert into `'. $db_config['prefix'] .'_config` (lang, module, config_name, config_value) values("vi", "system", "regno", "0")';
-  $query = $db->query($sql);
-  return 0;
-}
-
-function setRegno($regno) {
-  global $db, $db_config;
-
-  $sql = 'update `'. $db_config['prefix'] .'_config` set config_value = "'. $regno .'" where config_name = "regno"';
-  $db->query($sql);
-}
-
-function checkUserinfo($userid, $type) {
+function getTradeById($id) {
   global $db;
 
-  if ($type == 1) {
-    $sql = 'select * from `'. PREFIX .'_user` where id = ' . $userid;
-    $query = $db->query($sql);
-    return $query->fetch();
-  }
-  else {
-    $sql = 'select * from `'. PREFIX .'_contact` where id = ' . $userid;
-    $query = $db->query($sql);
-    return $query->fetch();
-  }
-  return false;
-}
-
-function getPetById($id) {
-  global $db;
-
-  if (intval($id)) {
-    $sql = 'select * from `'. PREFIX .'_pet` where id = ' . $id;
-    $query = $db->query($sql);
-    if (!empty($row = $query->fetch())) {
-        return $row;
-    }
-  }
-  return false;
-}
-
-function getSign() {
-  global $db;
-
-  $sql = 'select * from `'.  PREFIX.'_sign` where active = 1 order by time desc';
+  $sql = 'select * from `'. PREFIX .'_trade` where petid = ' . $id;
   $query = $db->query($sql);
-  $list = array();
 
   while ($row = $query->fetch()) {
-    $list []= $row;
+    $list[$row['type']] = $row;
   }
   return $list;
 }
 
-function getOwnerById($id, $type = 1) {
-  global $db;
-
-  if (intval($id)) {
-    if ($type == 1) {
-      $sql = 'select * from `'. PREFIX .'_user` where id = ' . $id;
-    }
-    else {
-      $sql = 'select * from `'. PREFIX .'_contact` where id = ' . $id;
-    }
-    // die($sql);
-    $query = $db->query($sql);
-    return $query->fetch();
-  }
-  return false;
-}
-
-function getRequestId($id) {
-  global $db;
-
-  if (intval($id)) {
-    $sql = 'select * from `'. PREFIX .'_request` where id = ' . $id;
-    $query = $db->query($sql);
-    return $query->fetch();
-  }
-  return false;
-}
-
-function getPetNameId($id) {
-  global $db;
-
-  if ($id && !empty($pet = getPetById($id)) && !empty($pet['name'])) {
-    return $pet['name'];
-  }
-  return '';
-}
-
-function updatePet($data, $id) {
-  global $db;
-  $sql_part = array();
-  foreach ($data as $key => $value) {
-    $sql_part[] = $key . ' = "' . $value . '" ';
-  }
-
-  $sql = 'update `'. PREFIX .'_pet` set ' . implode(', ', $sql_part) . ' where id = ' . $id;
-
-  if ($db->query($sql)) {
-    return true;
-  }
-  return false;
-}
-
-function updateUser($data, $id) {
-  global $db;
-  $sql_part = array();
-  foreach ($data as $key => $value) {
-    $sql_part[] = $key . ' = "' . $value . '" ';
-  }
-
-  $sql = 'update `'. PREFIX .'_user` set ' . implode(', ', $sql_part) . ' where id = ' . $id;
-
-  if ($db->query($sql)) {
-    return true;
-  }
-  return false;
-}
-
-function checkUser($username, $password) {
-  global $db;
-
-  $sql = 'select * from `'. PREFIX .'_user` where username = "'. $username .'" and password = "'. md5('pet_' . $password) .'"';
-  $query = $db->query($sql);
-
-  if ($row = $query->fetch()) {
-    return $row;
-  }
-  return false;
-}
-
-function getPetDeactiveList($keyword = '', $page = 1, $limit = 10) {
-  global $db;
-  $data = array('list' => array(), 'count' => 0);
-
-  $sql = 'select count(*) as count from `'. PREFIX .'_pet` where name like "%'. $keyword .'%" or microchip like "%'.$keyword.'%" and active = 0';
-  $query = $db->query($sql);
-  $data['count'] = $query->fetch()['count'];
-
-  $sql = 'select * from `'. PREFIX .'_pet` where name like "%'. $keyword .'%" or microchip like "%'.$keyword.'%" and active = 0 limit ' . $limit . ' offset ' . (($page - 1) * $limit);
-  $query = $db->query($sql);
-
-  while($row = $query->fetch()) {
-    $data['list'][] = $row;
-  }
-  return $data;
-}
-
-function checkPetOwner($petid, $userid) {
-  global $db;
-
-  $sql = 'select * from `'. PREFIX .'_pet` where id = "'. $petid .'" and userid = ' . $userid;
-  $query = $db->query($sql);
-
-  if (!empty($row = $query->fetch())) {
-    return 1;
-  }
-  return 0;
-}
-
-function checkPet($name, $userid) {
-  global $db;
-
-  $sql = 'select * from `'. PREFIX .'_pet` where name = "'. $name .'" and userid = ' . $userid;
-  $query = $db->query($sql);
-
-  if (!empty($row = $query->fetch())) {
-    return 1;
-  }
-  return 0;
-}
-
-function pickVaccineId($id) {
-  global $db;
-
-  $sql = 'select * from `'. PREFIX .'_disease_suggest` where id = ' . $id;
-  $query = $db->query($sql);
-
-  return $query->fetch();
-}
-
-function getDiseaseById($id) {
-  global $db;
-
-  $sql = 'select * from `'. PREFIX.'_disease_suggest` where id = ' . $id;
-  $query = $db->query($sql);
-
-  if (empty($row = $query->fetch())) {
-    $row = array('disease' => '');
-  }
-
-  return $row;
-}
-
-function checkDisease($userid, $value) {
-  global $db;
-
-  $disease = getDiseaseById($value);
-  $sql = 'update `'. PREFIX .'_disease_suggest` set rate = rate + 1 where disease = "'. $disease['disease'] .'"';
-  if ($db->query($sql)) {
-    return true;
-  }
-  return false;
-}
 
 function parseVaccineType($userid) {
   global $db;
@@ -507,15 +533,10 @@ function parseVaccineType($userid) {
   return implode('', $list);
 }
 
-function checkPrvVaccine($data, $id) {
-  global $db;
-
-  $sql = 'select * from `'. PREFIX .'_vaccine` where type = ' . $data['type'] . ' and petid = ' . $id;
-  $query = $db->query($sql);
-  if (!empty($row = $query->fetch())) {
-    return $row['id'];
-  }
-  return false;
+function parseImage($image) {
+  $image = explode(',', $image);
+  if (!empty($image[0])) return $image[0];
+  return 'themes/default/images/thumbnail-xxs.jpg';
 }
 
 function sqlBuilder($data, $type) {
@@ -537,71 +558,6 @@ function sqlBuilder($data, $type) {
     }
   }
   return implode(', ', $string);
-}
-
-function getPetRelation($petid) {
-  global $db;
-
-  // $sibling = getPetSibling($parent, $petid);
-  $pet = getPetById($petid);
-  $parent = getPetParent($pet);
-  $grand = getPetGrand($parent);
-  // $child = getPetChild($petid);
-
-  $result = array('parent' => $parent, 'grand' => $grand);
-  return $result;
-}
-
-// function getPetSibling($parent, $petid) {
-//   global $db;
-
-//   $list = array();
-//   $sql = 'select * from `'. PREFIX .'_pet` where (fid = ' . $parent['f']['id'] . ' or mid = ' . $parent['m']['id'] . ') and id <> ' . $petid;
-//   $query = $db->query($sql);
-
-//   while ($row = $query->fetch()) {
-//     $list[] = $row;
-//   }
-//   return $list;
-// }
-
-function getPetGrand($parent) {
-  global $db;
-
-  if (empty($parent['f']['fid'])) $parent['f']['fid'] = 0;
-  if (empty($parent['f']['mid'])) $parent['f']['mid'] = 0;
-  if (empty($parent['m']['fid'])) $parent['m']['fid'] = 0;
-  if (empty($parent['m']['mid'])) $parent['m']['mid'] = 0;
-
-  $grand = array('i' => array('f' => getPetById($parent['f']['fid']), 'm' => getPetById($parent['f']['mid'])), 'e' => array('f' => getPetById($parent['m']['fid']), 'm' => getPetById($parent['m']['mid'])));
-  $grand['i']['f']['ns'] = 'igrandpa';
-  $grand['i']['m']['ns'] = 'igrandma';
-  $grand['e']['f']['ns'] = 'egrandpa';
-  $grand['e']['m']['ns'] = 'egrandma';
-  return $grand;
-}
-
-function getPetParent($pet) {
-  global $db;
-
-  $parent = array('f' => getPetById($pet['fid']), 'm' => getPetById($pet['mid']));
-  $parent['f']['ns'] = 'papa';
-  $parent['m']['ns'] = 'mama';
-  return $parent;
-}
-
-function getPetChild($petid) {
-  global $db;
-
-  $list = array();
-  $sql = 'select * from `'. PREFIX .'_pet` where fid = ' . $petid . ' or mid = ' . $petid;
-  $query = $db->query($sql);
-
-  while ($row = $query->fetch()) {
-    $list[] = $row;
-  }
-
-  return $list;
 }
 
 function totime($time) {
