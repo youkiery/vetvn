@@ -21,21 +21,6 @@
 
 <div class="container">
   <div id="msgshow"></div>
-  <div id="remove-pet" class="modal fade" role="dialog">
-    <div class="modal-dialog modal-sm">
-      <div class="modal-content">
-        <div class="modal-body text-center">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <p>
-            Xác nhận xóa?
-          </p>
-          <button class="btn btn-danger" onclick="removePetSubmit()">
-            Xóa
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <form onsubmit="filterE(event)">
     <div>

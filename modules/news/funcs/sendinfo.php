@@ -188,6 +188,19 @@ if (!empty($action)) {
 			$info['species'] = getRemindId($info['species'])['name'];
 			$info['color'] = getRemindId($info['color'])['name'];
 			$info['type'] = getRemindId($info['type'])['name'];
+			// Đã chứng nhận
+			$info['status'] = 'Đợi cấp giấy';
+			if (!empty($info['petid'])) {
+				// kiểm tra thông tin chứng nhận
+				$sql = 'select * from `'. PREFIX .'_pet` where id = ' . $info['petid'];
+				$query = $db->query($sql);
+				$pet = $query->fetch();
+				// có chứng nhận
+				if ($pet['ceti'] > 0) {
+					if ($pet['price'] > 0) $info['status'] = 'Đã thanh toán';
+					else $info['status'] = 'Chưa thanh toán';
+				}
+			}
 
 			$result['status'] = 1;
 			$result['data'] = $info;

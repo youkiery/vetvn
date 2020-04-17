@@ -234,21 +234,17 @@
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
 
-        <div class="rows">
-          <div class="col-3">
-            <img id="info-image" class="img-responsive">
-          </div>
-          <div class="col-9">
-            <p> Tên thú cưng: <span id="info-name"></span> </p>
-            <p> Giới tính: <span id="info-sex"></span> </p>
-            <p> Ngày sinh: <span id="info-birthtime"></span> </p>
-            <p> Giống loài: <span id="info-species"></span> </p>
-            <p> Màu lông: <span id="info-color"></span> </p>
-            <p> Kiểu lông: <span id="info-type"></span> </p>
-            <p> Người nhân giống: <span id="info-breeder"></span> </p>
-            <p> Chủ nuôi: <span id="info-owner"></span> </p>
-          </div>
+        <div class="text-center">
+          <img style="max-width: 250px; margin: auto;" id="info-image" class="img-responsive">
         </div>
+        <p> Tên thú cưng: <span id="info-name"></span> </p>
+        <p> Giới tính: <span id="info-sex"></span> </p>
+        <p> Ngày sinh: <span id="info-birthtime"></span> </p>
+        <p> Giống loài: <span id="info-species"></span> </p>
+        <p> Màu lông: <span id="info-color"></span> </p>
+        <p> Kiểu lông: <span id="info-type"></span> </p>
+        <p> Người nhân giống: <span id="info-breeder"></span> </p>
+        <p> Chủ nuôi: <span id="info-owner"></span> </p>
       </div>
     </div>
   </div>
@@ -270,6 +266,18 @@
               <input type="text" class="form-control" id="done-micro">
             </div>
           </div>
+
+          <div class="rows form-group">
+            <div class="col-3"> Người ký </div>
+            <div class="col-9">
+              <select class="form-control" id="done-sign">
+                <!-- BEGIN: sign -->
+                <option value="{id}"> {name} </option>
+                <!-- END: sign -->
+              </select>
+            </div>
+          </div>
+
           <button class="edit btn btn-info" onclick="doneSubmit()">
             Xác nhận duyệt
           </button>
@@ -299,4 +307,27 @@
   </div>
 </div>
 
+<div class="modal" id="sign-modal" role="dialog">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-group">
+          Danh sách chữ ký
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <div class="form-group input-group">
+          <input type="text" class="form-control" id="sign-name">
+          <div class="input-group-btn">
+            <button class="btn btn-success" onclick="insertSign()"> thêm </button>
+          </div>
+        </div>
+
+        <div id="sign-content">
+          {sign_content}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- END: main -->

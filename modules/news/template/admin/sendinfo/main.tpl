@@ -63,6 +63,13 @@
 
 <div style="clear: both;"></div>
 
+<div class="form-group" style="float: right;">
+  <button class="btn btn-info" onclick="signModal()"> Danh sách chữ ký </button>
+</div>
+
+<div style="clear: both;"></div>
+
+
 <div id="content">
   {content}
 </div>
@@ -198,6 +205,7 @@
   function removeSubmit() {
     vhttp.checkelse('', { action: 'remove-info', id: global['id'] }).then(data => {
       $("#content").html(data['html'])
+      $("#remove-modal").modal('hide')
     })
   }
 
@@ -350,9 +358,32 @@
   }
 
   function doneSubmit() {
-    vhttp.checkelse('', { action: 'done', id: global['id'], micro: $("#done-micro").val() }).then(data => {
+    vhttp.checkelse('', { action: 'done', id: global['id'], micro: $("#done-micro").val(), sign: $("#done-sign").val() }).then(data => {
       $("#content").html(data['html'])
       $("#done-modal").modal('hide')
+    })
+  }
+
+  function signModal() {
+    $("#sign-modal").modal('show')
+  }
+
+  function insertSign() {
+    vhttp.checkelse('', { action: 'insert-sign', name: $("#sign-name").val() }).then(data => {
+      $("#sign-content").html(data['html'])
+    })
+  }
+
+  function updateSign(id) {
+    vhttp.checkelse('', { action: 'update-sign', id: id, name: $("#sign-" + id).val() }).then(data => {
+      alert_msg('Đã cập nhật')
+      $("#sign-content").html(data['html'])
+    })
+  }
+
+  function removeSign(id) {
+    vhttp.checkelse('', { action: 'remove-sign', id: id, name: $("#sign-name").val() }).then(data => {
+      $("#sign-content").html(data['html'])
     })
   }
 </script>

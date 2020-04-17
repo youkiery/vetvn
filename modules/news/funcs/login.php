@@ -48,7 +48,7 @@ if (!empty($username)) {
 		else {
 			$_SESSION['username'] = $username;
 			$_SESSION['password'] = $password;
-			header('location: /news/private');
+			header('location: /'. $module_name .'/private');
 		}
 	}
 }

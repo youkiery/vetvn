@@ -159,12 +159,13 @@ if (!empty($action)) {
 			$query = $db->query($sql);
 			$info = $query->fetch();
 
-			$breeder = getUserinfoId($info['breeder']);
-			$owner = getUserinfoId($info['owner']);
+			$breeder = getContactId(intval($info['breeder']), $info['userid']);
+			$owner = getContactId(intval($info['owner']), $info['userid']);
+
 			$image = explode(',', $info['image']);
 			$info['image'] = $image[0];
-			$info['breeder'] = $breeder['address'];
-			$info['owner'] = $owner['address'];
+			$info['breeder'] = $breeder['fullname'] . ', ' . $breeder['address'];
+			$info['owner'] = $owner['fullname'] . ', ' . $owner['address'];
 			$info['sex'] = $sex_data[$info['sex']];
 			$info['birthtime'] = date('d/m/Y', $info['birthtime']);
 			$info['species'] = getRemindId($info['species'])['name'];
@@ -175,27 +176,19 @@ if (!empty($action)) {
 			$result['data'] = $info;
 		break;
 		case 'done':
-			$id = $nv_Request->get_int('id', 'post');
+			$id = $nv_Request->get_int('id', 'post', 0);
+			$sign = $nv_Request->get_int('sign', 'post', 0);
 			$micro = $nv_Request->get_string('micro', 'post');
 
-			$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
-			$query = $db->query($sql);
-			$info = $query->fetch();
-
-			$species = getRemindId($info['species'])['name'];
-			$color = getRemindId($info['color'])['name'];
-			$breed = substr($species, 0, strpos($species, ' '));
-			$species = checkRemind($species, 'species');
-			$breed = checkRemind($breed, 'breed');
-
-			$sql = 'insert into `'. PREFIX .'_pet` (name, dateofbirth, species, breed, sex, color, microchip, miear, image, active, userid, breeder, origin, fid, mid, type, graph, sell, breeding, time, ceti, price, ctime, youtube) values("'. $info['name'] .'", '. $info['birthtime'] .', '. $species .', '. $breed .', '. $info['sex'] .', "'. $color .'", "'. $micro .'", "", "'. $info['image'] .'", 1, '. $info['userid'] .', 0, "", "", "", 1, "", 0, 0, '. time() .', 0, 0, 0, "")';
-			if ($db->query($sql)) {
-				// thông báo
-				$sql = 'update `'. PREFIX .'_sendinfo` set active = 1, activetime = '. time() .', petid = '. $db->lastInsertId() .' where id = ' . $id;
-				if ($db->query($sql)) {
-					$result['status'] = 1;
-					$result['html'] = sendinfoContent();
-				}
+			$regno = checkRegno();
+			// kích hoạt thú cưng
+			$sql = 'update `'. PREFIX .'_sendinfo` set active = 1, micro = "'. $micro .'", regno = "'. ($regno++) .'" where id = ' . $id;
+			// xác nhận cấp giấy thú cưng
+			$sql2 = 'insert into `'. PREFIX .'_certify` (petid, signid, price, status, time) values('. $id .', '. $sign .', 0, 0, '. time() .')';
+			if ($db->query($sql) && $db->query($sql2)) {
+				setRegno($regno);
+				$result['status'] = 1;
+				$result['html'] = sendinfoContent();
 			}
 		break;
 		case 'remove-info':
@@ -205,6 +198,50 @@ if (!empty($action)) {
 			if ($db->query($sql)) {
 				$result['status'] = 1;
 				$result['html'] = sendinfoContent();
+			}
+		break;
+		case 'insert-sign':
+			$name = $nv_Request->get_string('name', 'post', '');
+
+			$sql = 'select * from `'. PREFIX .'_sign` where name = "'. $name .'"';
+			$query = $db->query($sql);
+			
+			if (!empty($name)) {
+				if (empty($row = $query->fetch())) {
+					$sql = 'insert into `'. PREFIX .'_sign` (name, time) values ("'. $name .'", '. time() .')';
+				}
+				else {
+					$sql = 'update `'. PREFIX .'_sign` set active = 1, time = "'. time() .'" where id = ' . $row['id'];
+				}
+				if ($db->query($sql)) {
+					$result['status'] = 1;
+					$result['html'] = signContent();
+				}
+			}	
+			
+		break;
+		case 'update-sign':
+			$id = $nv_Request->get_int('id', 'post');
+			$name = $nv_Request->get_string('name', 'post', '');
+
+			$sql = 'select * from `'. PREFIX .'_sign` where name = "'. $name .'" and id <> ' . $id;
+			$query = $db->query($sql);
+			
+			if (!empty($name) && empty($query->fetch())) {
+				$sql = 'update `'. PREFIX .'_sign` set name = "'. $name .'" where id = ' . $id;
+				if ($db->query($sql)) {
+					$result['status'] = 1;
+					$result['html'] = signContent();
+				}
+			}
+		break;
+		case 'remove-sign':
+			$id = $nv_Request->get_int('id', 'post');
+
+			$sql = 'update `'. PREFIX .'_sign` set active = 0 where id = ' . $id;
+			if ($db->query($sql)) {
+				$result['status'] = 1;
+				$result['html'] = signContent();
 			}
 		break;
 	}

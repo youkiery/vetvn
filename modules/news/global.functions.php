@@ -269,9 +269,32 @@ function getContactId($id, $userid = 0) {
     $query = $db->query($sql);
     $row = $query->fetch();
     $row['mobile'] = xdecrypt($row['mobile']);
+    $row['address'] = xdecrypt($row['address']) . ', ' . $row['a2'] . ', ' . $row['a1'];
     if ($row) return $row;
   }
   return 0;
+}
+
+function checkRegno() {
+  global $db, $db_config;
+
+  // kiểm tra có trường regno chưa
+  $sql = 'select * from `'. $db_config['prefix'] .'_config` where config_name = "regno"';
+  $query = $db->query($sql);
+  if (!empty($config = $query->fetch())) {
+    // đã có, return
+    return intval($config['config_value']);
+  }
+  $sql = 'insert into `'. $db_config['prefix'] .'_config` (lang, module, config_name, config_value) values("vi", "system", "regno", "0")';
+  $query = $db->query($sql);
+  return 0;
+}
+
+function setRegno($regno) {
+  global $db, $db_config;
+
+  $sql = 'update `'. $db_config['prefix'] .'_config` set config_value = "'. $regno .'" where config_name = "regno"';
+  $db->query($sql);
 }
 
 function checkUserinfo($userid, $type) {
@@ -301,6 +324,19 @@ function getPetById($id) {
     }
   }
   return false;
+}
+
+function getSign() {
+  global $db;
+
+  $sql = 'select * from `'.  PREFIX.'_sign` where active = 1 order by time desc';
+  $query = $db->query($sql);
+  $list = array();
+
+  while ($row = $query->fetch()) {
+    $list []= $row;
+  }
+  return $list;
 }
 
 function getOwnerById($id, $type = 1) {

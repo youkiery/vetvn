@@ -371,6 +371,7 @@
       $("#info-type").text(data['data']['type'])
       $("#info-breeder").text(data['data']['breeder'])
       $("#info-owner").text(data['data']['owner'])
+      $("#info-status").text(data['data']['status'])
       $("#info-modal").modal('show')
     })
   }

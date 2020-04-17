@@ -632,6 +632,13 @@ function checkLogin($username, $password = '') {
 function sendinfoModal() {
   global $userinfo;
   $xtpl = new XTemplate('modal.tpl', PATH2);
+  $sign = getSign();
+  foreach ($sign as $row) {
+    $xtpl->assign('id', $row['id']);
+    $xtpl->assign('name', $row['name']);
+    $xtpl->parse('main.sign');
+  }
+  $xtpl->assign('sign_content', signContent());
   $xtpl->parse('main');
   return $xtpl->text();
 }
@@ -779,6 +786,23 @@ function petModal() {
       $xtpl->assign('active', 'display: none');
     }
     $xtpl->parse('main.l2');
+  }
+  
+  $xtpl->parse('main');
+  return $xtpl->text();
+}
+
+function signContent() {
+  global $db;
+  $xtpl = new XTemplate('sign-list.tpl', PATH2);
+
+  $sign = getSign();
+  $index = 1;
+  foreach ($sign as $row) {
+    $xtpl->assign('index', $index ++);
+    $xtpl->assign('id', $row['id']);
+    $xtpl->assign('name', $row['name']);
+    $xtpl->parse('main.row');
   }
   
   $xtpl->parse('main');
