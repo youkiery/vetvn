@@ -31,7 +31,7 @@ if (!empty($action)) {
 
 $xtpl = new XTemplate("main.tpl", PATH2);
 
-$xtpl->assign('content', breedingList());
+// $xtpl->assign('content', breedingList());
 
 $xtpl->parse("main");
 $contents = $xtpl->text("main");
