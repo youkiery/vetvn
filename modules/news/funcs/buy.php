@@ -41,9 +41,9 @@ if (!empty($action)) {
 	die();
 }
 
-$xtpl = new XTemplate("buy.tpl", "modules/". $module_name ."/template");
+$xtpl = new XTemplate("main.tpl", PATH2);
 
-$xtpl->assign('content', buyList());
+// $xtpl->assign('content', buyList());
 if (!empty($userinfo = getUserinfo())) {
   $userinfo['address'] = xdecrypt($userinfo['address']);
   $userinfo['mobile'] = xdecrypt($userinfo['mobile']);

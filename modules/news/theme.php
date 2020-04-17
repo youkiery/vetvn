@@ -564,7 +564,7 @@ function transferedList($userid, $filter = array('page' => 1, 'limit' => 10, 'ty
 function sellList($filter = array('species' => '', 'breed' => '', 'keyword' => '', 'page' => '1', 'limit' => '12')) {
   global $db, $module_name;
 
-  $xtpl = new XTemplate('sell-list.tpl', PATH);
+  $xtpl = new XTemplate('list.tpl', PATH2);
   $xtpl->assign('module_name', $module_name);
 
   // ??
@@ -601,7 +601,7 @@ function sellList($filter = array('species' => '', 'breed' => '', 'keyword' => '
 function breedingList($filter = array('species' => '', 'breed' => '', 'keyword' => '', 'page' => '1', 'limit' => '12')) {
   global $db, $module_name;
 
-  $xtpl = new XTemplate('breeding-list.tpl', PATH);
+  $xtpl = new XTemplate('list.tpl', PATH2);
   $xtpl->assign('module_name', $module_name);
 
   $sql = 'select count(*) as count from `'. PREFIX .'_trade` a inner join `'. PREFIX .'_pet` b on a.petid = b.id where a.status = 1 and a.type = 2 and b.name like "%'. $filter['keyword'] .'%" and b.breed like "%'. $filter['species'] .'%" and b.species like "%'. $filter['breed'] .'%"';
@@ -693,7 +693,7 @@ function statistic($filter = array('from' => '', 'to' => '')) {
 function buyList($filter = array('species' => '', 'breed' => '', 'page' => '1', 'limit' => '12')) {
   global $db, $module_name, $buy_sex;
 
-  $xtpl = new XTemplate('buy-list.tpl', PATH);
+  $xtpl = new XTemplate('list.tpl', PATH2);
   $xtpl->assign('module_name', $module_name);
 
   $sql = 'select count(*) as count from `'. PREFIX .'_buy` where status = 1 and breed like "%'. $filter['species'] .'%" and species like "%'. $filter['breed'] .'%"';

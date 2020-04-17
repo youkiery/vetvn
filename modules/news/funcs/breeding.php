@@ -29,7 +29,7 @@ if (!empty($action)) {
 	die();
 }
 
-$xtpl = new XTemplate("breeding.tpl", "modules/". $module_name ."/template");
+$xtpl = new XTemplate("main.tpl", PATH2);
 
 $xtpl->assign('content', breedingList());
 
