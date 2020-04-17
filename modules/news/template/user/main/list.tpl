@@ -10,8 +10,8 @@
     <div class="pright">
       Tên: {name} <br>
       Tuổi: {age} <br>
-      Loài: {breed} <br>
-      Giống: {species}
+      Giống loài: {species} <br>
+      Chủ nuôi: {owner}
     </div>
   </a>
   <span style="clear: both;"></span>

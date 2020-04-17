@@ -11,6 +11,12 @@ if (!defined('NV_IS_FORM')) {
 	die('Stop!!!');
 }
 
+$filter = array(
+  'page' => $nv_Request->get_int('page', 'get', 1),
+  'limit' => $nv_Request->get_int('limit', 'get', 12),
+  'keyword' => $nv_Request->get_string('keyword', 'get', '')
+);
+
 $action = $nv_Request->get_string('action', 'post', '');
 if (!empty($action)) {
 	$result = array('status' => 0);
@@ -19,24 +25,22 @@ if (!empty($action)) {
       $data = $nv_Request->get_array('data', 'post');
 
       $result['status'] = 1;
-      $result['html'] = mainPetList($data['keyword'], $data['page']);
+      $result['html'] = listContent();
     break;
 	}
 	echo json_encode($result);
 	die();
 }
 
-$xtpl = new XTemplate("list.tpl", "modules/". $module_name ."/template");
-
-$keyword = $nv_Request->get_string('keyword', 'get', '');
+$xtpl = new XTemplate("main.tpl", PATH2);
 
 $page_title = "Danh sách thú cưng";
-if (!empty($keyword)) {
-  $page_title = $keyword . " - Tìm kiếm thú cưng";
+if (!empty($filter['keyword'])) {
+  $page_title = $filter['keyword'] . " - Tìm kiếm thú cưng";
 }
 
-$xtpl->assign('keyword', $keyword);
-$xtpl->assign('content', mainPetList($keyword));
+$xtpl->assign('keyword', $filter['keyword']);
+$xtpl->assign('content', listContent());
 $xtpl->assign('module_file', $module_file);
 
 $xtpl->parse("main");

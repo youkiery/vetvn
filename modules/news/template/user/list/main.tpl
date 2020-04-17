@@ -2,7 +2,7 @@
 <div class="container">
   <div id="msgshow"></div>
   <div style="float: right;">
-    {FILE "heading.tpl"}
+    {FILE "../../heading.tpl"}
   </div>
   <div style="clear: right;"></div>
   <a href="/">

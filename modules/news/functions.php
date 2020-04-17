@@ -40,34 +40,63 @@ function mainContent() {
     $xtpl = new XTemplate('list.tpl', PATH2);
     $xtpl->assign('module_file', $module_file);
   
-    $sql = 'select * from `'. PREFIX .'_pet` where active > 0 order by time desc limit 12';
+    $sql = 'select * from `'. PREFIX .'_sendinfo` where active = 1 order by time desc limit 12';
     $query = $db->query($sql);
   
-    $time = time();
-    $year = 60 * 60 * 24 * 365.25;
-  
     while ($row = $query->fetch()) {
-      $owner = getOwnerById($row['userid'], $row['type']);
-      $xtpl->assign('index', $index++);
-      $xtpl->assign('image', $row['image']);
+      $owner = getContactId($row['owner'], $row['userid']);
+      $certify = checkCertify($row['id']);
+      $xtpl->assign('id', $row['id']);
+      $xtpl->assign('image', parseImage($row['image']));
       $xtpl->assign('name', $row['name']);
       $xtpl->assign('owner', $owner['fullname']);
-      $xtpl->assign('id', $row['id']);
-      $xtpl->assign('image', $row['image']);
-      $xtpl->assign('microchip', $row['microchip']);
-      $xtpl->assign('breed', $row['breed']);
-      $xtpl->assign('species', $row['species']);
+      $xtpl->assign('microchip', $row['micro']);
+      $xtpl->assign('species', getRemindId($row['species'])['name']);
       $xtpl->assign('sex', $sex_array[$row['sex']]);
-      $xtpl->assign('age', parseAgeTime($row['dateofbirth']));
-      if ($row['ceti'] == 1) {
+      $xtpl->assign('age', parseAgeTime($row['birthtime']));
+      if (!empty($certify)) {
         $xtpl->parse('main.row.ddc');
       }
-      // $xtpl->assign('dob', cdate($row['dateofbirth']));
       $xtpl->parse('main.row');
     }
     $xtpl->parse('main');
     return $xtpl->text();
 }
+
+function listContent() {
+  global $db, $sex_array, $module_file, $filter;
+  $xtpl = new XTemplate('list.tpl', PATH2);
+  $xtpl->assign('module_file', $module_file);
+  
+  $sql = 'select count(*) as count from `'. PREFIX .'_sendinfo` where active = 1 and (name like "%'.$filter['keyword'].'%" or micro like "%'.$filter['keyword'].'%")';
+  $query = $db->query($sql);
+  $data['count'] = $query->fetch()['count'];
+  $count = $data['count'];
+  
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where active = 1 and (name like "%'.$filter['keyword'].'%" or micro like "%'.$filter['keyword'].'%") order by time desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
+  $query = $db->query($sql);
+
+  while ($row = $query->fetch()) {
+    $owner = getContactId($row['owner'], $row['userid']);
+    $certify = checkCertify($row['id']);
+    $xtpl->assign('id', $row['id']);
+    $xtpl->assign('image', parseImage($row['image']));
+    $xtpl->assign('name', $row['name']);
+    $xtpl->assign('owner', $owner['fullname']);
+    $xtpl->assign('microchip', $row['micro']);
+    $xtpl->assign('species', getRemindId($row['species'])['name']);
+    $xtpl->assign('sex', $sex_array[$row['sex']]);
+    $xtpl->assign('age', parseAgeTime($row['birthtime']));
+    if (!empty($certify)) {
+      $xtpl->parse('main.row.ddc');
+    }
+    $xtpl->parse('main.row');
+  }
+  $xtpl->assign('nav', nav_generater('news/list/?keyword='.$filter['keyword'], $count, $filter['page'], $filter['limit']));
+  $xtpl->parse('main');
+  return $xtpl->text();
+}
+
 
 function getPetListById($userid) {
   global $db;
@@ -164,13 +193,13 @@ function parseLink2($info) {
 
 function parseInfo($info) {
   if (!empty($info['id'])) {
-    $age = round( time() - $info['dateofbirth']) / 60 / 60 / 24 / 365.25;
+    $age = round( time() - $info['birthtime']) / 60 / 60 / 24 / 365.25;
     if ($age < 1) {
       $age = 1;
     }
-    return 'Tên: '. $info['name'] .'<br>Tuổi: '. $age .'<br>Giống: '. $info['species'] .'<br>Loài: '. $info['breed'] .'<br>';
+    return 'Tên: '. $info['name'] .'<br>Tuổi: '. $age .'<br>Giống loài: '. $info['species'];
   }
-  return '';
+  return 'chưa xác định';
 }
 
 function userRowList($filter = array()) {

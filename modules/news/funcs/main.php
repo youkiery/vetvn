@@ -13,6 +13,22 @@ if (!defined('NV_IS_FORM')) {
 
 $page_title = "Veterinary Vietnam";
 
+// $sql = 'select * from pet_news_pet';
+// $query = $db->query($sql);
+// while ($row = $query->fetch()) {
+//   $species = checkRemind($row['species'], 'species2');
+//   $color = checkRemind($row['color'], 'color');
+//   $type = checkRemind($row['type'], 'type');
+//   echo "insert into pet_news_sendinfo (name, micro, regno, sex, birthtime, species, color, type, breeder, owner, image, userid, active, father, mother, intro, time) values ('$row[name]', '$row[microchip]', '', $row[sex], $row[dateofbirth], $species, $color, $type, 0, 0, '$row[image]', $row[userid], $row[active], 0, 0, '$row[graph]', $row[time]);";
+//   echo '<br>';
+//   if ($row['ceti']) {
+//     echo "insert into pet_news_certify(petid, signid, price, time) values ($row[id], 1, $row[price], $row[ctime]);";
+//   }
+//   echo '<br>';
+//   echo '<br>';
+// }
+// die();
+
 
 // $sql = 'select * from ((select id, fullname, mobile, address, 1 as type from `'. PREFIX .'_user`) union (select id, fullname, mobile, address, 2 as type from `'. PREFIX .'_contact` where userid = '. $userinfo['id'] .')) as c';
 // $query = $db->query($sql);

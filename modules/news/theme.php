@@ -439,54 +439,6 @@ function userDogRowByList($userid, $tabber = array(0, 1, 2), $filter = array('pa
   return $xtpl->text();
 }
 
-function mainPetList($keyword = '', $page = 1, $filter = 12) {
-  global $db, $sex_array, $module_file;
-  $index = ($page - 1) * $filter + 1;
-  $xtpl = new XTemplate('dog-list.tpl', PATH);
-  $xtpl->assign('module_file', $module_file);
-
-  $sql = 'select count(*) as count from `'. PREFIX .'_pet` where active > 0 and (name like "%'.$keyword.'%" or microchip like "%'.$keyword.'%")';
-  $query = $db->query($sql);
-  $data['count'] = $query->fetch()['count'];
-  $count = $data['count'];
-  
-  $sql = 'select * from `'. PREFIX .'_pet` where active > 0 and (name like "%'.$keyword.'%" or microchip like "%'.$keyword.'%") order by time desc limit ' . $filter . ' offset ' . (($page - 1) * $filter);
-  $query = $db->query($sql);
-
-  if (strlen(trim($keyword)) > 0) {
-    $xtpl->assign('keyword', ' "' . $keyword . '",');
-  }
-
-  $xtpl->assign('from', ($page - 1) * $filter + 1);
-  $xtpl->assign('end', ($count + $filter >= ($page * $filter) ? $count : $page * $filter));
-  $xtpl->assign('count', $count);
-  $xtpl->assign('nav', navList($count, $page, $filter));
-  $xtpl->parse('main.msg');
-  $time = time();
-  $year = 60 * 60 * 24 * 365.25;
-
-  while ($row = $query->fetch()) {
-    $owner = getOwnerById($row['userid'], $row['type']);
-    $xtpl->assign('index', $index++);
-    $xtpl->assign('image', $row['image']);
-    $xtpl->assign('name', $row['name']);
-    $xtpl->assign('owner', $owner['fullname']);
-    $xtpl->assign('id', $row['id']);
-    $xtpl->assign('image', $row['image']);
-    $xtpl->assign('microchip', $row['microchip']);
-    $xtpl->assign('breed', $row['breed']);
-    $xtpl->assign('species', $row['species']);
-    $xtpl->assign('sex', $sex_array[$row['sex']]);
-    $xtpl->assign('age', parseAgeTime($row['dateofbirth']));
-    if ($row['ceti'] == 1) {
-      $xtpl->parse('main.row.ddc');
-    }
-    // $xtpl->assign('dob', cdate($row['dateofbirth']));
-    $xtpl->parse('main.row');
-  }
-  $xtpl->parse('main');
-  return $xtpl->text();
-}
 
 function introList($userid, $filter = array('page' => 1, 'limit' => 10)) {
   global $db, $module_file;

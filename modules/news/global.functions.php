@@ -332,6 +332,68 @@ function pickVaccineId($id) {
   return $query->fetch();
 }
 
+
+function getPetRelation($id) {
+  global $db;
+
+  // get parent
+  $parent = getPetParent($id);
+  // get grand parent
+  $parent['father'] = getPetParent($parent['father']['id']);
+  $parent['mother'] = getPetParent($parent['mother']['id']);
+  return $parent;
+  // return array(
+  //   // father
+  //   'father' => array(
+  //     'data' => $parent['father'],
+  //     // inner grand father
+  //     'f00' => getPetinfoId($parent['father']['father']),
+  //     // inner grand mother
+  //     'f01' => getPetinfoId($parent['father']['mother'])
+  //   ),
+  //   // mother
+  //   'f1' => array(
+  //     'data' => $parent['mother'],
+  //     // outter grand father
+  //     'f00' => getPetinfoId($parent['mother']['father']),
+  //     // outter grand mother
+  //     'f01' => getPetinfoId($parent['mother']['mother'])
+  //   )
+  // );
+}
+
+function getPetParent($id) {
+  $pet = getPetinfoId($id);
+
+  return array(
+    'data' => $pet,
+    'mother' => getPetinfoId($pet['mother']),
+    'father' => getPetinfoId($pet['father'])
+  );
+}
+
+function getPetinfoId($id) {
+  global $db, $sex_array;
+
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
+  $query = $db->query($sql);
+
+  // trả về dữ liệu ảo
+  if (empty($info = $query->fetch())) return array(
+    'id' => 0, 'name' => '', 'micro' => '', 'regno' => '', 'sex' => '', 'birthtime' => date('d/m/Y'), 'species' => '', 'color' => '', 'type' => '', 'breeder' => '', 'owner' => '', 'image' => parseImage(''), 'userid' => '', 'active' => '0', 'father' => '0', 'mother' => '0', 'intro' => '', 'time' => time()
+  );
+  $info['sex'] = $sex_array[$info['sex']];
+  $info['birthtime'] = date('d/m/Y', $info['birthtime']);
+  $info['species'] = getRemindId($info['species'], 'species2')['name'];
+  $info['color'] = getRemindId($info['color'], 'color')['name'];
+  $info['type'] = getRemindId($info['type'], 'type')['name'];
+  $info['breeder'] = getContactId($info['breeder'], $info['userid']);
+  $info['owner'] = getContactId($info['owner'], $info['userid']);
+  $info['certify'] = checkCertify($info['id']);
+
+  return $info;
+}
+
 function getPetDeactiveList($keyword = '', $page = 1, $limit = 10) {
   global $db;
   $data = array('list' => array(), 'count' => 0);

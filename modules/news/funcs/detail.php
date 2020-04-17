@@ -29,125 +29,55 @@ if (!empty($action)) {
 	die();
 }
 
+
+$xtpl = new XTemplate("main.tpl", PATH2);
+
 $id = $nv_Request->get_int('id', 'get', 0);
-
-$xtpl = new XTemplate("detail.tpl", "modules/". $module_name ."/template");
-
-$sql = 'select * from `'. PREFIX .'_pet` where id = ' . $id;
+$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
 $query = $db->query($sql);
 
 $page_title = "Thông tin thú cưng";
-if (!empty($row = $query->fetch())) {
-  $page_title = $row['name'] . " - Thông tin thú cưng";
-  $owner = getOwnerById($row['userid'], $row['type']);
-	$xtpl->assign('graph', $row['graph']);
-	$xtpl->assign('name', $row['name']);
-	$xtpl->assign('dob', date('d/m/Y', $row['dateofbirth']));
-	$xtpl->assign('breed', $row['breed']);
-	$xtpl->assign('species', $row['species']);
-  $xtpl->assign('sex', $sex_array[$row['sex']]);
-	$xtpl->assign('color', $row['color']);
-	$xtpl->assign('microchip', $row['microchip']);
-	$xtpl->assign('owner', $owner['fullname']);
-	$xtpl->assign('politic', $owner['politic']);
-	$xtpl->assign('image', $row['image']);
+$pet = getPetRelation($id);
 
-  $relation = getPetRelation($id);
-  // $bay = array('grand' => array(), 'parent' => array(), 'sibling' => array(), 'child' => array());
+if (!empty($pet['data']['id'])) {
+  $page_title = $pet['data']['name'] . " - Thông tin thú cưng";
+  // echo json_encode($pet);die();
 
-  // echo json_encode($relation); die();
+  $owner = getOwnerById($pet['data']['userid'], $pet['data']['type']);
+	$xtpl->assign('owner', $pet['data']['owner']['fullname']);
+	$xtpl->assign('politic', $pet['data']['owner']['politic']);
+	$xtpl->assign('name', $pet['data']['name']);
+	$xtpl->assign('dob', $pet['data']['birthtime']);
+	$xtpl->assign('species', $pet['data']['species']);
+	$xtpl->assign('color', $pet['data']['color']);
+	$xtpl->assign('type', $pet['data']['type']);
+  $xtpl->assign('sex', $pet['data']['sex']);
+	$xtpl->assign('micro', $pet['data']['micro']);
+	$xtpl->assign('image', $pet['data']['image']);
+  $xtpl->assign('intro', $pet['data']['intro']);
   
-  foreach ($relation['grand'] as $lv1) {
-    foreach ($lv1 as $lv2) {
-      $xtpl->assign($lv2['ns'], parseLink($lv2));
-      $xtpl->assign('ig' . $lv2['ns'], parseInfo($lv2));
-    }
-    foreach ($lv1['m'] as $lv2) {
-      if (empty($lv2['ns'])) $lv2 = array(
-        'ns' => $lv2,
-        'id' => 0,
-        'name' => ''
-      );
-      $xtpl->assign($lv2['ns'], parseLink($lv2));
-      $xtpl->assign('ig' . $lv2['ns'], parseInfo($lv2));
-    }
+  if (!empty($pet['data']['certify'])) {
+    $xtpl->parse('main.row.ddc');
   }
 
-  $xtpl->assign('mama', parseLink($relation['parent']['f']));
-  $xtpl->assign('igmama', parseInfo($relation['parent']['f']));
-  $xtpl->assign('papa', parseLink($relation['parent']['m']));
-  $xtpl->assign('igpapa', parseInfo($relation['parent']['m']));
-
-  // foreach ($relation['parent'] as $lv1) {
-  //   $xtpl->assign($lv1['ns'], parseLink($lv1));
-  //   $xtpl->assign('ig' . $lv1['ns'], parseInfo($lv1));
-  // }
-  // if ($row = $relation['grand']['e']['m']) {
-  //   $xtpl->assign('egrandpa', '<a href="/index.php?nv=biograph&op=detail&id=' . $row['id'] . '">' . $row['name'] . '</a>');
-  //   $xtpl->assign('efgrandpa', parseInfo($row));
-  // }
-  // if ($row = $relation['grand']['i']['f']) {
-  //   $xtpl->assign('igrandma', '<a href="/index.php?nv=biograph&op=detail&id=' . $row['id'] . '">' . $row['name'] . '</a>');
-  //   $xtpl->assign('ifgrandma', parseInfo($row));
-  // }
-  // if ($row = $relation['grand']['i']['m']) {
-  //   $xtpl->assign('igrandpa', '<a href="/index.php?nv=biograph&op=detail&id=' . $row['id'] . '">' . $row['name'] . '</a>');
-  //   $xtpl->assign('ifgrandpa', parseInfo($row));
-  // }
-  // if ($row = $relation['parent']['m']) {
-  //   $xtpl->assign('mama', '<a href="/index.php?nv=biograph&op=detail&id=' . $row['id'] . '">' . $row['name'] . '</a>');
-  //   $xtpl->assign('ifmama', parseInfo($row));
-  // }
-  // if ($row = $relation['parent']['f']) {
-  //   $xtpl->assign('papa', '<a href="/index.php?nv=biograph&op=detail&id=' . $row['id'] . '">' . $row['name'] . '</a>');
-  //   $xtpl->assign('ifpapa', parseInfo($row));
-  // }
-
-  // if (count($child = $relation['child'])) {
-  //   $html = '';    
-  //   foreach ($child as $row) {
-  //     $html = '<a href="/index.php?nv=biograph&op=detail&id=' . $row['id'] . '">' . $row['name'] . '</a>';
-  //   }
-  //   $xtpl->assign('child', $html);
-  // }
-
-
-  // if ($relation['grand']) {    
-  //   foreach ($relation['grand'] as $row) {
-  //     foreach ($row as $row2) {
-  //       if ($row2) {
-  //         $bay['grand'][] = '<a href="/index.php?nv=biograph&op=detail&id=' . $row['name'] . '">' . $row['name'] . '</a>';
-  //       }
-  //     }
-  //   }
-  // }
-  // if ($relation['parent']) {    
-  //   foreach ($relation['parent'] as $row) {
-  //     if ($row) {
-  //       $bay['parent'][] = '<a href="/index.php?nv=biograph&op=detail&id=' . $row['name'] . '">' . $row['name'] . '</a>';
-  //     }
-  //   }
-  // }
-  // if ($relation['sibling']) {    
-  //   foreach ($relation['sibling'] as $row) {
-  //     if ($row['id']) {
-  //       $bay['parent'][] = '<a href="/index.php?nv=biograph&op=detail&id=' . $row['name'] . '">' . $row['name'] . '</a>';
-  //     }
-  //   }
-  // }
-  // if ($relation['child']) {    
-  //   foreach ($relation['child'] as $row) {
-  //     if ($row['id']) {
-  //       $bay['child'][] = '<a href="/index.php?nv=biograph&op=detail&id=' . $row['name'] . '">' . $row['name'] . '</a>';
-  //     }
-  //   }
-  // }
-  //   var_dump($bay);die();
-
-  // $xtpl->assign('grand', implode('<br>', $bay['grand']));
-  // $xtpl->assign('parent', implode('<br>', $bay['parent']));
-  // $xtpl->assign('sibling', implode('<br>', $bay['sibling']));
-  // $xtpl->assign('child', implode('<br>', $bay['child']));
+  // Bố
+  $xtpl->assign('papa', parseLink($pet['father']['data']));
+  $xtpl->assign('igpapa', parseInfo($pet['father']['data']));
+  // Ông nội
+  $xtpl->assign('igrandpa', parseLink($pet['father']['father']));
+  $xtpl->assign('igigrandpa', parseInfo($pet['father']['father']));
+  // Bà nội
+  $xtpl->assign('igrandma', parseLink($pet['father']['mother']));
+  $xtpl->assign('igigrandma', parseInfo($pet['father']['mother']));
+  // mẹ
+  $xtpl->assign('mama', parseLink($pet['mother']['data']));
+  $xtpl->assign('igmama', parseInfo($pet['mother']['data']));
+  // ông ngoại
+  $xtpl->assign('egrandpa', parseLink($pet['mother']['father']));
+  $xtpl->assign('igegrandpa', parseInfo($pet['mother']['father']));
+  // bà ngoại
+  $xtpl->assign('egrandma', parseLink($pet['mother']['mother']));
+  $xtpl->assign('igegrandma', parseInfo($pet['mother']['mother']));
 
 	$xtpl->parse("main.detail");
 }
@@ -155,8 +85,9 @@ else {
 	$xtpl->parse("main.error");
 }
 
-$pet = getPetById($id);
+// kiểm tra hiển thị youtube
 try {
+  $pet = getPetById($id);
   $youtube = json_decode($pet['youtube']);
   if (empty($youtube)) $youtube = array();
   foreach ($youtube as $url) {
