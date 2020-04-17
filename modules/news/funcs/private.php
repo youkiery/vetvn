@@ -25,6 +25,11 @@ if (empty($userinfo) || $userinfo['active'] == 0) {
 $userinfo['mobile'] = xdecrypt($userinfo['mobile']);
 $userinfo['address'] = xdecrypt($userinfo['address']);
 
+$filter = array(
+  'page' => $nv_Request->get_int('page', 'get', 1),
+  'limit' => $nv_Request->get_int('limit', 'get', 12),
+  'keyword' => $nv_Request->get_string('keyword', 'get', '')
+);
 
 if (!empty($action)) {
 	$result = array('status' => 0);
@@ -696,6 +701,146 @@ if (!empty($action)) {
         $result['html'] = parseVaccineType($userinfo['id']);
         $result['notify'] = 'Đã thêm danh sách';
       }
+    break;
+    case 'send-info':
+			$data = $nv_Request->get_array('data', 'post');
+			$image = $nv_Request->get_array('image', 'post');
+
+			// check các remind
+			$data['species'] = checkRemind($data['species'], 'species2');
+			$data['color'] = checkRemind($data['color'], 'color');
+			$data['type'] = checkRemind($data['type'], 'type');
+			$data['birthtime'] = totime($data['birthtime']);
+
+      // insert vào bảng
+			$sql = 'insert into `'. PREFIX .'_sendinfo` (name, micro, sex, birthtime, species, color, type, breeder, owner, image, userid, active, active2, father, mother, intro, time) values("'. $data['name'] .'", "'. $data['micro'] .'", "'. $data['sex'] .'", "'. $data['birthtime'] .'", "'. $data['species'] .'", "'. $data['color'] .'", "'. $data['type'] .'", "'. $data['breeder'] .'", "'. $data['owner'] .'", "'. implode(',', $image) .'", "'. $userinfo['id'] .'", 0, 1, '. $data['father'] .', '. $data['mother'] .', "", '. time() .')';
+			if ($db->query($sql)) {
+				// thông báo
+				$result['status'] = 1;
+				$result['html'] = managerContent();
+			}
+		break;
+		case 'edit-info':
+			$id = $nv_Request->get_int('id', 'post');
+			$data = $nv_Request->get_array('data', 'post');
+
+			// check các remind
+			$data['species'] = checkRemind($data['species'], 'species2');
+			$data['color'] = checkRemind($data['color'], 'color');
+			$data['type'] = checkRemind($data['type'], 'type');
+			$data['birthtime'] = totime($data['birthtime']);
+
+			// cập nhật bảng
+			$sql = 'update `'. PREFIX .'_sendinfo` set name = "'. $data['name'] .'", sex = "'. $data['sex'] .'", birthtime = "'. $data['birthtime'] .'", species = "'. $data['species'] .'", color = "'. $data['color'] .'", type = "'. $data['type'] .'", breeder = "'. $data['breeder'] .'", owner = "'. $data['owner'] .'", father = '. $data['father'] .', mother = '. $data['mother'] .' where id = ' . $id;
+			if ($db->query($sql)) {
+				// thông báo
+				$result['status'] = 1;
+				$result['html'] = managerContent();
+			}
+		break;
+		case 'get-pet':
+			$id = $nv_Request->get_int('id', 'post', '');
+			$type = $nv_Request->get_string('type', 'post', '');
+			$keyword = $nv_Request->get_string('keyword', 'post', '');
+
+			$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
+			$query = $db->query($sql);
+			$info = $query->fetch();
+
+			$sql = 'select * from `'. PREFIX .'_pet` where name like "%'. $keyword .'%" and userid = '. $userinfo['id'] .' and sex = '. $type .' order by name limit 20';
+			$query = $db->query($sql);
+			$xtpl = new XTemplate('pet.tpl', PATH2);
+			$xtpl->assign('type', $type);
+			
+			$check = true;
+			while ($pet = $query->fetch()) {
+				$check = false;
+				$xtpl->assign('id', $pet['id']);
+				$xtpl->assign('name', $pet['name']);
+				$xtpl->parse('main.row');
+			}
+			if ($check) $xtpl->parse('main.no');
+			$xtpl->parse('main');
+      $result['status'] = 1;
+			$result['html'] = $xtpl->text();
+		break;
+		case 'get-remind':
+			$keyword = $nv_Request->get_string('keyword', 'post', '');
+			$type = $nv_Request->get_string('type', 'post', '');
+
+			$sql = 'select * from `'. PREFIX .'_remind` where type = "'. $type .'" and visible = 1 and name like "%'. $keyword .'%" order by rate limit 20';
+			$query = $db->query($sql);
+			$xtpl = new XTemplate('remind.tpl', PATH2);
+			$xtpl->assign('type', $type);
+
+			$check = true;
+			while ($remind = $query->fetch()) {
+				$check = false;
+				$xtpl->assign('name', $remind['name']);
+				$xtpl->parse('main.row');
+			}
+			if ($check) $xtpl->parse('main.no');
+			$xtpl->parse('main');
+      $result['status'] = 1;
+			$result['html'] = $xtpl->text();
+		break;
+		case 'get-info':
+			$id = $nv_Request->get_int('id', 'post');
+
+			$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
+			$query = $db->query($sql);
+			$info = $query->fetch();
+
+			$father = getPetById($info['father'])['name'];
+			$mother = getPetById($info['mother'])['name'];
+
+			$info['fathername'] = $father;
+			$info['mothername'] = $mother;
+			$info['breeder'] = getContactId(intval($info['breeder']));
+			$info['owner'] = getContactId(intval($info['owner']));
+			$info['birthtime'] = date('d/m/Y', $info['birthtime']);
+			$info['species'] = getRemindId($info['species'])['name'];
+			$info['color'] = getRemindId($info['color'])['name'];
+			$info['type'] = getRemindId($info['type'])['name'];
+			$info['image'] = explode(',', $info['image']);
+			$result['status'] = 1;
+			$result['data'] = $info;
+		break;
+		case 'get-user':
+			$keyword = $nv_Request->get_string('keyword', 'post', '');
+			$type = $nv_Request->get_string('type', 'post', '');
+
+			$xtpl = new XTemplate("user.tpl", PATH2);
+			$sql = 'select * from `'. PREFIX .'_contact` where (fullname like "%'. $keyword .'%" or address like "%'. $keyword .'%" or mobile like "%'. $keyword .'%") and userid = ' . $userinfo['id'];
+			$query = $db->query($sql);
+			
+			$check = true;
+			while ($row = $query->fetch()) {
+				$check = false;
+				$xtpl->assign('name', $type);			
+				$xtpl->assign('id', $row['id']);			
+				$xtpl->assign('fullname', $row['fullname']);					
+				$xtpl->assign('mobile', $row['mobile']);					
+				$xtpl->parse('main.row');
+			}
+			if ($check) $xtpl->parse('main.no');
+			$xtpl->parse('main');
+			$result['status'] = 1;
+			$result['html'] = $xtpl->text();
+		break;
+		case 'insert-user':
+			$data = $nv_Request->get_array('data', 'post');
+
+			$sql = 'select * from `'. PREFIX .'_contact` where mobile = "'. $data['mobile'] .'"';
+			$query = $db->query($sql);
+			if (empty($query->fetch)) {
+				$sql = 'insert into `'. PREFIX .'_contact` (fullname, address, mobile, politic, userid) values ("'. $data['name'] .'", "'. $data['address'] .'", "'. $data['mobile'] .'", "'. $data['politic'] .'", '. $userinfo['id'] .')';
+
+				if ($db->query($sql)) {
+					$result['status'] = 1;
+					$result['id'] = $db->lastInsertId();
+				}
+			}
 		break;
 	}
 	echo json_encode($result);
@@ -716,7 +861,8 @@ $xtpl->assign('mobile', $userinfo['mobile']);
 $xtpl->assign('address', $userinfo['address'] . ', ' . $userinfo['a2'] . ', ' . $userinfo['a1']);
 $xtpl->assign('image', $userinfo['image']);
 $xtpl->assign('remind', json_encode(getRemind()));
-$xtpl->assign('list', userDogRowByList($userinfo['id']));
+$xtpl->assign('content', managerContent());
+// $xtpl->assign('list', userDogRowByList($userinfo['id']));
 
 if (!$userinfo['center']) {
   $xtpl->assign('tabber', '0, 1, 2');
