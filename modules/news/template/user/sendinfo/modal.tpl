@@ -230,7 +230,7 @@
     <div class="modal-content">
       <div class="modal-body">
         <div class="form-group">
-          Thông tin khách hàng
+          Chi tiết yêu cầu
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
 

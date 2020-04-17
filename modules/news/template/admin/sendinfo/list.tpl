@@ -28,6 +28,12 @@
         duyệt
       </button>  
       <!-- END: done -->
+      <button class="btn btn-danger btn-xs" onclick="remove({id})">
+        xóa
+      </button>  
+      <button class="btn btn-info btn-xs" onclick="preview({id})">
+        chi tiết
+      </button>  
     </td>
   </tr>
   <!-- END: row -->

@@ -641,39 +641,51 @@ function sendinfoContent() {
   $xtpl = new XTemplate('list.tpl', PATH2);
   $filter['status'] --;
 
-  $sql = 'select * from `'. PREFIX .'_sendinfo` '. ($filter['status'] >= 0 ? ' where active = ' . $filter['status'] : '') .' order by id';
+  $sql = 'select * from `'. PREFIX .'_sendinfo` '. ($filter['status'] >= 0 ? ' where active = ' . $filter['status'] : '') .' order by id desc';
+
   $query = $db->query($sql);
   $list = array();
+  $number = 0;
+
+  // nếu filter.keyword rỗng, không thực hiện lọc
+  // kiểm tra owner, nếu không tồn tại dùng thông tin userinfo
+
   while ($row = $query->fetch()) {
-    $user = checkUserinfo($row['userid'], 1);
-    $user['mobile'] = xdecrypt($user['mobile']);
-    $c1 = empty($filter['keyword']);
-    $c2 = strpos($user['mobile'], $filter['keyword']) !== false;
-    $c3 = mb_strpos($row['name'], $filter['keyword']) !== false;
-    if ($c1 || (!$c1 && ($c2 || $c3))) {
-      $row['user'] = $user;
+    $owner = getContactId($row['owner']);
+    if (empty($owner)) {
+      $userinfo = checkUserinfo($row['userid'], 1);
+      $userinfo['mobile'] = xdecrypt($userinfo['mobile']);
+      $row['fullname'] = $userinfo['fullname'];
+      $row['mobile'] = $userinfo['mobile'];
+    }
+    else {
+      $row['fullname'] = $owner['fullname'];
+      $row['mobile'] = $owner['mobile'];
+    }
+    if (empty($filter['keyword'])) $list []= $row;
+    else if ((mb_strpos($row['fullname'], $filter['keyword']) !== false) || (strpos($row['mobile'], $filter['keyword']) !== false)) {
       $list []= $row;
     }
   }
-
+  
   $from = ($filter['page'] - 1) * $filter['limit'];
   $end = $from + $filter['limit'];
   for ($i = $from; $i < $end; $i++) { 
-    if (!empty($row = $list[$i])) {
-      $species = getRemindId($row['species']);
-      $xtpl->assign('index', $i + 1);
-      $xtpl->assign('id', $row['id']);
-      $xtpl->assign('user', $row['user']['fullname']);
-      $xtpl->assign('mobile', $row['user']['mobile']);
-      $xtpl->assign('name', $row['name']);
-      $xtpl->assign('species', $species['name']);
-      $xtpl->assign('sex', $sex_data[$row['sex']]);
-      $xtpl->assign('birthtime', date('d/m/Y', $row['birthtime']));
-      if (!$row['active']) {
-        $xtpl->parse('main.row.done');
-      }
-      $xtpl->parse('main.row');
+    if (empty($list[$i])) break;
+    else $row = $list[$i];
+    $species = getRemindId($row['species']);
+    $xtpl->assign('index', $i + 1);
+    $xtpl->assign('id', $row['id']);
+    $xtpl->assign('user', $row['fullname']);
+    $xtpl->assign('mobile', $row['mobile']);
+    $xtpl->assign('name', $row['name']);
+    $xtpl->assign('species', $species['name']);
+    $xtpl->assign('sex', $sex_data[$row['sex']]);
+    $xtpl->assign('birthtime', date('d/m/Y', $row['birthtime']));
+    if (!$row['active']) {
+      $xtpl->parse('main.row.done');
     }
+    $xtpl->parse('main.row');
   }
 
   $xtpl->assign('nav', nav_generater('/admin32/index.php?nv=news&op=sendinfo', count($list), $filter['page'], $filter['limit']));

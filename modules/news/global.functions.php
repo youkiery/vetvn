@@ -256,13 +256,20 @@ function getRemind($type = '') {
 	return $list;
 }
 
-function getContactId($id) {
+function getContactId($id, $userid = 0) {
   global $db;
 
   if ($id > 0) {
     $sql = 'select * from `'. PREFIX .'_contact` where id = ' . $id;
     $query = $db->query($sql);
     if ($row = $query->fetch()) return $row;
+  }
+  if ($userid) {
+    $sql = 'select * from `'. PREFIX .'_user` where id = ' . $userid;
+    $query = $db->query($sql);
+    $row = $query->fetch();
+    $row['mobile'] = xdecrypt($row['mobile']);
+    if ($row) return $row;
   }
   return 0;
 }

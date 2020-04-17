@@ -16,8 +16,9 @@
         <div class="xxx rows">
           <p class="col-3"> Giới tính </p>
           <div class="col-9">
-            <label> <input type="radio" name="sex" value="0" checked> Đực </label>
-            <label> <input type="radio" name="sex" value="1"> Cái </label>
+            <label style="width: 45%; display: inline-block;"> <input type="radio" name="sex" value="0" checked> Đực
+            </label>
+            <label style="width: 45%; display: inline-block;"> <input type="radio" name="sex" value="1"> Cái </label>
           </div>
         </div>
         <div class="text-red" id="sex-error"></div>
@@ -54,13 +55,65 @@
 
         <div class="xxx rows">
           <div class="col-3"> Người nhân giống </div>
-          <div class="col-9"> <textarea class="form-control" id="breeder" rows="3">{info}</textarea> </div>
+          <div class="col-9">
+            <div class="relative">
+              <div class="input-group">
+                <input type="text" class="form-control" id="breeder">
+                <div class="input-group-btn">
+                  <button class="btn btn-success" style="min-height: 32px;" onclick="insertUser('breeder')">
+                    <span class="glyphicon glyphicon-plus"></span>
+                  </button>
+                </div>
+              </div>
+              <div class="suggest" id="breeder-suggest"></div>
+            </div>
+          </div>
+        </div>
+        <div class="xxx rows" style="font-size: 0.8em;">
+          <div class="col-3"> </div>
+          <div class="col-3">
+            Họ tên: <span id="breeder-name"></span>
+          </div>
+          <div class="col-4">
+            SĐT: <span id="breeder-mobile"></span>
+          </div>
+          <div class="col-2" style="text-align: right;">
+            <button class="btn btn-danger" style="min-height: 32px;" onclick="clearUser('breeder')">
+              <span class="glyphicon glyphicon-remove"></span>
+            </button>
+          </div>
         </div>
         <div class="text-red" id="breeder-error"></div>
 
         <div class="xxx rows">
           <div class="col-3"> Chủ nuôi </div>
-          <div class="col-9"> <textarea class="form-control" id="owner" rows="3">{info}</textarea> </div>
+          <div class="col-9">
+            <div class="relative">
+              <div class="input-group">
+                <input type="text" class="form-control" id="owner">
+                <div class="input-group-btn">
+                  <button class="btn btn-success" style="min-height: 32px;" onclick="insertUser('owner')">
+                    <span class="glyphicon glyphicon-plus"></span>
+                  </button>
+                </div>
+              </div>
+              <div class="suggest" id="owner-suggest"></div>
+            </div>
+          </div>
+        </div>
+        <div class="xxx rows" style="font-size: 0.8em;">
+          <div class="col-3"> </div>
+          <div class="col-3">
+            Họ tên: <span id="owner-name"></span>
+          </div>
+          <div class="col-4">
+            SĐT: <span id="owner-mobile"></span>
+          </div>
+          <div class="col-2" style="text-align: right;">
+            <button class="btn btn-danger" style="min-height: 32px;" onclick="clearUser('owner')">
+              <span class="glyphicon glyphicon-remove"></span>
+            </button>
+          </div>
         </div>
         <div class="text-red" id="owner-error"></div>
 
@@ -70,8 +123,8 @@
           </div>
           <div class="col-3 relative">
             <!-- <div class="input-group"> -->
-              <input type="text" class="form-control" id="father">
-              <!-- <div class="input-group-btn">
+            <input type="text" class="form-control" id="father">
+            <!-- <div class="input-group-btn">
                 <button class="btn btn-success">
                   <span class="glyphicon glyphicon-plus"></span>
                 </button>
@@ -84,8 +137,8 @@
           </div>
           <div class="col-3 relative">
             <!-- <div class="input-group"> -->
-              <input type="text" class="form-control" id="mother">
-              <!-- <div class="input-group-btn">
+            <input type="text" class="form-control" id="mother">
+            <!-- <div class="input-group-btn">
                 <button class="btn btn-success">
                   <span class="glyphicon glyphicon-plus"></span>
                 </button>
@@ -99,11 +152,15 @@
           <span id="image-list"></span>
           <label class="insert text-center thumb">
             <img style="width: 100px; height: 100px;" src="/assets/images/upload.png">
+            <div style="width: 50px; height: 50px; display: none;" id="image"></div>
           </label>
         </div>
         <div style="clear: both;"></div>
 
         <div class="text-center">
+          <button class="insert btn btn-success" onclick="sendInfo()">
+            Gửi thông tin
+          </button>
           <button class="edit btn btn-info" onclick="editInfo()">
             Sửa thông tin
           </button>
@@ -113,8 +170,92 @@
   </div>
 </div>
 
-<div class="modal" id="done-modal" role="dialog">
+<div class="modal" id="user-modal" role="dialog">
   <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-group">
+          Thông tin khách hàng
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <label class="rows">
+          <div class="col-3">
+            Họ tên
+          </div>
+          <div class="col-9">
+            <input type="text" class="form-control" id="user-name">
+          </div>
+        </label>
+
+        <label class="rows">
+          <div class="col-3">
+            Số điện thoại
+          </div>
+          <div class="col-9">
+            <input type="text" class="form-control" id="user-mobile">
+          </div>
+        </label>
+
+        <label class="rows">
+          <div class="col-3">
+            Địa chỉ
+          </div>
+          <div class="col-9">
+            <input type="text" class="form-control" id="user-address">
+          </div>
+        </label>
+
+        <label class="rows">
+          <div class="col-3">
+            CMND
+          </div>
+          <div class="col-9">
+            <input type="text" class="form-control" id="user-politic">
+          </div>
+        </label>
+
+        <div class="text-center">
+          <button class="btn btn-success" onclick="insertUserSubmit()">
+            Thêm khách hàng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="info-modal" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-group">
+          Chi tiết yêu cầu
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <div class="rows">
+          <div class="col-3">
+            <img id="info-image" class="img-responsive">
+          </div>
+          <div class="col-9">
+            <p> Tên thú cưng: <span id="info-name"></span> </p>
+            <p> Giới tính: <span id="info-sex"></span> </p>
+            <p> Ngày sinh: <span id="info-birthtime"></span> </p>
+            <p> Giống loài: <span id="info-species"></span> </p>
+            <p> Màu lông: <span id="info-color"></span> </p>
+            <p> Kiểu lông: <span id="info-type"></span> </p>
+            <p> Người nhân giống: <span id="info-breeder"></span> </p>
+            <p> Chủ nuôi: <span id="info-owner"></span> </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="done-modal" role="dialog">
+  <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-body">
         <div class="form-group">
@@ -137,4 +278,25 @@
     </div>
   </div>
 </div>
+
+<div class="modal" id="remove-modal" role="dialog">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="form-group">
+          Xóa yêu cầu
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <div class="text-center">
+          <p> Sau khi xác nhận yêu cầu sẽ bị xóa vĩnh viễn </p>
+          <button class="btn btn-danger" onclick="removeSubmit()">
+            Xác nhận
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- END: main -->
