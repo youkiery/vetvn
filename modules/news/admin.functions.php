@@ -409,14 +409,10 @@ function userRowList($filter = array('username' => '', 'fullname' => '', 'mobile
   $xtpl = new XTemplate('user-list.tpl', PATH);
   $xtpl->assign('module_file', $module_file);
 
-  $sql = 'select id, username, fullname, address, mobile, active from `'. PREFIX .'_user` where fullname like "%'. $filter['fullname'] .'%" and username like "%'. $filter['username'] .'%" ' . ($filter['status'] > 0 ? ' and active = ' . ($filter['status'] - 1) : '');
+  $filter['fullname'] = mb_strtolower($filter['fullname']);
+  $sql = 'select id, username, fullname, address, mobile, active from `'. PREFIX .'_user` where lower(fullname) like "%'. $filter['fullname'] .'%" and username like "%'. $filter['username'] .'%" ' . ($filter['status'] > 0 ? ' and active = ' . ($filter['status'] - 1) : '') . ' order by id desc';
   $query = $db->query($sql);
-  // $count = $query->fetch()['count'];
-  // $xtpl->assign('nav', navList($count, $filter['page'], $filter['limit']));
 
-  // $sql = 'select * from `'. PREFIX .'_user` where fullname like "%'. $filter['keyword'] .'%"' . ($filter['status'] > 0 ? ' and active = ' . ($filter['status'] - 1) : '') . ' order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
-  // die($sql);
-  // $query = $db->query($sql);
   $from = ($filter['page'] - 1) * $filter['limit'];
   $end = $from + $filter['limit'] + 1;
   $count = 0;

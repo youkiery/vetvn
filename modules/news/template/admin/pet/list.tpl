@@ -27,39 +27,39 @@
     </tr>
     <tr>
       <td colspan="7" style="text-align: right;">
-        <button class="btn btn-info" onclick="push({id})">
+        <button class="btn btn-info" onclick="push({id})" data-toggle="tooltip" data-placement="top" title="Đẩy lên đầu trang">
           <span class="glyphicon glyphicon-upload"></span>
         </button>
-        <button class="btn btn-info" onclick="editPet({id})">
+        <button class="btn btn-info" onclick="editPet({id})" data-toggle="tooltip" data-placement="top" title="Chỉnh sửa thông tin">
           <span class="glyphicon glyphicon-edit"></span>
         </button>
         <!-- BEGIN: lock -->
-        <button class="btn btn-info" onclick="lock({id}, 1)">
+        <button class="btn btn-info" onclick="lock({id}, 1)" data-toggle="tooltip" data-placement="top" title="Mở khóa quyền chỉnh sửa">
           <span class="glyphicon glyphicon-lock"></span>
         </button>
         <!-- END: lock -->
         <!-- BEGIN: unlock -->
-        <button class="btn btn-warning" onclick="lock({id}, 0)">
+        <button class="btn btn-warning" onclick="lock({id}, 0)" data-toggle="tooltip" data-placement="top" title="Khóa quyền chỉnh sửa">
           <span class="glyphicon glyphicon-lock"></span>
         </button>
         <!-- END: unlock -->
         <!-- BEGIN: uncheck -->
-        <button class="btn btn-warning" onclick="checkPet({id}, 0)">
+        <button class="btn btn-warning" onclick="checkPet({id}, 0)" data-toggle="tooltip" data-placement="top" title="Bất hoạt thú cưng">
           <span class="glyphicon glyphicon-check"></span>
         </button>
-        <button class="btn {ceti_btn}" onclick="cetiSubmit({id})">
+        <button class="btn {ceti_btn}" onclick="cetiSubmit({id})" data-toggle="tooltip" data-placement="top" title="Cấp giấy thú cưng">
           <img src="{url}//themes/default/images/cetificate.png">
         </button>
         <!-- END: uncheck -->
         <!-- BEGIN: check -->
-        <button class="btn btn-success" onclick="checkPet({id}, 1)">
+        <button class="btn btn-success" onclick="checkPet({id}, 1)" data-toggle="tooltip" data-placement="top" title="Kích hoạt thú cưng">
           <span class="glyphicon glyphicon-unchecked"></span>
         </button>
         <!-- END: check -->
-        <button class="btn btn-success" onclick="pickOwner({id}, {userid}, '{mobile}')">
+        <button class="btn btn-success" onclick="pickOwner({id}, {userid}, '{mobile}')" data-toggle="tooltip" data-placement="top" title="Thay đổi chủ nuôi">
           <span class="glyphicon glyphicon-user"></span>
         </button>
-        <button class="btn btn-danger" onclick="deletePet({id})">
+        <button class="btn btn-danger" onclick="deletePet({id})" data-toggle="tooltip" data-placement="top" title="Xóa thú cưng">
           <span class="glyphicon glyphicon-remove"></span>
         </button>
       </td>
