@@ -6,7 +6,12 @@
   </div>
 
     <div class="text-center start-content">
-      <img src="/themes/default/images/banner.png">
+      <div class="form-group">
+        <img style="display: inline-block; max-height: 150px; width: auto;" class="img-responsive" src="/themes/default/images/banner.png">
+        <a href="https://chopet.vn">
+          <img style="display: inline-block; max-height: 150px; width: auto;" class="img-responsive" src="/assets/images/chotot.jpg">
+        </a>
+      </div>
       <!-- <p> Nâng niu tình yêu động vật </p> -->
       <form action="/{module_file}/list">
         <div class="main-search">

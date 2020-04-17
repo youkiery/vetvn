@@ -705,7 +705,7 @@ function petContent($filter = array('owner' => '', 'mobile' => '', 'name' => '',
 
   $xtpl->assign('url', $y);
 
-  $sql = 'select * from `'. PREFIX .'_pet` a inner join `'. PREFIX .'_user` b on a.userid = b.id where LOWER(b.fullname) like "%'. $filter['owner'] .'%" and LOWER(a.name) like "%'. $filter['name'] .'%" and LOWER(a.species) like "%'. $filter['species'] .'%" and LOWER(a.breed) like "%'. $filter['breed'] .'%" and a.microchip like "%'. $filter['micro'] .'%" and a.miear like "%'. $filter['miear'] .'%" ' . ($filter['status'] > 0 ? ' and active = ' . ($filter['status'] - 1) : '') . ' order by a.id desc';
+  $sql = 'select a.* from `'. PREFIX .'_pet` a inner join `'. PREFIX .'_user` b on a.userid = b.id where LOWER(b.fullname) like "%'. $filter['owner'] .'%" and LOWER(a.name) like "%'. $filter['name'] .'%" and LOWER(a.species) like "%'. $filter['species'] .'%" and LOWER(a.breed) like "%'. $filter['breed'] .'%" and a.microchip like "%'. $filter['micro'] .'%" and a.miear like "%'. $filter['miear'] .'%" ' . ($filter['status'] > 0 ? ' and active = ' . ($filter['status'] - 1) : '') . ' order by a.id desc';
   $query = $db->query($sql);
   // $count = $query->fetch()['count'];
 
