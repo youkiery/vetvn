@@ -41,7 +41,7 @@ function tradeList($filter = array('owner' => '', 'mobile' => '', 'address' => '
   while ($row = $query->fetch()) {
     $row['mobile'] = xdecrypt($row['mobile']);
     $row['address'] = xdecrypt($row['address']);
-    if ((empty($filter['mobile'] || (mb_strpos($row['mobile'], $filter['mobile']) !== false))) && empty($filter['address'] || (mb_strpos($row['address'], $filter['address']) !== false))) {
+    if ((empty($filter['mobile']) || (mb_strpos($row['mobile'], $filter['mobile']) !== false)) && empty($filter['address']) || (mb_strpos($row['address'], $filter['address']) !== false)) {
       $count ++;
 
       if ($count > $from && $count < $end) {
@@ -93,7 +93,7 @@ function buyList2($filter = array('owner' => '', 'mobile' => '', 'address' => ''
   while ($row = $query->fetch()) {
     $row['mobile'] = xdecrypt($row['mobile']);
     $row['address'] = xdecrypt($row['address']);
-    if ((empty($filter['mobile'] || (mb_strpos($row['mobile'], $filter['mobile']) !== false))) && empty($filter['address'] || (mb_strpos($row['address'], $filter['address']) !== false))) {
+    if ((empty($filter['mobile']) || (mb_strpos($row['mobile'], $filter['mobile']) !== false)) && empty($filter['address']) || (mb_strpos($row['address'], $filter['address']) !== false)) {
       $count ++;
 
       if ($count > $from && $count < $end) {
@@ -689,10 +689,11 @@ function petContent($filter = array('owner' => '', 'mobile' => '', 'name' => '',
 
   $x = $_SERVER['HTTP_REFERER'];
   $y = substr($x, 0, strpos($x, '/', 8));
+  $filter = tolower($filter);
 
   $xtpl->assign('url', $y);
 
-  $sql = 'select * from `'. PREFIX .'_pet` where name like "%'. $filter['name'] .'%" and species like "%'. $filter['species'] .'%" and breed like "%'. $filter['breed'] .'%" and microchip like "%'. $filter['micro'] .'%" and miear like "%'. $filter['miear'] .'%" ' . ($filter['status'] > 0 ? ' and active = ' . ($filter['status'] - 1) : '') . ' order by id desc';
+  $sql = 'select * from `'. PREFIX .'_pet` a inner join `'. PREFIX .'_user` b on a.userid = b.id where LOWER(b.fullname) like "%'. $filter['owner'] .'%" and LOWER(a.name) like "%'. $filter['name'] .'%" and LOWER(a.species) like "%'. $filter['species'] .'%" and LOWER(a.breed) like "%'. $filter['breed'] .'%" and a.microchip like "%'. $filter['micro'] .'%" and a.miear like "%'. $filter['miear'] .'%" ' . ($filter['status'] > 0 ? ' and active = ' . ($filter['status'] - 1) : '') . ' order by a.id desc';
   $query = $db->query($sql);
   // $count = $query->fetch()['count'];
 

@@ -581,6 +581,13 @@ function mytrim($str) {
   return $str;
 }
 
+function tolower($array) {
+  foreach ($array as $key => $value) {
+    $array[$key] = mb_strtolower($value);
+  }
+  return $array;
+}
+
 function deuft8($str) {
   $str = preg_replace("/(à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ)/", "a", $str);
   $str = preg_replace("/(è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ)/", "e", $str);
