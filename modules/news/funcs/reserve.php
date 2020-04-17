@@ -58,11 +58,10 @@ if (!empty($action)) {
 	die();
 }
 
-$xtpl = new XTemplate("reserve.tpl", "modules/". $module_name ."/template");
+$xtpl = new XTemplate("main.tpl", PATH2);
 
-$xtpl->assign('content', reserveList($userinfo['id']));
-$xtpl->assign('url', '/' . $module_name . '/' . $op . '/');
-$xtpl->assign('url', '/' . $module_name . '/' . $op . '/');
+// $xtpl->assign('content', reserveList($userinfo['id']));
+// $xtpl->assign('url', '/' . $module_name . '/' . $op . '/');
 
 $xtpl->assign('module_file', $module_file);
 $xtpl->parse("main");

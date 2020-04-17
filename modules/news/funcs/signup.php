@@ -63,15 +63,18 @@ $global = array();
 $global['login'] = 0;
 
 include_once(LAYOUT . '/position.php');
+// var_dump($position);
+// die();
 
 $xtpl = new XTemplate("signup.tpl", PATH2);
 $xtpl->assign('module_file', $module_file);
 
 foreach ($position as $l1i => $l1) {
-	$xtpl->assign('l1name', $l1->{name});
+  // echo json_encode($l1);
+	$xtpl->assign('l1name', $l1->{'name'});
 	$xtpl->assign('l1id', $l1i);
 	$xtpl->parse('main.l1');
-  foreach ($l1->{district} as $l2i => $l2) {
+  foreach ($l1->{'district'} as $l2i => $l2) {
     $xtpl->assign('l2name', $l2);
     $xtpl->assign('l2id', $l2i);
   	$xtpl->parse('main.l2.l2c');

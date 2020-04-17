@@ -126,9 +126,9 @@ if (!empty($action)) {
   die();
 }
 
-$xtpl = new XTemplate("trading.tpl", PATH);
+$xtpl = new XTemplate("main.tpl", PATH2);
 
-$xtpl->assign('content', trading());
+// $xtpl->assign('content', trading());
 
 // $sql = 'select * from `'. PREFIX .'_user` where view = 1';
 // $query = $db->query($sql);

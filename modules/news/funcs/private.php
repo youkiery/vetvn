@@ -22,11 +22,9 @@ $userinfo = getUserinfo();
 if (empty($userinfo) || $userinfo['active'] == 0) {
 	header('location: /'. $module_name .'/login/');
 }
-else {
-  if (!empty($userinfo['center'])) {
-    header('location: /'. $module_name .'/center');
-  }
-}
+$userinfo['mobile'] = xdecrypt($userinfo['mobile']);
+$userinfo['address'] = xdecrypt($userinfo['address']);
+
 
 if (!empty($action)) {
 	$result = array('status' => 0);
@@ -705,18 +703,12 @@ if (!empty($action)) {
 }
 
 $id = $nv_Request->get_int('id', 'get', 0);
-$global = array();
-$global['login'] = 0;
-
 $xtpl = new XTemplate("main.tpl", PATH2);
 
 include_once(LAYOUT . '/position.php');
 
 $xtpl->assign('position', json_encode($position));
 $xtpl->assign('modal', privateModal());
-
-$userinfo['mobile'] = xdecrypt($userinfo['mobile']);
-$userinfo['address'] = xdecrypt($userinfo['address']);
 
 $xtpl->assign('userid', $userinfo['id']);
 $xtpl->assign('fullname', $userinfo['fullname']);
@@ -776,12 +768,6 @@ $query = $db->query($sql);
 if (!empty($query->fetch())) {
   $xtpl->parse('main.xter');
 }
-
-// $xtpl->assign('today', date('d/m/Y', time()));
-// $sql = 'select * from `'. PREFIX .'_pet` where userid = ' . $userinfo['id'];
-// $query = $db->query($sql);
-
-// $stat = array('species' => array(), 'breeder' => array(), 'origin' => array());
 
 $xtpl->assign('origin', '/' . $module_name . '/' . $op . '/');
 $xtpl->assign('mail', $userinfo['mail']);

@@ -84,11 +84,11 @@ if (!empty($action)) {
 	die();
 }
 
-$xtpl = new XTemplate("transfer.tpl", "modules/". $module_name ."/template");
+$xtpl = new XTemplate("main.tpl", PATH2);
 
-$xtpl->assign('content', transferList($userinfo['id']));
-$xtpl->assign('content1', transferedList($userinfo['id']));
-$xtpl->assign('content2', transferqList($userinfo['id']));
+// $xtpl->assign('content', transferList($userinfo['id']));
+// $xtpl->assign('content1', transferedList($userinfo['id']));
+// $xtpl->assign('content2', transferqList($userinfo['id']));
 $xtpl->assign('url', '/' . $module_name . '/' . $op . '/');
 
 $xtpl->assign('module_file', $module_file);
