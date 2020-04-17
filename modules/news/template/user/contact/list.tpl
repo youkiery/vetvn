@@ -27,12 +27,12 @@
         {politic}
       </td>
       <td style="text-align: right;">
-        <button class="btn btn-info" onclick="edit({id})">
-          <span class="glyphicon glyphicon-edit"></span>
+        <button class="btn btn-info btn-xs" onclick="update({id})">
+          sửa
         </button>
-        <button class="btn btn-info" onclick="view({id})">
-          <span class="glyphicon glyphicon-eye-open"></span>
-        </button>
+        <!-- <button class="btn btn-info btn-xs" onclick="view({id})">
+
+        </button> -->
       </td>
     </tr>
   </tbody>

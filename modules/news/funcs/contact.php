@@ -20,6 +20,13 @@ if (empty($userinfo) || $userinfo['active'] == 0) {
 	die();
 }
 
+$filter = array(
+  'page' => $nv_Request->get_int('page', 'get', 1),
+  'limit' => $nv_Request->get_int('limit', 'get', 10),
+  'keyword' => $nv_Request->get_string('keyword', 'get', '')
+);
+
+$action = $nv_Request->get_string('action', 'post', '');
 if (!empty($action)) {
 	$result = array('status' => 0);
 	switch ($action) {
@@ -62,7 +69,7 @@ if (!empty($action)) {
         $result['html'] = $html;
       }
     break;
-    case 'get-owner':
+    case 'get-info':
       $id = $nv_Request->get_string('id', 'post');
 
       $sql = 'select * from `'. PREFIX .'_contact` where id = ' . $id;
@@ -70,21 +77,18 @@ if (!empty($action)) {
 
       if ($row = $query->fetch()) {
         $result['status'] = 1;
-        $result['data'] = array('name' => $row['fullname'], 'mobile' => xdecrypt($row['mobile']), 'address' => xdecrypt($row['address']), 'politic' => $row['politic']);
+        $result['data'] = $row;
       }
     break;
-    case 'update-owner':
+    case 'update-info':
       $id = $nv_Request->get_string('id', 'post');
-      $filter = $nv_Request->get_array('filter', 'post');
       $data = $nv_Request->get_array('data', 'post');
 
       $data['fullname'] = $data['name'];
-      $data['mobile'] = xencrypt($data['mobile']);
-      $data['address'] = xencrypt($data['address']);
       unset($data['name']);
 
       $sql = 'update `'. PREFIX .'_contact` set '. sqlBuilder($data, BUILDER_EDIT) .' where id = ' . $id;
-      if ($db->query($sql) && $html = contactList($userinfo['id'], $filter)) {
+      if ($db->query($sql) && $html = contactContent()) {
         $result['status'] = 1;
         $result['notify'] = 'Đã lưu';
         $result['html'] = $html;
@@ -95,9 +99,11 @@ if (!empty($action)) {
 	die();
 }
 
-$xtpl = new XTemplate("contact.tpl", "modules/". $module_name ."/template");
+$xtpl = new XTemplate("main.tpl", PATH2);
 
-$xtpl->assign('content', contactList($userinfo['id']));
+$xtpl->assign('keyword', $filter['keyword']);
+$xtpl->assign('modal', contactModal());
+$xtpl->assign('content', contactContent());
 
 $xtpl->parse("main");
 $contents = $xtpl->text("main");

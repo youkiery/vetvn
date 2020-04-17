@@ -407,23 +407,21 @@ function getParentTree($data) {
   return $list;
 }
 
-function contactList($userid, $filter = array('page' => 1, 'limit' => 10)) {
-  global $db;
+function contactContent() {
+  global $db, $filter, $userinfo;
 
-  $xtpl = new XTemplate('contact-list.tpl', PATH);
+  $xtpl = new XTemplate('list.tpl', PATH2);
+  $filter['keyword'] = mb_strtolower($filter['keyword']);
 
-  $sql = 'select count(*) as count from `'. PREFIX .'_contact` where userid = ' . $userid;
+  $sql = 'select count(*) as count from `'. PREFIX .'_contact` where (LOWER(fullname) like "%'. $filter['keyword'] .'%" or LOWER(address) like "%'. $filter['keyword'] .'%" or LOWER(mobile) like "%'. $filter['keyword'] .'%") and userid = ' . $userinfo['id'];
   $query = $db->query($sql);
   $count = $query->fetch()['count'];
-  $xtpl->assign('nav', navList($count, $filter['page'], $filter['limit']));
 
-  $sql = 'select * from `'. PREFIX .'_contact` where userid = '. $userid .' order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
+  $sql = 'select * from `'. PREFIX .'_contact` where (LOWER(fullname) like "%'. $filter['keyword'] .'%" or LOWER(address) like "%'. $filter['keyword'] .'%" or LOWER(mobile) like "%'. $filter['keyword'] .'%") and userid = '. $userinfo['id'] .' order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
   $query = $db->query($sql);
   $index = ($filter['page'] - 1) * $filter['limit'] + 1;
 
   while ($row = $query->fetch()) {
-    $row['address'] = xdecrypt($row['address']);
-    $row['mobile'] = xdecrypt($row['mobile']);
     $xtpl->assign('index', $index++);
     $xtpl->assign('id', $row['id']);
     $xtpl->assign('fullname', $row['fullname']);
@@ -433,36 +431,45 @@ function contactList($userid, $filter = array('page' => 1, 'limit' => 10)) {
     $xtpl->parse('main.row');
   }
 
+  $xtpl->assign('nav', nav_generater('/news/contact/?keyword=' . $filter['keyword'], $count, $filter['page'], $filter['limit']));
   $xtpl->parse('main');
   return $xtpl->text();
 }
 
-function contactContent($userid, $filter = array('page' => 1, 'limit' => 10)) {
-  global $db;
 
-  $xtpl = new XTemplate('contact-content.tpl', PATH);
-
-  $sql = 'select count(*) as count from `'. PREFIX .'_pet` where userid = ' . $userid . ' and type = 2';
-  $query = $db->query($sql);
-  $count = $query->fetch()['count'];
-  $xtpl->assign('nav', navList2($count, $filter['page'], $filter['limit'], 'goPage2'));
-
-  $sql = 'select * from `'. PREFIX .'_pet` where userid = '. $userid .' and type = 2 order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
-  $query = $db->query($sql);
-  $index = ($filter['page'] - 1) * $filter['limit'] + 1;
-
-  while ($row = $query->fetch()) {
-    $xtpl->assign('index', $index++);
-    $xtpl->assign('id', $row['id']);
-    $xtpl->assign('name', $row['name']);
-    $xtpl->assign('species', $row['species']);
-    $xtpl->assign('breed', $row['breed']);
-    $xtpl->parse('main.row');
-  }
-
+function contactModal() {
+  global $userinfo;
+  $xtpl = new XTemplate('modal.tpl', PATH2);
   $xtpl->parse('main');
   return $xtpl->text();
 }
+
+// function contactContent($userid, $filter = array('page' => 1, 'limit' => 10)) {
+//   global $db;
+
+//   $xtpl = new XTemplate('contact-content.tpl', PATH);
+
+//   $sql = 'select count(*) as count from `'. PREFIX .'_pet` where userid = ' . $userid . ' and type = 2';
+//   $query = $db->query($sql);
+//   $count = $query->fetch()['count'];
+//   $xtpl->assign('nav', navList2($count, $filter['page'], $filter['limit'], 'goPage2'));
+
+//   $sql = 'select * from `'. PREFIX .'_pet` where userid = '. $userid .' and type = 2 order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
+//   $query = $db->query($sql);
+//   $index = ($filter['page'] - 1) * $filter['limit'] + 1;
+
+//   while ($row = $query->fetch()) {
+//     $xtpl->assign('index', $index++);
+//     $xtpl->assign('id', $row['id']);
+//     $xtpl->assign('name', $row['name']);
+//     $xtpl->assign('species', $row['species']);
+//     $xtpl->assign('breed', $row['breed']);
+//     $xtpl->parse('main.row');
+//   }
+
+//   $xtpl->parse('main');
+//   return $xtpl->text();
+// }
 
 function getNoteGroupByUserid() {
   return 0;
