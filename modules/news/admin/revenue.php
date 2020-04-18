@@ -15,6 +15,11 @@ define('BUILDER_EDIT', 2);
 $page_title = "Quản lý thu chi";
 
 $action = $nv_Request->get_string('action', 'post', '');
+$filter = array(
+  'page' => $nv_Request->get_int('page', 'get', 1),
+  'limit' => $nv_Request->get_int('limit', 'get', 12),
+  'type' => $nv_Request->get_int('type', 'get', 1)
+);
 
 if (!empty($action)) {
 	$result = array('status' => 0);
@@ -239,9 +244,9 @@ if (!empty($action)) {
 	die();
 }
 
-$xtpl = new XTemplate("revenue.tpl", PATH);
+$xtpl = new XTemplate("main.tpl", PATH2);
 
-$xtpl->assign('content', revenue2());
+// $xtpl->assign('content', revenue2());
 
 $sql = 'select * from `'. PREFIX .'_user` where view = 1';
 $query = $db->query($sql);
@@ -252,7 +257,15 @@ while ($row = $query->fetch()) {
   $xtpl->parse('main.user');
 }
 
-$xtpl->assign('statistic', statistic());
+if ($filter['type'] == 1) {
+  $xtpl->assign('content', statisticCollect());
+}
+else {
+  $xtpl->assign('content', statisticPay());
+}
+$xtpl->assign('type' . $filter['type'], 'selected');
+$xtpl->assign('statistic_content', statisticContent());
+
 $xtpl->parse("main");
 $contents = $xtpl->text("main");
 

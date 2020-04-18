@@ -876,6 +876,38 @@ function reserveList($userid, $filter = array('page' => 1, 'limit' => 10)) {
   return $xtpl->text();
 }
 
+function managerContent() {
+  global $db, $userinfo, $filter, $sex_array, $module_file, $module_name;
+  $xtpl = new XTemplate('list.tpl', PATH2);
+  $xtpl->assign('module_file', $module_file);
+  $xtpl->assign('module_name', $module_name);
+
+  $filter['keyword'] = mb_strtolower($filter['keyword']);
+  // $data = getUserPetList($userid, $tabber, $filter);
+  $sql = 'select count(*) as count from `'. PREFIX .'_sendinfo` where LOWER(name) like "%'. $filter['keyword'] .'%" and active2 = 1 and userid = ' . $userinfo['id'];
+  $query = $db->query($sql);
+  $number = $query->fetch()['count'];
+
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where LOWER(name) like "%'. $filter['keyword'] .'%" and active2 = 0 and userid = ' . $userinfo['id'] . ' limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
+  $query = $db->query($sql);
+
+  $index = ($filter['page'] - 1) * $filter['limit'] + 1;
+  while ($row = $query->fetch()) {
+    $owner = getContactId($row['owner'], $row['userid']);
+    $xtpl->assign('index', $index++);
+    $xtpl->assign('id', $row['id']);
+    $xtpl->assign('name', $row['name']);
+    $xtpl->assign('owner', $owner['fullname'] . ', ' . $owner['address']);
+    $xtpl->assign('sex', $sex_array[$row['sex']]);
+    $xtpl->assign('species', getRemindId($row['species'])['name']);
+    $xtpl->parse('main.row');
+  }
+
+  $xtpl->assign('nav', nav_generater('/news/private/keyword=' . $filter['keyword'], $number, $filter['page'], $filter['limit']));
+  $xtpl->parse('main');
+  return $xtpl->text();
+}
+
 function statisticCollect() {
   global $db, $sex_array, $filter;
 
@@ -923,7 +955,7 @@ function statisticPay() {
   // $data = getUserPetList($filter);
 
   while ($row = $query->fetch()) {
-    $owner = getUserInfo($row['userid']);
+    $owner = getUserinfoId($row['userid']);
     $xtpl->assign('index', $index++);
     $xtpl->assign('id', $row['id']);
     $xtpl->assign('price', number_format($row['price'], 0, '', ','));
@@ -989,38 +1021,6 @@ function statisticContent($filter = array('from' => '', 'to' => '')) {
   $xtpl->assign('total_pay', number_format($p2, 0, '', ','));
   $xtpl->assign('sum', number_format($p1 - $p2, 0, '', ','));
 
-  $xtpl->parse('main');
-  return $xtpl->text();
-}
-
-function managerContent() {
-  global $db, $userinfo, $filter, $sex_array, $module_file, $module_name;
-  $xtpl = new XTemplate('list.tpl', PATH2);
-  $xtpl->assign('module_file', $module_file);
-  $xtpl->assign('module_name', $module_name);
-
-  $filter['keyword'] = mb_strtolower($filter['keyword']);
-  // $data = getUserPetList($userid, $tabber, $filter);
-  $sql = 'select count(*) as count from `'. PREFIX .'_sendinfo` where LOWER(name) like "%'. $filter['keyword'] .'%" and active2 = 1 and userid = ' . $userinfo['id'];
-  $query = $db->query($sql);
-  $number = $query->fetch()['count'];
-
-  $sql = 'select * from `'. PREFIX .'_sendinfo` where LOWER(name) like "%'. $filter['keyword'] .'%" and active2 = 0 and userid = ' . $userinfo['id'] . ' limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
-  $query = $db->query($sql);
-
-  $index = ($filter['page'] - 1) * $filter['limit'] + 1;
-  while ($row = $query->fetch()) {
-    $owner = getContactId($row['owner'], $row['userid']);
-    $xtpl->assign('index', $index++);
-    $xtpl->assign('id', $row['id']);
-    $xtpl->assign('name', $row['name']);
-    $xtpl->assign('owner', $owner['fullname'] . ', ' . $owner['address']);
-    $xtpl->assign('sex', $sex_array[$row['sex']]);
-    $xtpl->assign('species', getRemindId($row['species'])['name']);
-    $xtpl->parse('main.row');
-  }
-
-  $xtpl->assign('nav', nav_generater('/news/private/keyword=' . $filter['keyword'], $number, $filter['page'], $filter['limit']));
   $xtpl->parse('main');
   return $xtpl->text();
 }

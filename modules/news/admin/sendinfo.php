@@ -182,9 +182,9 @@ if (!empty($action)) {
 
 			$regno = checkRegno();
 			// kích hoạt thú cưng
-			$sql = 'update `'. PREFIX .'_sendinfo` set active = 1, micro = "'. $micro .'", regno = "'. ($regno++) .'" where id = ' . $id;
+			$sql = 'update `'. PREFIX .'_sendinfo` set active = 1,  active = 2, micro = "'. $micro .'", regno = "'. ($regno++) .'" where id = ' . $id;
 			// xác nhận cấp giấy thú cưng
-			$sql2 = 'insert into `'. PREFIX .'_certify` (petid, signid, price, status, time) values('. $id .', '. $sign .', 0, 0, '. time() .')';
+			$sql2 = 'insert into `'. PREFIX .'_certify` (petid, signid, price, status, time) values('. $id .', '. $sign .', 0, '. time() .')';
 			if ($db->query($sql) && $db->query($sql2)) {
 				setRegno($regno);
 				$result['status'] = 1;
@@ -194,7 +194,9 @@ if (!empty($action)) {
 		case 'remove-info':
 			$id = $nv_Request->get_int('id', 'post');
 
+			// đang sửa chỗ này nè má
 			$sql = 'delete from `'. PREFIX .'_sendinfo` where id = ' . $id;
+			// $sql2 = 'delete from `'. PREFIX .'_certify` where id = ' . $id;
 			if ($db->query($sql)) {
 				$result['status'] = 1;
 				$result['html'] = sendinfoContent();

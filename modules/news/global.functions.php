@@ -163,6 +163,13 @@ function updateUser($data, $id) {
   return false;
 }
 
+function checkPetlock($id) {
+  global $db;
+  $sql = 'select * from `'. PREFIX .'_lock` where petid = ' . $id;
+  $query = $db->query($sql);
+  $lock = $query->fetch();
+  return $lock;
+}
 
 function checkMobile($source, $target) {
   if (empty($target)) {
@@ -380,7 +387,7 @@ function getPetinfoId($id) {
 
   // trả về dữ liệu ảo
   if (empty($info = $query->fetch())) return array(
-    'id' => 0, 'name' => '', 'micro' => '', 'regno' => '', 'sex' => '', 'birthtime' => date('d/m/Y'), 'species' => '', 'color' => '', 'type' => '', 'breeder' => '', 'owner' => '', 'image' => parseImage(''), 'userid' => '', 'active' => '0', 'father' => '0', 'mother' => '0', 'intro' => '', 'time' => time()
+    'id' => 0, 'name' => '', 'micro' => '', 'regno' => '', 'sex' => '', 'birthtime' => date('d/m/Y'), 'species' => '', 'color' => '', 'type' => '', 'breeder' => '', 'owner' => '', 'image' => parseImage(''), 'userid' => 0, 'active' => '0', 'father' => '0', 'mother' => '0', 'intro' => '', 'time' => time()
   );
   $info['sex'] = $sex_array[$info['sex']];
   $info['birthtime'] = date('d/m/Y', $info['birthtime']);
@@ -511,11 +518,20 @@ function getRemindIdv2($name, $type) {
 function getUserinfoId($id) {
   $user = getContactId($id);
   if (!empty($user)) return $user;
-  $user = getUserinfo();
+  $user = getUserDataId($id);
   $user['address'] = xdecrypt($user['address']);
   $user['mobile'] = xdecrypt($user['mobile']);
   $user['address'] = $user['address'] . ', ' . $user['a2'] . ', ' . $user['a1'];
   return $user;
+}
+
+function getUserDataId($userid) {
+  global $db;
+
+  $sql = 'select * from `'. PREFIX .'_user` where id = ' . $userid;
+  $query = $db->query($sql);
+
+  return $query->fetch();
 }
 
 function getRemindId($id) {

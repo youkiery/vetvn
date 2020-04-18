@@ -1,6 +1,6 @@
 <!-- BEGIN: main -->
 <link rel="stylesheet" href="/modules/core/src/glyphicons.css">
-<script type="text/javascript" src="/themes/default/src/jquery-ui.min.js"></script> 
+<script type="text/javascript" src="/themes/default/src/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/themes/default/src/jquery.ui.datepicker-vi.js"></script>
 
 <div class="container">
@@ -20,7 +20,7 @@
 
   <div class="separate"></div>
   <a style="margin: 8px 0px; display: block;" href="javascript:history.go(-1)">
-    <span class="glyphicon glyphicon-chevron-left">  </span> Trở về </a>
+    <span class="glyphicon glyphicon-chevron-left"> </span> Trở về </a>
   </a>
 
   <div id="modal-statistic" class="modal fade" role="dialog">
@@ -48,7 +48,7 @@
   </div>
 
   <form>
-  <div class="form-group input-group">
+    <div class="form-group input-group">
       <select class="form-control" name="type">
         <option value="1" {type1}> Danh sách thu </option>
         <option value="2" {type2}> Danh sách chi </option>
@@ -91,7 +91,7 @@
       if (Number.isFinite(val)) {
         money = val
       }
-      
+
       val = formatter.format(val).replace(/ ₫/g, "").replace(/\./g, ",");
       current.value = val
     })
@@ -105,7 +105,7 @@
     e.preventDefault()
     $.post(
       global['url'],
-      {action: 'statistic', filter: {from: $("#filter-from").val(), end: $("#filter-end").val()}},
+      { action: 'statistic', filter: { from: $("#filter-from").val(), end: $("#filter-end").val() } },
       (response, status) => {
         checkResult(response, status).then(data => {
           $("#statistic").html(data['html'])

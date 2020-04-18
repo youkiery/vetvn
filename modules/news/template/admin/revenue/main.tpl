@@ -124,18 +124,22 @@
   </div>
 </div>
 
-<label>
-  <input type="radio" name="type" id="filter-type-1" onclick="t1()" checked> Danh sách thu
-</label>
-<label>
-  <input type="radio" name="type" id="filter-type-2" onclick="t2()"> Danh sách chi
-</label>
-<button class="btn btn-info" onclick="filter()">
-  Lọc
-</button>
-<button class="btn btn-info" style="float: right;" onclick="showStatistic()">
-  Thống kê
-</button>
+<form>
+  <input type="hidden" name="nv" value="news">
+  <input type="hidden" name="op" value="revenue">
+  <div class="form-group input-group">
+    <select class="form-control" name="type">
+      <option value="1" {type1}> Danh sách thu </option>
+      <option value="2" {type2}> Danh sách chi </option>
+    </select>
+    <div class="input-group-btn">
+      <button class="btn btn-info" style="height: 32px;">
+        Lọc
+      </button>
+    </div>
+  </div>
+</form>
+
 <button class="btn btn-success" style="float: right;" id="nceti" onclick="newCeti()">
   <span class="glyphicon glyphicon-plus"></span>
 </button>

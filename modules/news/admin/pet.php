@@ -16,6 +16,17 @@ define('BUILDER_EDIT', 2);
 $page_title = "Quản lý thú cưng";
 
 $action = $nv_Request->get_string('action', 'post', '');
+$filter = array(
+  'page' => $nv_Request->get_int('page', 'post', 1),
+  'limit' => $nv_Request->get_int('limit', 'post', 10),
+  'status' => $nv_Request->get_int('status', 'post', 0),
+  'username' => $nv_Request->get_string('username', 'post', ''),
+  'owner' => $nv_Request->get_string('owner', 'post', ''),
+  'mobile' => $nv_Request->get_string('mobile', 'post', ''),
+  'name' => $nv_Request->get_string('name', 'post', ''),
+  'species' => $nv_Request->get_string('species', 'post', ''),
+  'mc' => $nv_Request->get_string('mc', 'post', '')
+);
 
 if (!empty($action)) {
   $result = array('status' => 0);
@@ -23,7 +34,7 @@ if (!empty($action)) {
     case 'lock':
       $id = $nv_Request->get_string('id', 'post', '0');
       $type = $nv_Request->get_string('type', 'post', '0');
-			$filter = $nv_Request->get_array('filter', 'post');
+			
 
       if ($type == '1') {
         $sql = 'insert into `'. PREFIX .'_lock` (petid) values('. $id .')';
@@ -33,7 +44,7 @@ if (!empty($action)) {
       }
 
       if ($db->query($sql)) {
-        $result['html'] = petContent($filter);
+        $result['html'] = petContent();
 				if ($result['html']) {
 					$result['status'] = 1;
 				}
@@ -42,7 +53,7 @@ if (!empty($action)) {
     case 'push':
       $id = $nv_Request->get_string('id', 'post', '0');
 
-      $sql = 'update `'. PREFIX .'_pet` set time = '. time() .' where id = ' . $id;
+      $sql = 'update `'. PREFIX .'_sendinfo` set time = '. time() .' where id = ' . $id;
       if ($db->query($sql)) {
         $result['status'] = 1;
         $result['notify'] = 'Đã đưa lên đầu trang';
@@ -50,11 +61,11 @@ if (!empty($action)) {
     break;
     case 'remove-user-list':
       $list = $nv_Request->get_string('list', 'post', '');
-			$filter = $nv_Request->get_array('filter', 'post');
+			
 
       $sql = 'delete from `'. PREFIX .'_pet` where id in ('. $list .')' ;
       if ($db->query($sql)) {
-        $result['html'] = petContent($filter);
+        $result['html'] = petContent();
 				if ($result['html']) {
 					$result['notify'] = 'Đã xóa';
 					$result['status'] = 1;
@@ -63,11 +74,11 @@ if (!empty($action)) {
     break;
     case 'active-user-list':
       $list = $nv_Request->get_string('list', 'post', '');
-			$filter = $nv_Request->get_array('filter', 'post');
+			
 
       $sql = 'update `'. PREFIX .'_pet` set active = 1 where id in ('. $list .')' ;
       if ($db->query($sql)) {
-        $result['html'] = petContent($filter);
+        $result['html'] = petContent();
 				if ($result['html']) {
 					$result['notify'] = 'Đã lưu';
 					$result['status'] = 1;
@@ -76,11 +87,11 @@ if (!empty($action)) {
     break;
     case 'deactive-user-list':
       $list = $nv_Request->get_string('list', 'post', '');
-			$filter = $nv_Request->get_array('filter', 'post');
+			
 
       $sql = 'update `'. PREFIX .'_pet` set active = 0 where id in ('. $list .')' ;
       if ($db->query($sql)) {
-        $result['html'] = petContent($filter);
+        $result['html'] = petContent();
 				if ($result['html']) {
 					$result['notify'] = 'Đã lưu';
 					$result['status'] = 1;
@@ -92,7 +103,7 @@ if (!empty($action)) {
       $userid = $nv_Request->get_string('userid', 'post');
       $type = $nv_Request->get_string('type', 'post');
       $image = $nv_Request->get_string('image', 'post');
-      $filter = $nv_Request->get_array('filter', 'post');
+      
       $tabber = $nv_Request->get_array('tabber', 'post');
       $result['notify'] = 'Có lỗi xảy ra';
 
@@ -140,7 +151,7 @@ if (!empty($action)) {
           $result['notify'] = 'Đã thêm thú cưng';
           $result['id'] = $db->lastInsertId();
           $result['remind'] = json_encode(getRemind());
-          $result['html'] = petContent($filter);
+          $result['html'] = petContent();
         }
       }
       break;
@@ -194,11 +205,10 @@ if (!empty($action)) {
     case 'change-owner':
       $id = $nv_Request->get_int('id', 'post', 0);
       $userid = $nv_Request->get_int('userid', 'post', 0);
-      $filter = $nv_Request->get_array('filter', 'post');
-
+      
       $sql = 'update `'. PREFIX .'_pet` set userid = ' . $userid . ' where id = ' . $id;
       if ($db->query($sql)) {
-        $result['html'] = petContent($filter);
+        $result['html'] = petContent();
         if ($result['html']) {
           $result['notify'] = 'Đã lưu';
           $result['status'] = 1;
@@ -354,45 +364,34 @@ if (!empty($action)) {
     case 'checkpet':
       $id = $nv_Request->get_string('id', 'post');
       $type = $nv_Request->get_string('type', 'post');
-      $filter = $nv_Request->get_array('filter', 'post');
-
-      $sql = 'update `' . PREFIX . '_pet` set active = ' . $type . ', time = '. time().' where id = ' . $id;
+      
+      $sql = 'update `' . PREFIX . '_sendinfo` set active = ' . $type . ', time = '. time().' where id = ' . $id;
       if ($db->query($sql)) {
-        $result['html'] = petContent($filter);
-        if ($result['html']) {
-          $result['status'] = 1;
-        }
+        $result['html'] = petContent();
+        $result['status'] = 1;
       }
     break;
     case 'ceti':
       $petid = $nv_Request->get_string('petid', 'post');
-      $filter = $nv_Request->get_array('filter', 'post');
-
-      $sql = 'select * from `' . PREFIX . '_pet` where id = ' . $petid;
-      $query = $db->query($sql);
-      $pet = $query->fetch();
-
-      if ($pet['ceti']) {
-        $sql = 'update `' . PREFIX . '_pet` set ceti = 0, price = 0 where id = ' . $petid;
+      
+      if (empty($certify = checkCertify($petid))) {
+        $sql = 'insert into `' . PREFIX . '_certify` (petid, signid, price, time) values ('. $petid .', 0, 0, '. time() .')';
       }
       else {
-        $sql = 'update `' . PREFIX . '_pet` set ceti = 1 where id = ' . $petid;
+        $sql = 'delete from `' . PREFIX . '_certify` where id = ' . $certify['id'];
       }
       if ($db->query($sql)) {
-        $result['html'] = petContent($filter);
-        if ($result['html']) {
-          $result['status'] = 1;
-        }
+        $result['html'] = petContent();
+        $result['status'] = 1;
       }
     break;
     case 'remove-ceti':
       $petid = $nv_Request->get_string('petid', 'post');
-      $filter = $nv_Request->get_array('filter', 'post');
-
+      
       $sql = 'update `' . PREFIX . '_pet` set ceti = 0, price = 0 where id = ' . $petid;
       
       if ($db->query($sql)) {
-        $result['html'] = petContent($filter);
+        $result['html'] = petContent();
         if ($result['html']) {
           $result['notify'] = 'Đã xóa';
           $result['status'] = 1;
@@ -401,10 +400,9 @@ if (!empty($action)) {
     break;
 
     case 'filter':
-      $filter = $nv_Request->get_array('filter', 'post');
-
+      
       if (count($filter) > 1) {
-        $result['html'] = petContent($filter);
+        $result['html'] = petContent();
         if ($result['html']) {
           $result['status'] = 1;
         }
@@ -427,19 +425,17 @@ if (!empty($action)) {
       break;
     case 'remove':
       $id = $nv_Request->get_string('id', 'post');
-      $filter = $nv_Request->get_array('filter', 'post');
-
-      $sql = 'delete from `' . PREFIX . '_pet` where id = ' . $id;
-      if ($db->query($sql)) {
-        $result['html'] = petContent($filter);
-        if ($result['html']) {
-          $result['status'] = 1;
-        }
+      
+      $sql = 'delete from `' . PREFIX . '_sendinfo` where id = ' . $id;
+      $sql2 = 'delete from `' . PREFIX . '_certify` where petid = ' . $id;
+      if ($db->query($sql) && $db->query($sql2)) {
+        $result['html'] = petContent();
+        $result['status'] = 1;
       }
       break;
     case 'insertpet':
       $data = $nv_Request->get_array('data', 'post');
-      $filter = $nv_Request->get_array('filter', 'post');
+      
       $tabber = $nv_Request->get_array('tabber', 'post');
       $image = $nv_Request->get_string('image', 'post');
       $result['notify'] = 'Có lỗi xảy ra';
@@ -481,7 +477,7 @@ if (!empty($action)) {
           $result['notify'] = 'Đã thêm thú cưng';
           $result['id'] = $db->lastInsertId();
           $result['remind'] = json_encode(getRemind());
-          $result['html'] = petContent($filter);
+          $result['html'] = petContent();
         }
       }
       break;
@@ -489,7 +485,7 @@ if (!empty($action)) {
       $id = $nv_Request->get_string('id', 'post', '');
       $image = $nv_Request->get_string('image', 'post');
       $data = $nv_Request->get_array('data', 'post');
-      $filter = $nv_Request->get_array('filter', 'post');
+      
       $tabber = $nv_Request->get_array('tabber', 'post');
       $result['notify'] = 'Có lỗi xảy ra';
 
@@ -533,7 +529,7 @@ if (!empty($action)) {
           $result['status'] = 1;
           $result['notify'] = 'Đã chỉnh sửa thú cưng';
           $result['remind'] = json_encode(getRemind());
-          $result['html'] = petContent($filter);
+          $result['html'] = petContent();
         }
       }
       break;
@@ -595,6 +591,134 @@ if (!empty($action)) {
           $result['error'] = 'Số điện thoại đã được sử dụng';
         }
       }
+    break;
+    case 'edit-info':
+			$id = $nv_Request->get_int('id', 'post');
+			$data = $nv_Request->get_array('data', 'post');
+
+			// check các remind
+			$data['species'] = checkRemind($data['species'], 'species2');
+			$data['color'] = checkRemind($data['color'], 'color');
+			$data['type'] = checkRemind($data['type'], 'type');
+			$data['birthtime'] = totime($data['birthtime']);
+
+			// cập nhật bảng
+			$sql = 'update `'. PREFIX .'_sendinfo` set micro = "'. $data['micro'] .'", regno = "'. $data['regno'] .'", name = "'. $data['name'] .'", sex = "'. $data['sex'] .'", birthtime = "'. $data['birthtime'] .'", species = "'. $data['species'] .'", color = "'. $data['color'] .'", type = "'. $data['type'] .'", breeder = "'. $data['breeder'] .'", owner = "'. $data['owner'] .'", father = '. $data['father'] .', mother = '. $data['mother'] .' where id = ' . $id;
+			if ($db->query($sql)) {
+				// thông báo
+				$result['status'] = 1;
+				$result['html'] = petContent();
+			}
+		break;
+		case 'get-pet':
+			$id = $nv_Request->get_int('id', 'post', '');
+			$type = $nv_Request->get_string('type', 'post', '');
+			$keyword = $nv_Request->get_string('keyword', 'post', '');
+
+			$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
+			$query = $db->query($sql);
+			$info = $query->fetch();
+
+			$sql = 'select * from `'. PREFIX .'_pet` where name like "%'. $keyword .'%" and userid = '. $info['userid'] .' and sex = '. $type .' order by name limit 20';
+			$query = $db->query($sql);
+			$xtpl = new XTemplate('pet.tpl', PATH2);
+			$xtpl->assign('type', $type);
+			
+			$check = true;
+			while ($pet = $query->fetch()) {
+				$check = false;
+				$xtpl->assign('id', $pet['id']);
+				$xtpl->assign('name', $pet['name']);
+				$xtpl->parse('main.row');
+			}
+			if ($check) $xtpl->parse('main.no');
+			$xtpl->parse('main');
+      $result['status'] = 1;
+			$result['html'] = $xtpl->text();
+		break;
+		case 'get-remind':
+			$keyword = $nv_Request->get_string('keyword', 'post', '');
+			$type = $nv_Request->get_string('type', 'post', '');
+
+			$sql = 'select * from `'. PREFIX .'_remind` where type = "'. $type .'" and visible = 1 and name like "%'. $keyword .'%" order by rate limit 20';
+			$query = $db->query($sql);
+			$xtpl = new XTemplate('remind.tpl', PATH2);
+			$xtpl->assign('type', $type);
+
+			$check = true;
+			while ($remind = $query->fetch()) {
+				$check = false;
+				$xtpl->assign('name', $remind['name']);
+				$xtpl->parse('main.row');
+			}
+			if ($check) $xtpl->parse('main.no');
+			$xtpl->parse('main');
+      $result['status'] = 1;
+			$result['html'] = $xtpl->text();
+		break;
+		case 'get-info':
+			$id = $nv_Request->get_int('id', 'post');
+
+			$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
+			$query = $db->query($sql);
+			$info = $query->fetch();
+
+			$father = getPetById($info['father'])['name'];
+			$mother = getPetById($info['mother'])['name'];
+
+			$info['fathername'] = $father;
+			$info['mothername'] = $mother;
+			// đang sửa chỗ này nè má xxx
+			$info['breeder'] = getContactId(intval($info['breeder']), $info['userid']);
+			$info['owner'] = getContactId(intval($info['owner']), $info['userid']);
+			$info['birthtime'] = date('d/m/Y', $info['birthtime']);
+			$info['species'] = getRemindId($info['species'])['name'];
+			$info['color'] = getRemindId($info['color'])['name'];
+			$info['type'] = getRemindId($info['type'])['name'];
+			$info['image'] = explode(',', $info['image']);
+			$result['status'] = 1;
+			$result['data'] = $info;
+		break;
+		case 'get-user':
+			$id = $nv_Request->get_int('id', 'post');
+			$keyword = $nv_Request->get_string('keyword', 'post', '');
+			$type = $nv_Request->get_string('type', 'post', '');
+
+			$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
+			$query = $db->query($sql);
+			$info = $query->fetch();
+
+			$xtpl = new XTemplate("user.tpl", PATH2);
+			$sql = 'select * from `'. PREFIX .'_contact` where (fullname like "%'. $keyword .'%" or address like "%'. $keyword .'%" or mobile like "%'. $keyword .'%") and userid = ' . $info['userid'];
+			$query = $db->query($sql);
+			
+			$check = true;
+			while ($row = $query->fetch()) {
+				$check = false;
+				$xtpl->assign('name', $type);			
+				$xtpl->assign('id', $row['id']);			
+				$xtpl->assign('fullname', $row['fullname']);					
+				$xtpl->assign('mobile', $row['mobile']);					
+				$xtpl->parse('main.row');
+			}
+			if ($check) $xtpl->parse('main.no');
+			$xtpl->parse('main');
+			$result['status'] = 1;
+			$result['html'] = $xtpl->text();
+		break;
+		case 'insert-user':
+			$data = $nv_Request->get_array('data', 'post');
+
+			$sql = 'select * from `'. PREFIX .'_contact` where mobile = "'. $data['mobile'] .'"';
+			$query = $db->query($sql);
+			if (empty($query->fetch)) {
+				$sql = 'insert into `'. PREFIX .'_contact` (fullname, address, mobile, politic, userid) values ("'. $data['name'] .'", "'. $data['address'] .'", "'. $data['mobile'] .'", "'. $data['politic'] .'", '. $userinfo['id'] .')';
+
+				if ($db->query($sql)) {
+					$result['status'] = 1;
+					$result['id'] = $db->lastInsertId();
+				}
+			}
 		break;
   }
   echo json_encode($result);
@@ -604,6 +728,13 @@ if (!empty($action)) {
 $xtpl = new XTemplate("main.tpl", PATH2);
 include_once(LAYOUT . '/position.php');
 
+$xtpl->assign('status' . $filter['status'], 'selected');
+$xtpl->assign('name', $filter['name']);
+$xtpl->assign('species', $filter['species']);
+$xtpl->assign('micro', $filter['mc']);
+$xtpl->assign('username', $filter['username']);
+$xtpl->assign('owner', $filter['owner']);
+$xtpl->assign('mobile', $filter['mobile']);
 $xtpl->assign('modal', petModal());
 $xtpl->assign('position', json_encode($position));
 $xtpl->assign('list', petContent());

@@ -1,20 +1,28 @@
 <!-- BEGIN: main -->
-<link rel="stylesheet" href="/themes/default/src/glyphicons.css">
-<link rel="stylesheet" href="/themes/default/src/jquery-ui.min.css">
-<script type="text/javascript" src="{NV_BASE_SITEURL}{NV_ASSETS_DIR}/js/jquery-ui/jquery-ui.min.js"></script> 
-<script type="text/javascript" src="/themes/default/src/jquery.ui.datepicker-vi.js"></script>
-
+<link rel="stylesheet" href="/modules/core/src/jquery-ui.min.css">
+<link rel="stylesheet" href="/modules/core/src/style.css">
+<link rel="stylesheet" href="/modules/core/src/glyphicons.css">
 <style>
   label {
     width: 100%;
   }
+
   .btn {
-    min-height: 32px !important;
+    min-height: 32px;
   }
+  .btn-xs {
+    min-height: unset;
+  }
+
   .select {
     background: rgb(223, 223, 223);
     border: 2px solid deepskyblue;
   }
+
+  #middle {
+    height: fit-content;
+  }
+
 </style>
 
 {modal}
@@ -22,42 +30,45 @@
 <div class="container">
   <div id="msgshow"></div>
 
-  <form onsubmit="filterE(event)">
-    <div>
-      <div style="float: right; width: 30%;">
-        <select class="form-control" id="limit">
+  <form>
+    <input type="hidden" name="nv" value="news">
+    <input type="hidden" name="op" value="pet">
+    <div class="rows">
+      <div class="col-4">
+        <input type="text" class="form-control form-group" name="username" value="{username}" placeholder="Tài khoản">
+        <input type="text" class="form-control form-group" name="owner" value="{owner}" placeholder="Tên chủ nuôi">
+        <input type="text" class="form-control form-group" name="mobile" value="{mobile}" placeholder="SĐT chủ nuôi">
+      </div>
+      <div class="col-4">
+        <input type="text" class="form-control form-group" name="name" value="{name}" placeholder="Tên thú cưng">
+        <input type="text" class="form-control form-group" name="species" value="{species}" placeholder="Giống loài">
+        <input type="text" class="form-control form-group" name="mc" value="{micro}" placeholder="Microchip">
+      </div>
+      <div class="col-4">
+        <select class="form-control form-group" name="limit">
           <option value="10"> 10 </option>
           <option value="20"> 20 </option>
           <option value="50"> 50 </option>
           <option value="75"> 75 </option>
           <option value="100"> 100 </option>
         </select>
-        <br>
-        <label> <input type="radio" name="status" class="status" id="status-0" checked> Toàn bộ </label>
-        <label> <input type="radio" name="status" class="status" id="status-1"> Chưa xác nhận </label>
-        <label> <input type="radio" name="status" class="status" id="status-2"> Đã xác nhận </label>
-      </div>
-
-      <div style="float: left; width: 60%;">
-        <input type="text" class="form-control" id="filter-owner" placeholder="Tên chủ">
-        <input type="text" class="form-control" id="filter-mobile" placeholder="Số điện thoại">
-        <input type="text" class="form-control" id="filter-name" placeholder="Tên thú cưng">
-        <input type="text" class="form-control" id="filter-species" placeholder="Giống">
-        <input type="text" class="form-control" id="filter-breed" placeholder="Loài">
-        <input type="text" class="form-control" id="filter-micro" placeholder="Microchip">
-        <input type="text" class="form-control" id="filter-miear" placeholder="Xăm tai">
+        <select class="form-control form-group" name="status">
+          <option value="0" {status0}> Toàn bộ </option>
+          <option value="1" {status1}> Chưa xác nhận</option>
+          <option value="2" {status2}> Đã xác nhận </option>
+        </select>
       </div>
     </div>
     <div class="text-center" style="clear: both;">
-    <button class="btn btn-info">
-      Lọc danh sách thú cưng
-    </button>
+      <button class="btn btn-info">
+        Lọc danh sách thú cưng
+      </button>
     </div>
   </form>
   <div style="clear: both;"></div>
 
   <button class="btn btn-success" style="float: right;" onclick="addPet()">
-    <span class="glyphicon glyphicon-plus">  </span>
+    <span class="glyphicon glyphicon-plus"> </span>
   </button>
   <button class="btn btn-info" style="float: right;" onclick="selectRow(this)">
     <span class="glyphicon glyphicon-unchecked"></span>
@@ -71,12 +82,17 @@
   <button class="btn btn-info select-button" style="float: right;" onclick="activeUserList()" disabled>
     <span class="glyphicon glyphicon-arrow-up"></span>
   </button>
-      
-  <div id="pet-list">
+
+  <div id="content">
     {list}
   </div>
 </div>
 
+<script src="/modules/core/vhttp.js"></script>
+<script src="/modules/core/vimage.js"></script>
+<script src="/modules/core/vremind-5.js"></script>
+<script type="text/javascript" src="{NV_BASE_SITEURL}{NV_ASSETS_DIR}/js/jquery-ui/jquery-ui.min.js"></script>
+<script src="/modules/core/src/jquery.ui.datepicker-vi.js"></script>
 <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase-storage.js"></script>
 <script>
@@ -91,8 +107,25 @@
     owner: {},
     petid: 0,
     parentid: 0,
-    user_parent: 0
+    user_parent: 0,
+    pet: {
+      0: 0,
+      1: 0
+    },
+    petobj: {
+      0: 'father',
+      1: 'mother'
+    }
   }
+  var notify = {
+    'name': 'Nhập tên thú cưng trước khi gửi',
+    'birthtime': 'Chọn ngày sinh trước khi gửi',
+    'species': 'Chọn giống loài trước khi gửi',
+    'color': 'Chọn màu lông trước khi gửi',
+    'type': 'Chọn kiểu lông trước khi gửi'
+  }
+  var sex_data = ['Đực', 'Cái']
+  var image_data = []
   var user = {
     username: $("#username"),
     fullname: $("#fullname"),
@@ -161,7 +194,7 @@
   var file, filename
   var uploadedUrl = ''
   uploaded = {}
-
+  
   var firebaseConfig = {
     apiKey: "AIzaSyAgxaMbHnlYbUorxXuDqr7LwVUJYdL2lZo",
     authDomain: "petcoffee-a3cbc.firebaseapp.com",
@@ -171,7 +204,7 @@
     messagingSenderId: "351569277407",
     appId: "1:351569277407:web:8ef565047997e013"
   };
-  
+
   firebase.initializeApp(firebaseConfig);
 
   var storage = firebase.storage();
@@ -241,11 +274,11 @@
   function lock(id, type) {
     $.post(
       global['url'],
-      {action: 'lock', id: id, type: type, filter: checkFilter()},
+      { action: 'lock', id: id, type: type },
       (response, status) => {
         checkResult(response, status).then(data => {
-          petList.html(data['html'])
-        }, () => {})
+          $("#content").html(data['html'])
+        }, () => { })
       }
     )
   }
@@ -275,15 +308,15 @@
       freeze()
       $.post(
         global['url'],
-        {action: 'remove-user-list', list: list.join(', '), filter: checkFilter()},
+        { action: 'remove-user-list', list: list.join(', ') },
         (response, status) => {
           checkResult(response, status).then(data => {
             installSelect()
-            petList.html(data['html'])
-          }, () => {})
+            $("#content").html(data['html'])
+          }, () => { })
         }
       )
-    }    
+    }
   }
 
   function activeUserList() {
@@ -295,15 +328,15 @@
       freeze()
       $.post(
         global['url'],
-        {action: 'active-user-list', list: list.join(', '), filter: checkFilter()},
+        { action: 'active-user-list', list: list.join(', ') },
         (response, status) => {
           checkResult(response, status).then(data => {
             installSelect()
-            petList.html(data['html'])
-          }, () => {})
+            $("#content").html(data['html'])
+          }, () => { })
         }
       )
-    }    
+    }
   }
 
   function deactiveUserList() {
@@ -315,25 +348,25 @@
       freeze()
       $.post(
         global['url'],
-        {action: 'deactive-user-list', list: list.join(', '), filter: checkFilter()},
+        { action: 'deactive-user-list', list: list.join(', ') },
         (response, status) => {
           checkResult(response, status).then(data => {
             installSelect()
-            petList.html(data['html'])
-          }, () => {})
+            $("#content").html(data['html'])
+          }, () => { })
         }
       )
-    }    
+    }
   }
 
   function push(id) {
     $.post(
       global['url'],
-      {action: 'push', id: id},
+      { action: 'push', id: id },
       (response, status) => {
         checkResult(response, status).then(data => {
-          console.log('success');          
-        }, () => {})
+          console.log('success');
+        }, () => { })
       }
     )
   }
@@ -348,25 +381,25 @@
   function filterOwner() {
     $.post(
       global['url'],
-      {action: 'filter-owner', key: $("#owner-key").val()},
+      { action: 'filter-owner', key: $("#owner-key").val() },
       (response, status) => {
         checkResult(response, status).then(data => {
           $("#owner-list").html(data['html'])
-        }, () => {})
+        }, () => { })
       }
     )
-  }  
+  }
 
   function thisOwner(id) {
     $.post(
       global['url'],
-      {action: 'change-owner', userid: id, id: global['petid'], filter: checkFilter()},
+      { action: 'change-owner', userid: id, id: global['petid'] },
       (response, status) => {
         checkResult(response, status).then(data => {
-          petList.html(data['html'])
+          $("#content").html(data['html'])
           $("#modal-owner").modal('hide')
           // $("#owner-list").html(data['html'])
-        }, () => {})
+        }, () => { })
       }
     )
   }
@@ -409,7 +442,7 @@
             uploaded[previewname] = {
               url: '',
               file: file,
-              name: filename              
+              name: filename
             }
           }
         };
@@ -429,12 +462,12 @@
   function removePetSubmit() {
     $.post(
       global['url'],
-      {action: 'remove', id: global['id'], filter: checkFilter()},
+      { action: 'remove', id: global['id'] },
       (response, status) => {
         checkResult(response, status).then(data => {
-          petList.html(data['html'])
+          $("#content").html(data['html'])
           removetPet.modal('hide')
-        }, () => {})
+        }, () => { })
       }
     )
   }
@@ -484,10 +517,10 @@
       url = url.substr(0, url.search(/\?alt=/))
       var xref = storage.refFromURL(url);
 
-      xref.delete().then(function() {
-        resolve()        
-      }).catch(function(error) {
-        resolve()        
+      xref.delete().then(function () {
+        resolve()
+      }).catch(function (error) {
+        resolve()
       });
     })
   }
@@ -497,12 +530,12 @@
     uploader('pet').then((imageUrl) => {
       $.post(
         global['url'],
-        { action: 'editpet', id: global['id'], data: checkPetData(), image: imageUrl, filter: checkFilter(), tabber: global['tabber'] },
+        { action: 'editpet', id: global['id'], data: checkPetData(), image: imageUrl, tabber: global['tabber'] },
         (response, status) => {
           checkResult(response, status).then(data => {
             deleteImage(data['image']).then(() => {
               uploaded['pet'] = {}
-              petList.html(data['html'])
+              $("#content").html(data['html'])
               clearInputSet(pet)
               file = false
               filename = ''
@@ -565,11 +598,11 @@
     global['page'] = page
     $.post(
       global['url'],
-      {action: 'filter', filter: checkFilter()},
+      { action: 'filter' },
       (response, status) => {
         checkResult(response, status).then(data => {
-          petList.html(data['html'])
-        }, () => {})
+          $("#content").html(data['html'])
+        }, () => { })
       }
     )
   }
@@ -582,11 +615,11 @@
   function check(id, type) {
     $.post(
       global['url'],
-      {action: 'check', id: id, type: type, filter: checkFilter()},
+      { action: 'check', id: id, type: type },
       (response, status) => {
         checkResult(response, status).then(data => {
-          petList.html(data['html'])
-        }, () => {})
+          $("#content").html(data['html'])
+        }, () => { })
       }
     )
   }
@@ -609,11 +642,11 @@
     uploader('pet').then(imageUrl => {
       $.post(
         global['url'],
-        { action: 'insertpet', data: checkPetData(), filter: checkFilter(), tabber: global['tabber'], image: imageUrl },
+        { action: 'insertpet', data: checkPetData(), tabber: global['tabber'], image: imageUrl },
         (response, status) => {
           checkResult(response, status).then(data => {
             uploaded['pet'] = {}
-            petList.html(data['html'])
+            $("#content").html(data['html'])
             file = false
             filename = ''
             clearInputSet(pet)
@@ -671,7 +704,7 @@
       else {
         var uploadTask = storageRef.child('images/' + uploaded[name]['filename'] + '?t=' + new Date().getTime() / 1000).putString(uploaded[name]['file'], 'base64', metadata);
         uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
-          function(snapshot) {
+          function (snapshot) {
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log('Upload is ' + progress + '% done');
             switch (snapshot.state) {
@@ -682,39 +715,39 @@
                 console.log('Upload is running');
                 break;
             }
-          }, function(error) {
+          }, function (error) {
             resolve('')
             switch (error.code) {
               case 'storage/unauthorized':
                 // User doesn't have permission to access the object
-              break;
+                break;
               case 'storage/canceled':
                 // User canceled the upload
-              break;
+                break;
               case 'storage/unknown':
                 // Unknown error occurred, inspect error.serverResponse
-              break;
+                break;
             }
-          }, function() {
+          }, function () {
             // Upload completed successfully, now we can get the download URL
-            uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
-            uploaded[name]['url'] = downloadURL
-            resolve(downloadURL)
-            console.log('File available at', downloadURL);
+            uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
+              uploaded[name]['url'] = downloadURL
+              resolve(downloadURL)
+              console.log('File available at', downloadURL);
+            });
           });
-        });
       }
     })
-	}
+  }
 
   function checkPet(id, type) {
     $.post(
       global['url'],
-      {action: 'checkpet', id: id, type: type, filter: checkFilter()},
+      { action: 'checkpet', id: id, type: type },
       (response, status) => {
         checkResult(response, status).then(data => {
-          petList.html(data['html'])
-        }, () => {})
+          $("#content").html(data['html'])
+        }, () => { })
       }
     )
   }
@@ -725,24 +758,24 @@
   //     {action: 'editpet', id: global['id'], data: checkInputSet(pet)},
   //     (response, status) => {
   //       checkResult(response, status).then(data => {
-  //         petList.html(data['html'])
+  //         $("#content").html(data['html'])
   //         clearInputSet(user)
   //         insertUser.modal('hide')
   //       }, () => {})
   //     }
   //   )
   // }
-  
+
   function insertParentSubmit() {
     freeze()
     uploader('parent').then((imageUrl) => {
       $.post(
         global['url'],
-        { action: 'insert-parent', id: global['id'], userid: global['user_parent'], data: checkInputSet(parent), image: imageUrl, filter: checkFilter(), tabber: global['tabber'] },
+        { action: 'insert-parent', id: global['id'], userid: global['user_parent'], data: checkInputSet(parent), image: imageUrl, tabber: global['tabber'] },
         (response, status) => {
           checkResult(response, status).then(data => {
             uploaded['parent'] = {}
-            petList.html(data['html'])
+            $("#content").html(data['html'])
             clearInputSet(parent)
             file = false
             filename = ''
@@ -825,7 +858,7 @@
   function installRemindSpecies(section) {
     var timeout
     var input = $("#" + section)
-    var suggest = $("#" + section + "-suggest")    
+    var suggest = $("#" + section + "-suggest")
 
     input.keyup(() => {
       clearTimeout(timeout)
@@ -865,10 +898,10 @@
   // function cetiSubmit() {
   //   $.post(
   //     global['url'],
-  //     { action: 'ceti', price: $("#ceti-price").val(), petid: global['petid'], filter: checkFilter() },
+  //     { action: 'ceti', price: $("#ceti-price").val(), petid: global['petid'] },
   //     (response, status) => {
   //       checkResult(response, status).then(data => {
-  //         petList.html(data['html'])
+  //         $("#content").html(data['html'])
   //         $("#modal-ceti").modal('hide')
   //       }, () => { })
   //     }
@@ -878,11 +911,10 @@
   function cetiSubmit(petid) {
     $.post(
       global['url'],
-      { action: 'ceti', petid: petid, filter: checkFilter() },
+      { action: 'ceti', petid: petid },
       (response, status) => {
         checkResult(response, status).then(data => {
-          petList.html(data['html'])
-          $("#modal-ceti").modal('hide')
+          $("#content").html(data['html'])
         }, () => { })
       }
     )
@@ -891,10 +923,10 @@
   // function removeCetiSubmit() {
   //   $.post(
   //     global['url'],
-  //     { action: 'remove-ceti', petid: global['petid'], filter: checkFilter() },
+  //     { action: 'remove-ceti', petid: global['petid'] },
   //     (response, status) => {
   //       checkResult(response, status).then(data => {
-  //         petList.html(data['html'])
+  //         $("#content").html(data['html'])
   //         $("#modal-ceti").modal('hide')
   //       }, () => { })
   //     }
@@ -976,14 +1008,14 @@
     e.preventDefault()
     $.post(
       global['url'],
-      {action: 'insert-user', data: checkEdit()},
+      { action: 'insert-user', data: checkEdit() },
       (response, status) => {
         checkResult(response, status).then(data => {
           clearInputSet(user)
           $("#owner-key").val(data['mobile'])
           $("#insert-user").modal('hide')
           thisOwner(data['id'])
-        }, () => {})
+        }, () => { })
       }
     )
   }
@@ -1030,6 +1062,252 @@
 
     $(".al2").hide()
     $("#al2" + value).show()
+  }
+
+  $(document).ready(() => {
+    $(".date").datepicker()
+    vremind.install('#species2', '#species2-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-remind', keyword: input, type: 'species2' }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
+    vremind.install('#color', '#color-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-remind', keyword: input, type: 'color' }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
+    vremind.install('#type', '#type-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-remind', keyword: input, type: 'type' }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
+    vremind.install('#breeder', '#breeder-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-user', keyword: input, type: 'breeder', id: global['id'] }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
+    vremind.install('#owner', '#owner-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-user', keyword: input, type: 'owner', id: global['id'] }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
+    vremind.install('#father', '#father-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-pet', type: 0, keyword: input, id: global['id'] }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
+    vremind.install('#mother', '#mother-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-pet', type: 1, keyword: input, id: global['id'] }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
+  })
+
+  function refreshImage(list) {
+    html = ''
+    list.forEach((item, index) => {
+      html += `
+      <div class="thumb">
+        <button type="button" class="close insert" onclick="removeImage(`+ index + `)">&times;</button>
+        <img src="`+ item + `">
+      </div>`
+    })
+    $("#image-list").html(html)
+  }
+
+  function selectRemind(name, id) {
+    $("#" + id).val(name)
+  }
+
+  function selectPet(name, type, id) {
+    $("#" + global['petobj'][type]).val(name)
+    global['pet'][type] = id
+  }
+
+  function sendinfoModal() {
+    $(".insert").show()
+    $(".edit").hide()
+    global['pet'] = {
+      0: 0,
+      1: 0
+    }
+    $("#micro").val('')
+    $("#regno").val('')
+    $("#father").val('')
+    $("#mother").val('')
+    $("#name").val('')
+    $("[name=sex][value=0]").prop('checked', true)
+    $("#birthtime").val('')
+    $("#species2").val('')
+    $("#color").val('')
+    $("#type").val('')
+    $("#breeder").val('')
+    $("#owner").val('')
+    vimage.data['image'] = []
+    refreshImage(vimage.data['image'])
+    $("#sendinfo-modal").modal('show')
+  }
+
+
+  function edit(id) {
+    vhttp.checkelse('', { action: 'get-info', id: id }).then(data => {
+      global['id'] = id
+      global['pet'] = {
+        0: data['data']['father'],
+        1: data['data']['mother']
+      }
+
+      parseUser('breeder', data['data']['breeder'])
+      parseUser('owner', data['data']['owner'])
+
+      $("#micro").val(data['data']['micro'])
+      $("#regno").val(data['data']['regno'])
+      $("#father").val(data['data']['fathername'])
+      $("#mother").val(data['data']['mothername'])
+      $("#name").val(data['data']['name'])
+      $("[name=sex][value=" + data['data']['sex'] + "]").prop('checked', true)
+      $("#birthtime").val(data['data']['birthtime'])
+      $("#species2").val(data['data']['species'])
+      $("#color").val(data['data']['color'])
+      $("#type").val(data['data']['type'])
+      vimage.data['image'] = data['data']['image']
+      refreshImage(vimage.data['image'])
+      $(".insert").hide()
+      $(".edit").show()
+      $("#sendinfo-modal").modal('show')
+    })
+  }
+
+  function checkData() {
+    data = {
+      micro: $("#micro").val(),
+      regno: $("#regno").val(),
+      name: $("#name").val(),
+      sex: $("[name=sex]:checked").val(),
+      birthtime: $("#birthtime").val(),
+      species: $("#species2").val(),
+      color: $("#color").val(),
+      type: $("#type").val(),
+      breeder: global['breeder'],
+      owner: global['owner'],
+      father: global['pet'][0],
+      mother: global['pet'][1]
+    }
+
+    for (const key in notify) {
+      if (notify.hasOwnProperty(key)) {
+        if (!data[key].length) return key
+      }
+    }
+    return data
+  }
+
+  function editInfo() {
+    sdata = checkData()
+    if (!sdata['name']) textError(sdata)
+    else {
+      vhttp.checkelse('', { action: 'edit-info', data: sdata, id: global['id'] }).then(data => {
+        $("#content").html(data['html'])
+        $("#sendinfo-modal").modal('hide')
+      })
+    }
+  }
+
+  function clearUser(name) {
+    global[name] = 0
+    $("#" + name).val('')
+    $("#" + name + "-suggest").html('')
+    $("#" + name + '-name').text(global['user']['name'])
+    $("#" + name + '-mobile').text(global['user']['mobile'])
+  }
+
+  function parseUser(name, data) {
+    $("#"+ name).val('')
+    if (data['id']) {
+      global[name] = data['id']
+      $("#"+ name +"-name").text(data['fullname'])
+      $("#"+ name +"-mobile").text(data['mobile'])
+    }
+    else {
+      global[name] = 0
+      $("#"+ name +"-name").text(global['user']['name'])
+      $("#"+ name +"-mobile").text(global['user']['mobile'])
+    }
+  }
+
+  function selectUser(name, id, fullname, mobile) {
+    global[name] = id
+    $("#" + name).val('')
+    $("#" + name + '-name').text(fullname)
+    $("#" + name + '-mobile').text(mobile)
+  }
+
+  function insertUser(name) {
+    global['modal'] = name
+    $("#user-name").val('')
+    $("#user-mobile").val('')
+    $("#user-address").val('')
+    $("#user-politic").val('')
+    $("#user-modal").modal('show')
+  }
+
+  function preview(id) {
+    vhttp.checkelse('', { action: 'get-preview', id: id }).then(data => {
+      $("#info-image").attr('src', data['data']['image'])
+      $("#info-name").text(data['data']['name'])
+      $("#info-sex").text(data['data']['sex'])
+      $("#info-birthtime").text(data['data']['birthtime'])
+      $("#info-species").text(data['data']['species'])
+      $("#info-color").text(data['data']['color'])
+      $("#info-type").text(data['data']['type'])
+      $("#info-breeder").text(data['data']['breeder'])
+      $("#info-owner").text(data['data']['owner'])
+      $("#info-modal").modal('show')
+    })
+  }
+
+  function checkUserData() {
+    data = {
+      name: $("#user-name").val(),
+      mobile: $("#user-mobile").val(),
+      address: $("#user-address").val(),
+      politic: $("#user-politic").val(),
+    }
+    return data
+  }
+
+  function insertUserSubmit() {
+    sdata = checkUserData()
+    vhttp.checkelse('', { action: 'insert-user', data: sdata }).then(data => {
+      global[global['modal']] = data['id']
+      $("#"+ global['modal'] +"").val('')
+      $("#"+ global['modal'] +"-name").text(sdata['name'])
+      $("#"+ global['modal'] +"-mobile").text(sdata['mobile'])
+      $("#user-modal").modal('hide')
+    })
+  }
+
+  function textError(label) {
+    $("#" + label + "-error").text(notify[label])
+    $("#" + label + "-error").show()
+    $("#" + label + "-error").fadeOut(3000)
+    $('html, body').animate({
+      scrollTop: $("#" + label + "-error").offset().top
+    }, 1000);
   }
 
 </script>
