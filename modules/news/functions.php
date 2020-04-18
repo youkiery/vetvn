@@ -512,7 +512,7 @@ function sendinfoList() {
   $xtpl = new XTemplate('list.tpl', PATH2);
   $filter['status'] --;
 
-  $sql = 'select * from `'. PREFIX .'_sendinfo` where userid = ' . $userinfo['id'] . ' '. ($filter['status'] >= 0 ? ' and active = ' . $filter['status'] : '') .' order by id desc';
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where userid = ' . $userinfo['id'] . ' '. ($filter['status'] >= 0 ? ' and active = ' . $filter['status'] : '') .' and active2 = 0 order by id desc';
 
   $query = $db->query($sql);
   $list = array();
@@ -1005,7 +1005,7 @@ function managerContent() {
   $query = $db->query($sql);
   $number = $query->fetch()['count'];
 
-  $sql = 'select * from `'. PREFIX .'_sendinfo` where LOWER(name) like "%'. $filter['keyword'] .'%" and active2 = 1 and userid = ' . $userinfo['id'] . ' limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where LOWER(name) like "%'. $filter['keyword'] .'%" and active2 = 0 and userid = ' . $userinfo['id'] . ' limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
   $query = $db->query($sql);
 
   $index = ($filter['page'] - 1) * $filter['limit'] + 1;

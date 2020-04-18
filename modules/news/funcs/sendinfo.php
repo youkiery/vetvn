@@ -41,7 +41,7 @@ if (!empty($action)) {
 			$data['birthtime'] = totime($data['birthtime']);
 
 			// insert vào bảng
-			$sql = 'insert into `'. PREFIX .'_sendinfo` (userid, name, sex, birthtime, species, color, type, breeder, owner, image, mother, father) values("'. $userinfo['id'] .'", "'. $data['name'] .'", "'. $data['sex'] .'", "'. $data['birthtime'] .'", "'. $data['species'] .'", "'. $data['color'] .'", "'. $data['type'] .'", "'. $data['breeder'] .'", "'. $data['owner'] .'", "'. implode(',', $image) .'", '. $data['mother'] .', '. $data['father'] .')';
+			$sql = 'insert into `'. PREFIX .'_sendinfo` (userid, name, sex, birthtime, species, color, type, breeder, owner, image, mother, father, active2) values("'. $userinfo['id'] .'", "'. $data['name'] .'", "'. $data['sex'] .'", "'. $data['birthtime'] .'", "'. $data['species'] .'", "'. $data['color'] .'", "'. $data['type'] .'", "'. $data['breeder'] .'", "'. $data['owner'] .'", "'. implode(',', $image) .'", '. $data['mother'] .', '. $data['father'] .', 0)';
 			if ($db->query($sql)) {
 				// thông báo
 				$result['status'] = 1;

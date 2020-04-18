@@ -36,9 +36,9 @@
       <button class="btn btn-info" onclick="editUser({userid})">
         Chỉnh sửa thông tin
       </button>
-      <button class="btn btn-info" onclick="centerConfirm()">
+      <!-- <button class="btn btn-info" onclick="centerConfirm()">
         Đăng ký trại
-      </button>
+      </button> -->
     </div>
 
     <div class="form-group">
