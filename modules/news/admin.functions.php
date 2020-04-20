@@ -775,7 +775,7 @@ function petContent() {
   $glit['status']++;
   unset($glit['page']);
   unset($glit['limit']);
-  $xtpl->assign('nav', nav_generater('/index.php?nv=news&op=pet&' . http_build_query($glit), count($list), $filter['page'], $filter['limit']));
+  $xtpl->assign('nav', nav_generater('/admin32/index.php?nv=news&op=pet&' . http_build_query($glit), count($list), $filter['page'], $filter['limit']));
   $xtpl->parse('main');
   return $xtpl->text();
 }

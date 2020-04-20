@@ -17,15 +17,15 @@ $page_title = "Quản lý thú cưng";
 
 $action = $nv_Request->get_string('action', 'post', '');
 $filter = array(
-  'page' => $nv_Request->get_int('page', 'post', 1),
-  'limit' => $nv_Request->get_int('limit', 'post', 10),
-  'status' => $nv_Request->get_int('status', 'post', 0),
-  'username' => $nv_Request->get_string('username', 'post', ''),
-  'owner' => $nv_Request->get_string('owner', 'post', ''),
-  'mobile' => $nv_Request->get_string('mobile', 'post', ''),
-  'name' => $nv_Request->get_string('name', 'post', ''),
-  'species' => $nv_Request->get_string('species', 'post', ''),
-  'mc' => $nv_Request->get_string('mc', 'post', '')
+  'page' => $nv_Request->get_int('page', 'get', 1),
+  'limit' => $nv_Request->get_int('limit', 'get', 10),
+  'status' => $nv_Request->get_int('status', 'get', 0),
+  'username' => $nv_Request->get_string('username', 'get', ''),
+  'owner' => $nv_Request->get_string('owner', 'get', ''),
+  'mobile' => $nv_Request->get_string('mobile', 'get', ''),
+  'name' => $nv_Request->get_string('name', 'get', ''),
+  'species' => $nv_Request->get_string('species', 'get', ''),
+  'mc' => $nv_Request->get_string('mc', 'get', '')
 );
 
 if (!empty($action)) {

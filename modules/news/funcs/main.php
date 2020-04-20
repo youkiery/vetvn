@@ -18,11 +18,11 @@ $page_title = "Veterinary Vietnam";
 // while ($row = $query->fetch()) {
 //   $species = checkRemind($row['species'], 'species2');
 //   $color = checkRemind($row['color'], 'color');
-//   $type = checkRemind($row['type'], 'type');
-//   echo "insert into pet_news_sendinfo (name, micro, regno, sex, birthtime, species, color, type, breeder, owner, image, userid, active, father, mother, intro, time) values ('$row[name]', '$row[microchip]', '', $row[sex], $row[dateofbirth], $species, $color, $type, 0, 0, '$row[image]', $row[userid], $row[active], 0, 0, '$row[graph]', $row[time]);";
+//   $type = checkRemind('Ngắn', 'type');
+//   echo "insert into pet_news_sendinfo (name, micro, regno, sex, birthtime, species, color, type, breeder, owner, image, userid, active, active2, father, mother, intro, time) values ('$row[name]', '$row[microchip]', '', $row[sex], $row[dateofbirth], $species, $color, $type, 0, 0, '$row[image]', $row[userid], $row[active], 1, 0, 0, '$row[graph]', $row[time]);";
 //   echo '<br>';
 //   if ($row['ceti']) {
-//     echo "insert into pet_news_certify(petid, signid, price, time) values ($row[id], 1, $row[price], $row[ctime]);";
+//     echo "insert into pet_news_certify(petid, signid, price, time) values ($row[id], 1, $row[price], $row[time]);";
 //   }
 //   echo '<br>';
 //   echo '<br>';
@@ -66,6 +66,9 @@ if (!empty($userinfo)) {
 else {
   $xtpl->parse("main.nolog");
 }
+
+// echo md5('abc');
+// die();
 
 $xtpl->assign('content', mainContent());
 $xtpl->parse("main");

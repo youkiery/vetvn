@@ -888,7 +888,7 @@ function managerContent() {
   $query = $db->query($sql);
   $number = $query->fetch()['count'];
 
-  $sql = 'select * from `'. PREFIX .'_sendinfo` where LOWER(name) like "%'. $filter['keyword'] .'%" and active2 = 0 and userid = ' . $userinfo['id'] . ' limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where LOWER(name) like "%'. $filter['keyword'] .'%" and active2 = 1 and userid = ' . $userinfo['id'] . ' order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
   $query = $db->query($sql);
 
   $index = ($filter['page'] - 1) * $filter['limit'] + 1;

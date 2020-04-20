@@ -125,7 +125,7 @@
       1: 'mother'
     },
     user: {
-      name: '{name}',
+      name: '{fullname}',
       mobile: '{mobile}'
     },
     breeder: 0,
