@@ -92,7 +92,7 @@ function listContent() {
     }
     $xtpl->parse('main.row');
   }
-  $xtpl->assign('nav', nav_generater('news/list/?keyword='.$filter['keyword'], $count, $filter['page'], $filter['limit']));
+  $xtpl->assign('nav', nav_generater('/news/list/?keyword='.$filter['keyword'], $count, $filter['page'], $filter['limit']));
   $xtpl->parse('main');
   return $xtpl->text();
 }
@@ -566,7 +566,11 @@ function privateModal() {
   global $position, $userinfo;
   $xtpl = new XTemplate("modal.tpl", PATH2);
 
+  $today = time();
+  $xtpl->assign('today', date('d/m/Y', $today));
+  $xtpl->assign('recall', date('d/m/Y', $today + 60 * 60 * 24 * 21));
   $xtpl->assign('main', $userinfo['mail']);
+  $xtpl->assign('v', parseVaccineType($userinfo['id']));
   foreach ($position as $l1i => $l1) {
     $xtpl->assign('l1name', $l1->{'name'});
     $xtpl->assign('l1id', $l1i);
@@ -893,6 +897,7 @@ function managerContent() {
 
   $index = ($filter['page'] - 1) * $filter['limit'] + 1;
   while ($row = $query->fetch()) {
+    $lock = checkPetlock($row['id']);
     $owner = getContactId($row['owner'], $row['userid']);
     $xtpl->assign('index', $index++);
     $xtpl->assign('id', $row['id']);
@@ -900,10 +905,12 @@ function managerContent() {
     $xtpl->assign('owner', $owner['fullname'] . ', ' . $owner['address']);
     $xtpl->assign('sex', $sex_array[$row['sex']]);
     $xtpl->assign('species', getRemindId($row['species'])['name']);
+    $xtpl->assign('lock', '');
+    if (!empty($lock)) $xtpl->assign('lock', 'disabled');
     $xtpl->parse('main.row');
   }
 
-  $xtpl->assign('nav', nav_generater('/news/private/keyword=' . $filter['keyword'], $number, $filter['page'], $filter['limit']));
+  $xtpl->assign('nav', nav_generater('/news/private/?keyword=' . $filter['keyword'], $number, $filter['page'], $filter['limit']));
   $xtpl->parse('main');
   return $xtpl->text();
 }

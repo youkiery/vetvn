@@ -252,7 +252,7 @@ if (!empty($action)) {
       if (!empty($id) && count($data) > 0) {
         $data['time'] = totime($data['time']);
         $data['recall'] = totime($data['recall']);
-        if (!empty($row = checkPrvVaccine($data))) {
+        if (!empty($row = checkPrvVaccine($data, $id))) {
           // 
           $sql = 'update `'. PREFIX .'_vaccine` set status =  1 where id = ' . $row['id'];
         }
@@ -870,7 +870,6 @@ if (!$userinfo['center']) {
 else {
   $xtpl->assign('tabber', '0');
 }
-$xtpl->assign('v', parseVaccineType($userinfo['id']));
 
 $xtpl->assign('today', date('d/m/Y', time()));
 $xtpl->assign('recall', date('d/m/Y', time() + 60 * 60 * 24 * 21));

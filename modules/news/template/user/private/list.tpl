@@ -23,7 +23,7 @@
         <button class="btn btn-info" onclick="addVaccine({id})">
           <img src="/themes/default/images/syringe.png" style="width: 20px; height: 20px;">
         </button>
-        <button class="btn btn-info" onclick="edit({id})">
+        <button class="btn btn-info" onclick="edit({id})" {lock}>
           <span class="glyphicon glyphicon-edit"></span>
         </button>
         <a href="/{module_name}/info?id={id}"> 

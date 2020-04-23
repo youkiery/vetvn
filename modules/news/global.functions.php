@@ -307,7 +307,6 @@ function checkPet($name, $userid) {
   return 0;
 }
 
-
 function checkPrvVaccine($data, $id) {
   global $db;
 
