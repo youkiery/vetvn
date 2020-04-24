@@ -648,7 +648,7 @@ function sendinfoContent() {
   $xtpl = new XTemplate('list.tpl', PATH2);
   $filter['status'] --;
 
-  $sql = 'select * from `'. PREFIX .'_sendinfo` where '. ($filter['status'] >= 0 ? ' active = ' . $filter['status'] : '') .' active2 = 1 order by id desc';
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where '. ($filter['status'] >= 0 ? ' active = ' . $filter['status'] . ' and ' : '') .' active2 = 0 order by id desc';
 
   $query = $db->query($sql);
   $list = array();

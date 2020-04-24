@@ -253,7 +253,7 @@ if (!empty($action)) {
 $xtpl = new XTemplate("main.tpl", PATH2);
 
 $xtpl->assign('keyword', $filter['keyword']);
-$xtpl->assign('status' . $filter['status'], 'checked');
+$xtpl->assign('status' . $filter['status'], 'selected');
 $xtpl->assign('content', sendinfoContent());
 $xtpl->assign('modal', sendinfoModal());
 $xtpl->parse("main");
