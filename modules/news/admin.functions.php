@@ -648,7 +648,7 @@ function sendinfoContent() {
   $xtpl = new XTemplate('list.tpl', PATH2);
   $filter['status'] --;
 
-  $sql = 'select * from `'. PREFIX .'_sendinfo` where '. ($filter['status'] >= 0 ? ' active = ' . $filter['status'] . ' and ' : '') .' active2 = 0 order by id desc';
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where '. ($filter['status'] >= 0 ? ' active = ' . $filter['status'] . ' and ' : '') .' (active2 = 0 or active2 = 2) order by id desc';
 
   $query = $db->query($sql);
   $list = array();
@@ -706,7 +706,7 @@ function petContent() {
   $xtpl->assign('module_file', $module_file);
   $filter['status'] --;
 
-  $sql = 'select * from `'. PREFIX .'_sendinfo` where active2 > 0 ' . ($filter['status'] >= 0 ? ' and active = ' . $filter['status'] : '') . ' order by id desc';
+  $sql = 'select * from `'. PREFIX .'_sendinfo` where active2 > 0 ' . ($filter['status'] >= 0 ? ' and active = ' . $filter['status'] : '') . ' order by time desc';
   $query = $db->query($sql);
   $list = array();
 
