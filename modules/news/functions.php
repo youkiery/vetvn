@@ -921,11 +921,11 @@ function statisticCollect() {
   $index = ($filter['page'] - 1) * $filter['limit'] + 1;
   $xtpl = new XTemplate('list.tpl', PATH2);
 
-  $sql = 'select count(*) as count from `'. PREFIX .'_certify`';
+  $sql = 'select count(*) as count from `'. PREFIX .'_certify` where price > 0';
   $query = $db->query($sql);
   $count = $query->fetch()['count'];
 
-  $sql = 'select * from `'. PREFIX .'_certify` order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
+  $sql = 'select * from `'. PREFIX .'_certify` where price > 0 order by id desc limit ' . $filter['limit'] . ' offset ' . ($filter['page'] - 1) * $filter['limit'];
   $query = $db->query($sql);
   // $data = getUserPetList($filter);
 
