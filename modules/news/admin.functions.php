@@ -722,19 +722,22 @@ function petContent() {
     $row['owner'] = getContactId($row['owner'], $row['userid']);
     $row['species'] = getRemindId($row['species'])['name'];
     $row['user']['mobile'] = xdecrypt($row['user']['mobile']);
-    $name = mb_strtolower($row['name']);
-    $species = mb_strtolower($row['species']);
-    $micro = mb_strtolower($row['micro']);
-    $username = mb_strtolower($row['user']['username']);
-    $fullname = mb_strtolower($row['owner']['fullname']);
-    $mobile = mb_strtolower($row['user']['mobile']);
 
-    if (empty($filter['name']) || (mb_strpos($name, $filter['name']) !== false)) $list []= $row;
-    else if (empty($filter['species']) || (mb_strpos($species, $filter['species']) !== false)) $list []= $row;
-    else if (empty($filter['micro']) || (mb_strpos($micro, $filter['mc']) !== false)) $list []= $row;
-    else if (empty($filter['username']) || (mb_strpos($username, $filter['username']) !== false)) $list []= $row;
-    else if (empty($filter['owner']) || (mb_strpos($fullname, $filter['owner']) !== false)) $list []= $row;
-    else if (empty($filter['mobile']) || (mb_strpos($mobile, $filter['mobile']) !== false)) $list []= $row;
+    if (!empty($row['user']) && !empty($row['owner'])) {
+      $name = mb_strtolower($row['name']);
+      $species = mb_strtolower($row['species']);
+      $micro = mb_strtolower($row['micro']);
+      $username = mb_strtolower($row['user']['username']);
+      $fullname = mb_strtolower($row['owner']['fullname']);
+      $mobile = mb_strtolower($row['user']['mobile']);
+  
+      if (empty($filter['name']) || (mb_strpos($name, $filter['name']) !== false)) $list []= $row;
+      else if (empty($filter['species']) || (mb_strpos($species, $filter['species']) !== false)) $list []= $row;
+      else if (empty($filter['micro']) || (mb_strpos($micro, $filter['mc']) !== false)) $list []= $row;
+      else if (empty($filter['username']) || (mb_strpos($username, $filter['username']) !== false)) $list []= $row;
+      else if (empty($filter['owner']) || (mb_strpos($fullname, $filter['owner']) !== false)) $list []= $row;
+      else if (empty($filter['mobile']) || (mb_strpos($mobile, $filter['mobile']) !== false)) $list []= $row;
+    }
   }
 
   $from = ($filter['page'] - 1) * $filter['limit'];

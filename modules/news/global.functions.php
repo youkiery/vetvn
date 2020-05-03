@@ -574,9 +574,11 @@ function getContactId($id, $userid = 0) {
     $sql = 'select * from `'. PREFIX .'_user` where id = ' . $userid;
     $query = $db->query($sql);
     $row = $query->fetch();
-    $row['mobile'] = xdecrypt($row['mobile']);
-    $row['address'] = xdecrypt($row['address']) . ', ' . $row['a2'] . ', ' . $row['a1'];
-    if ($row) return $row;
+    if (!empty($row)) {
+      $row['address'] = xdecrypt($row['address']) . ', ' . $row['a2'] . ', ' . $row['a1'];
+      $row['mobile'] = xdecrypt($row['mobile']);
+      return $row;
+    }
   }
   return 0;
 }
