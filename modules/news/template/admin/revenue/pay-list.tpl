@@ -16,7 +16,7 @@
   <tbody>
     <tr class="clickable-row" data-href=''>
       <td> {index} </td>
-      <td> {name} </td>
+      <td> {fullname} </td>
       <td> {content} </td>
       <td> {price} </td>
       <td> {time} </td>

@@ -1,128 +1,13 @@
 <!-- BEGIN: main -->
+<link rel="stylesheet" href="/modules/core/src/style.css">
 <link rel="stylesheet" href="/themes/default/src/glyphicons.css">
 <link rel="stylesheet" href="/themes/default/src/jquery-ui.min.css">
-<script type="text/javascript" src="/themes/default/src/jquery-ui.min.js"></script> 
+<script type="text/javascript" src="/themes/default/src/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/themes/default/src/jquery.ui.datepicker-vi.js"></script>
 
-<div class="msgshow"></div>
-<div id="modal-parent" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-body">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <div style="clear: both;"></div>
-        <div class="row">
-          <div class="col-sm-12">
-            <div class="input-group">
-              <input type="text" class="form-control" id="parent-key" placeholder="Người dùng theo số điện thoại">
-              <div class="input-group-btn">
-                <button class="btn btn-info" onclick="parentFilter()">
-                  Tìm kiếm
-                </button>
-              </div>
-            </div>
-            <div id="parent-list" style="max-height: 400px; overflow-y: scroll;">  </div>
-          </div>
-          <div class="col-sm-12">
-            <div class="input-group">
-              <input type="text" class="form-control" id="pet-key" placeholder="Tên, giống loài thú cưng">
-              <div class="input-group-btn">
-                <button class="btn btn-info" onclick="petFilter()">
-                  Tìm kiếm
-                </button>
-              </div>
-            </div>
-            <div id="pet-list" style="max-height: 400px; overflow-y: scroll;">  </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<div id="msgshow"></div>
 
-<div id="modal-ceti" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-body text-center">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <p class="text-center">
-          Nhập số tiền thu?
-        </p>
-        <input type="text" class="form-control" id="ceti-price" placeholder="Số tiền">
-        <button class="btn btn-info" onclick="cetiSubmit()">
-          Lưu
-        </button>
-        <button class="btn btn-danger" onclick="removeCetiSubmit()">
-          Xóa
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="modal-statistic" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-body text-center">
-        <form class="row">
-          <div class="col-sm-6">
-            <input type="text" class="form-control" id="filter-from">
-          </div>
-          <div class="col-sm-6">
-            <input type="text" class="form-control" id="filter-end">
-          </div>
-          <button class="btn btn-info" onclick="viewStatistic(event)">
-            Lọc theo thời gian
-          </button>
-        </form>
-
-        <div id="statistic">
-          {statistic}
-        </div>
-
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="modal-remove-pay" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-body text-center">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <p>
-          Xác nhận xóa?
-        </p>
-        <button class="btn btn-danger" onclick="removePaySubmit()">
-          Xóa
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="modal-pay" class="modal fade" role="dialog">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-body text-center">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <p>
-          Nhập phiếc chi?
-        </p>
-        <select class="form-control" id="pay-user">
-          <!-- BEGIN: user -->
-          <option value="{userid}">{username}</option>
-          <!-- END: user -->
-        </select>
-        <input type="text" class="form-control" id="pay-price" placeholder="Số tiền">
-        <textarea class="form-control" id="pay-content" rows="3"></textarea>
-        <button class="btn btn-info" onclick="paySubmit()">
-          Lưu
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+{modal}
 
 <form>
   <input type="hidden" name="nv" value="news">
@@ -140,17 +25,28 @@
   </div>
 </form>
 
-<button class="btn btn-success" style="float: right;" id="nceti" onclick="newCeti()">
-  <span class="glyphicon glyphicon-plus"></span>
-</button>
-<button class="btn btn-success" style="float: right; display: none;" id="npay" onclick="pay()">
-  <span class="glyphicon glyphicon-plus"></span>
-</button>
+<div style="float: right;">
+  <button class="btn btn-success btn-sm" onclick="checkAllModal()">
+    Thêm hàng loạt
+  </button>
+  <!-- BEGIN: collect -->
+  <button class="btn btn-success btn-sm" id="nceti" onclick="newCeti()">
+    Thêm phiếu thu
+  </button>
+  <!-- END: collect -->
+  <!-- BEGIN: pay -->
+  <button class="btn btn-success btn-sm" id="npay" onclick="pay()">
+    Thêm phiếu chi
+  </button>
+  <!-- END: pay -->
+</div>
+
 <div style="clear: both;"></div>
 <div id="content">
   {content}
 </div>
 
+<script src="/modules/core/vhttp.js"></script>
 <script>
   var content = $("#content")
   var global = {
@@ -158,10 +54,11 @@
     petid: 0,
     page: 1,
     page2: 1,
-    parentid: 0
+    parentid: 0,
+    certify: 0
   }
 
-  $(this).ready(() => {
+  $(document).ready(() => {
     $("#filter-from, #filter-end").datepicker({
       format: 'dd/mm/yyyy',
       changeMonth: true,
@@ -173,10 +70,11 @@
       if (Number.isFinite(val)) {
         money = val
       }
-      
+
       val = formatter.format(val).replace(/ ₫/g, "").replace(/\./g, ",");
       current.value = val
     })
+    installCheckbox()
   })
 
   function t1() {
@@ -197,7 +95,7 @@
     e.preventDefault()
     $.post(
       strHref,
-      {action: 'statistic', filter: {from: $("#filter-from").val(), end: $("#filter-end").val()}},
+      { action: 'statistic', filter: { from: $("#filter-from").val(), end: $("#filter-end").val() } },
       (response, status) => {
         checkResult(response, status).then(data => {
           $("#statistic").html(data['html'])
@@ -223,6 +121,7 @@
       (response, status) => {
         checkResult(response, status).then(data => {
           content.html(data['html'])
+          installCheckbox()
           $("#modal-ceti").modal('hide')
         }, () => { })
       }
@@ -237,6 +136,7 @@
       (response, status) => {
         checkResult(response, status).then(data => {
           content.html(data['html'])
+          installCheckbox()
           $("#modal-ceti").modal('hide')
         }, () => { })
       }
@@ -271,6 +171,7 @@
       (response, status) => {
         checkResult(response, status).then(data => {
           content.html(data['html'])
+          installCheckbox()
           $("#modal-pay").modal('hide')
         }, () => { })
       }
@@ -300,6 +201,7 @@
       (response, status) => {
         checkResult(response, status).then(data => {
           content.html(data['html'])
+          installCheckbox()
           $("#modal-pay").modal('hide')
         }, () => { })
       }
@@ -310,48 +212,57 @@
     $("#modal-parent").modal('show')
   }
 
-  function ceti(petid, price) {
-    global['petid'] = petid
-    
+  function ceti(id, price) {
+    global['id'] = id
+    global['certify'] = 1
+
     $("#ceti-price").val(price)
     $("#modal-ceti").modal('show')
   }
 
   function cetiSubmit() {
-    $.post(
-      strHref,
-      { action: 'ceti', price: Number($("#ceti-price").val().replace(/\,/g, "")), petid: global['petid'], filter: checkFilter() },
-      (response, status) => {
-        checkResult(response, status).then(data => {
-          content.html(data['html'])
-          $("#modal-ceti").modal('hide')
-        }, () => { })
-      }
-    )
+    if (global['certify']) {
+      vhttp.checkelse('', { action: 'check-all', price: Number($("#ceti-price").val().replace(/\,/g, "")), list: list }).then(data => {
+        $("#content").html(data['html'])
+        installCheckbox()
+        $("#modal-ceti").modal('hide')
+      })
+    }
+    else {
+      vhttp.checkelse('', { action: 'ceti', price: Number($("#ceti-price").val().replace(/\,/g, "")), id: global['id'] }).then(data => {
+        content.html(data['html'])
+        installCheckbox()
+        $("#modal-ceti").modal('hide')
+      })
+    }
   }
 
   function removeCetiSubmit() {
-    $.post(
-      strHref,
-      { action: 'remove-ceti', petid: global['petid'], filter: checkFilter() },
-      (response, status) => {
-        checkResult(response, status).then(data => {
-          content.html(data['html'])
-          $("#modal-ceti").modal('hide')
-        }, () => { })
-      }
-    )
+    if (global['certify']) {
+      vhttp.checkelse('', { action: 'remove-check-all', list: list }).then(data => {
+        $("#content").html(data['html'])
+        installCheckbox()
+        $("#modal-ceti").modal('hide')
+      })
+    }
+    else {
+      vhttp.checkelse('', { action: 'remove-ceti', id: global['id'] }).then(data => {
+        content.html(data['html'])
+        installCheckbox()
+        $("#modal-ceti").modal('hide')
+      })
+    }
   }
 
   function parentFilter() {
     $.post(
       global['url'],
       // {action: 'filter-parent', key: $("#parent-key").val(), type: ($("#parent-type-1").prop('checked') ? 1 : 2)},
-      {action: 'filter-parent', key: $("#parent-key").val()},
+      { action: 'filter-parent', key: $("#parent-key").val() },
       (response, status) => {
         checkResult(response, status).then(data => {
           $("#parent-list").html(data['html'])
-        }, () => {})
+        }, () => { })
       }
     )
   }
@@ -365,11 +276,11 @@
     if (global['parentid']) {
       $.post(
         global['url'],
-        {action: 'filter-pet', key: $("#pet-key").val(), parentid: global['parentid']},
+        { action: 'filter-pet', key: $("#pet-key").val(), parentid: global['parentid'] },
         (response, status) => {
           checkResult(response, status).then(data => {
             $("#pet-list").html(data['html'])
-          }, () => {})
+          }, () => { })
         }
       )
     }
@@ -380,5 +291,37 @@
     ceti(id, 0)
   }
 
+  function checkCheckbox() {
+    list = []
+    $(".checkbox:checked").each((index, item) => {
+      list.push(item.getAttribute('rel'))
+    })
+    return list
+  }
+
+  function installCheckbox() {
+    $("#check-all").click(e => {
+      value = e.currentTarget.checked
+      $(".checkbox").prop('checked', value)
+    })
+  }
+
+  function checkAllModal() {
+    if (!(list = checkCheckbox()).length) alert_msg('Chọn ít nhất một mục')
+    else {
+      global['certify'] = 1
+      $("#modal-ceti").modal('show')
+    }
+  }
+
+  function removeCheckAll() {
+    if (!(list = checkCheckbox()).length) alert_msg('Chọn ít nhất một mục')
+    else {
+      vhttp.checkelse('', { action: 'check-all', list: list }).then(data => {
+        $("#content").html(data['html'])
+        installCheckbox()
+      })
+    }
+  }
 </script>
 <!-- END: main -->

@@ -25,13 +25,12 @@ if (!empty($action)) {
 	$result = array('status' => 0);
 	switch ($action) {
     case 'ceti':
-      $petid = $nv_Request->get_string('petid', 'post');
+      $id = $nv_Request->get_string('id', 'post');
       $price = $nv_Request->get_int('price', 'post', 0);
-      $filter = $nv_Request->get_array('filter', 'post');
 
-      $sql = 'update `' . PREFIX . '_pet` set ceti = 1, price = '. $price .', ctime = '. time() .' where id = ' . $petid;
+      $sql = 'update `' . PREFIX . '_certify` set price = '. $price .', time = '. time() .' where id = ' . $id;
       if ($db->query($sql)) {
-        $result['html'] = revenue2($filter);
+        $result['html'] = revenueContent();
         if ($result['html']) {
           $result['notify'] = 'Đã lưu';
           $result['status'] = 1;
@@ -52,17 +51,13 @@ if (!empty($action)) {
       }
     break;
     case 'remove-ceti':
-      $petid = $nv_Request->get_string('petid', 'post');
-      $filter = $nv_Request->get_array('filter', 'post');
+      $id = $nv_Request->get_string('id', 'post');
 
-      $sql = 'update `' . PREFIX . '_pet` set ceti = 0, price = 0 where id = ' . $petid;
-      
+      $sql = 'delete from `' . PREFIX . '_certify` where id = ' . $id;
       if ($db->query($sql)) {
-        $result['html'] = revenue($filter);
-        if ($result['html']) {
-          $result['notify'] = 'Đã xóa';
-          $result['status'] = 1;
-        }
+        $result['html'] = revenueContent();
+        $result['notify'] = 'Đã xóa';
+        $result['status'] = 1;
       }
     break;
     case 'remove-pay':
@@ -239,6 +234,25 @@ if (!empty($action)) {
         }
       }
     break;
+    case 'check-all':
+      $price = $nv_Request->get_int('price', 'post');
+      $list = $nv_Request->get_array('list', 'post');
+
+      $sql = 'update `' . PREFIX . '_certify` set price = "'. $price .'" where id in (' . implode(', ', $list) . ')';
+      $db->query($sql);
+      $result['html'] = revenueContent();
+      $result['notify'] = 'Đã lưu';
+      $result['status'] = 1;
+    break;
+    case 'remove-check-all':
+      $list = $nv_Request->get_array('list', 'post');
+
+      $sql = 'delete from `' . PREFIX . '_certify` where id in (' . implode(', ', $list) . ')';
+      $db->query($sql);
+      $result['html'] = revenueContent();
+      $result['notify'] = 'Đã lưu';
+      $result['status'] = 1;
+    break;
 	}
 	echo json_encode($result);
 	die();
@@ -256,15 +270,14 @@ while ($row = $query->fetch()) {
   $xtpl->assign('username', $row['fullname']);
   $xtpl->parse('main.user');
 }
-
-if ($filter['type'] == 1) {
-  $xtpl->assign('content', statisticCollect());
-}
-else {
-  $xtpl->assign('content', statisticPay());
-}
-$xtpl->assign('type' . $filter['type'], 'selected');
 $xtpl->assign('statistic_content', statisticContent());
+
+if ($filter['type'] == 1) $xtpl->parse("main.collect");
+else $xtpl->parse("main.pay");
+
+$xtpl->assign('modal', revenueModal());
+$xtpl->assign('content', revenueContent());
+$xtpl->assign('type' . $filter['type'], 'selected');
 
 $xtpl->parse("main");
 $contents = $xtpl->text("main");

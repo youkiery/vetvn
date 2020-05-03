@@ -839,6 +839,7 @@ function statisticCollect() {
   while ($row = $query->fetch()) {
     $pet = getPetinfoId($row['petid']);
     $user = getUserinfoId($pet['userid']);
+    $xtpl->assign('cid', $row['id']);
     $xtpl->assign('id', $pet['id']);
     $xtpl->assign('name', $pet['name']);
     $xtpl->assign('fullname', $user['fullname']);
@@ -851,6 +852,34 @@ function statisticCollect() {
   }
 
   $xtpl->assign('nav', nav_generater('/admin32/index.php?nv=news&op=revenue&type=' . $filter['type'], $count, $filter['page'], $filter['limit']));
+  $xtpl->parse('main');
+  return $xtpl->text();
+}
+
+function revenueContent() {
+  global $filter;
+
+  if ($filter['type'] == 1) {
+    return statisticCollect();
+  }
+  return statisticPay();
+}
+
+function revenueModal() {
+  global $db;
+
+  $xtpl = new XTemplate("modal.tpl", PATH2);
+
+  $sql = 'select * from `'. PREFIX .'_user` where view = 1';
+  $query = $db->query($sql);
+  
+  while ($row = $query->fetch()) {
+    $xtpl->assign('userid', $row['id']);
+    $xtpl->assign('username', $row['fullname']);
+    $xtpl->parse('main.user');
+  }
+  $xtpl->assign('statistic_content', statisticContent());
+  
   $xtpl->parse('main');
   return $xtpl->text();
 }
@@ -874,7 +903,7 @@ function statisticPay() {
     $xtpl->assign('id', $row['id']);
     $xtpl->assign('price', number_format($row['price'], 0, '', ','));
     $xtpl->assign('content', $row['content']);
-    $xtpl->assign('name', $owner['fullname']);
+    $xtpl->assign('fullname', $owner['fullname']);
     $xtpl->assign('time', date('d/m/Y', ($row['time'])));
     $xtpl->parse('main.row');
   }

@@ -6,22 +6,26 @@
 </p>
 <table class="table table-bordered">
   <tr>
-    <th> Tên </th>
     <th> Chủ nuôi </th>
-    <th> Số microchip </th>
+    <th> <input type="checkbox" id="check-all"> </th>
+    <th> Tên </th>
     <th> Giống loài </th>
     <th> Số tiền </th>
-    <th> Ngày thu </th>
+    <th></th>
   </tr>
   <!-- BEGIN: row -->
   <tbody>
-    <tr class="clickable-row" data-href=''>
-      <td> <a href="/news/detail/?id={id}"> {name} </a> </td>
-      <td> <a href="/news/detail/?id={id}"> {fullname} </a> </td>
-      <td> <a href="/news/detail/?id={id}"> {microchip} </a> </td>
-      <td> <a href="/news/detail/?id={id}"> {species} </a> </td>
-      <td> <a href="/news/detail/?id={id}"> {price} </a> </td>
-      <td> <a href="/news/detail/?id={id}"> {time} </a> </td>
+    <tr>
+      <td> {fullname} </td>
+      <td> <input type="checkbox" class="checkbox" id="check-{cid}" rel="{cid}"> </td>
+      <td> {name} </td>
+      <td> {species} </td>
+      <td> {price} </td>
+      <td>
+        <button class="btn btn-warning" onclick="ceti({cid}, '{price}')">
+          <img src="/themes/default/images/cetificate.png">
+        </button>
+      </td>
     </tr>
   </tbody>
   <!-- END: row -->
