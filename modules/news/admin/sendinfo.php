@@ -35,7 +35,7 @@ if (!empty($action)) {
 			$data['birthtime'] = totime($data['birthtime']);
 
 			// cập nhật bảng
-			$sql = 'update `'. PREFIX .'_sendinfo` set name = "'. $data['name'] .'", sex = "'. $data['sex'] .'", birthtime = "'. $data['birthtime'] .'", species = "'. $data['species'] .'", color = "'. $data['color'] .'", type = "'. $data['type'] .'", breeder = "'. $data['breeder'] .'", owner = "'. $data['owner'] .'", father = '. $data['father'] .', mother = '. $data['mother'] .' where id = ' . $id;
+			$sql = 'update `'. PREFIX .'_sendinfo` set micro = "'. $data['micro'] .'", regno = "'. $data['regno'] .'", name = "'. $data['name'] .'", sex = "'. $data['sex'] .'", birthtime = "'. $data['birthtime'] .'", species = "'. $data['species'] .'", color = "'. $data['color'] .'", type = "'. $data['type'] .'", breeder = "'. $data['breeder'] .'", owner = "'. $data['owner'] .'", father = '. $data['father'] .', mother = '. $data['mother'] .' where id = ' . $id;
 			if ($db->query($sql)) {
 				// thông báo
 				$result['status'] = 1;
@@ -179,10 +179,14 @@ if (!empty($action)) {
 			$id = $nv_Request->get_int('id', 'post', 0);
 			$sign = $nv_Request->get_int('sign', 'post', 0);
 			$micro = $nv_Request->get_string('micro', 'post');
+			$regno = $nv_Request->get_string('regno', 'post');
 
-			$regno = checkRegno();
+			if (empty($regno)) {
+				$regno = checkRegno();
+				$regno++;
+			}
 			// kích hoạt thú cưng
-			$sql = 'update `'. PREFIX .'_sendinfo` set active = 1, active2 = 2, micro = "'. $micro .'", regno = "'. ($regno++) .'", time = "'. time() .'" where id = ' . $id;
+			$sql = 'update `'. PREFIX .'_sendinfo` set active = 1, active2 = 2, micro = "'. $micro .'", regno = "'. ($regno) .'", time = "'. time() .'" where id = ' . $id;
 			// xác nhận cấp giấy thú cưng
 			$sql2 = 'insert into `'. PREFIX .'_certify` (petid, signid, price, time) values('. $id .', '. $sign .', 0, '. time() .')';
 			if ($db->query($sql) && $db->query($sql2)) {

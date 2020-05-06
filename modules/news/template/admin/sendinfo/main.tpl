@@ -220,6 +220,8 @@
       parseUser('breeder', data['data']['breeder'])
       parseUser('owner', data['data']['owner'])
 
+      $("#micro").val(data['data']['micro'])
+      $("#regno").val(data['data']['regno'])
       $("#father").val(data['data']['fathername'])
       $("#mother").val(data['data']['mothername'])
       $("#name").val(data['data']['name'])
@@ -238,6 +240,8 @@
 
   function checkData() {
     data = {
+      micro: $("#micro").val(),
+      regno: $("#regno").val(),
       name: $("#name").val(),
       sex: $("[name=sex]:checked").val(),
       birthtime: $("#birthtime").val(),
@@ -352,13 +356,15 @@
     }, 1000);
   }
 
-  function done(id) {
+  function done(id, regno, micro) {
     global['id'] = id
+    $("#done-regno").val(regno)
+    $("#done-micro").val(micro)
     $("#done-modal").modal('show')
   }
 
   function doneSubmit() {
-    vhttp.checkelse('', { action: 'done', id: global['id'], micro: $("#done-micro").val(), sign: $("#done-sign").val() }).then(data => {
+    vhttp.checkelse('', { action: 'done', id: global['id'], micro: $("#done-micro").val(), regno: $("#done-regno").val(), sign: $("#done-sign").val() }).then(data => {
       $("#content").html(data['html'])
       $("#done-modal").modal('hide')
     })

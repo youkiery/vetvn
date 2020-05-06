@@ -8,6 +8,13 @@
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <div class="xxx rows">
+          <div class="col-3"> Số Microchip </div>
+          <div class="col-3"> <input type="text" class="form-control" id="micro"> </div>
+          <div class="col-3"> Số đăng ký </div>
+          <div class="col-3"> <input type="text" class="form-control" id="regno"> </div>
+        </div>
+
+        <div class="xxx rows">
           <div class="col-3"> Tên thú cưng </div>
           <div class="col-9"> <input type="text" class="form-control" id="name"> </div>
         </div>
@@ -260,6 +267,13 @@
         </div>
         <div class="text-center">
           <p> Sau khi xác nhận sẽ không thể rút lại, thú cưng sẽ được tạo mới, đồng thời duyệt đăng </p>
+          <div class="rows form-group">
+            <div class="col-3"> Số đăng ký </div>
+            <div class="col-9">
+              <input type="text" class="form-control" id="done-regno">
+            </div>
+          </div>
+
           <div class="rows form-group">
             <div class="col-3"> Số microchip </div>
             <div class="col-9">

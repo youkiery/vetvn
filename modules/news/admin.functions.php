@@ -686,6 +686,8 @@ function sendinfoContent() {
     $xtpl->assign('user', $row['fullname']);
     $xtpl->assign('mobile', $row['mobile']);
     $xtpl->assign('name', $row['name']);
+    $xtpl->assign('regno', $row['regno']);
+    $xtpl->assign('micro', $row['micro']);
     $xtpl->assign('species', $species['name']);
     $xtpl->assign('sex', $sex_data[$row['sex']]);
     $xtpl->assign('birthtime', date('d/m/Y', $row['birthtime']));

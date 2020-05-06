@@ -24,7 +24,7 @@
       <button class="btn btn-info btn-xs" onclick="edit({id})">
         sửa
       </button>  
-      <button class="btn btn-success btn-xs" onclick="done({id})">
+      <button class="btn btn-success btn-xs" onclick="done({id}, '{regno}', '{micro}')">
         duyệt
       </button>  
       <!-- END: done -->
