@@ -730,13 +730,15 @@ function petContent() {
       $username = mb_strtolower($row['user']['username']);
       $fullname = mb_strtolower($row['owner']['fullname']);
       $mobile = mb_strtolower($row['user']['mobile']);
-  
-      if (empty($filter['name']) || (mb_strpos($name, $filter['name']) !== false)) $list []= $row;
-      else if (empty($filter['species']) || (mb_strpos($species, $filter['species']) !== false)) $list []= $row;
-      else if (empty($filter['micro']) || (mb_strpos($micro, $filter['mc']) !== false)) $list []= $row;
-      else if (empty($filter['username']) || (mb_strpos($username, $filter['username']) !== false)) $list []= $row;
-      else if (empty($filter['owner']) || (mb_strpos($fullname, $filter['owner']) !== false)) $list []= $row;
-      else if (empty($filter['mobile']) || (mb_strpos($mobile, $filter['mobile']) !== false)) $list []= $row;
+
+      $c1 = empty($filter['name']) || (mb_strpos($name, $filter['name']) !== false);
+      $c2 = empty($filter['species']) || (mb_strpos($species, $filter['species']) !== false);
+      $c3 = empty($filter['mc']) || (mb_strpos($micro, $filter['mc']) !== false);
+      $c4 = empty($filter['username']) || (mb_strpos($username, $filter['username']) !== false);
+      $c5 = empty($filter['owner']) || (mb_strpos($fullname, $filter['owner']) !== false);
+      $c6 = empty($filter['mobile']) || (mb_strpos($mobile, $filter['mobile']) !== false);
+
+      if ($c1 && $c2 && $c3 && $c4 && $c5 && $c6) $list []= $row;
     }
   }
 

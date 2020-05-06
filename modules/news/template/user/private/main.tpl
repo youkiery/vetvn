@@ -226,7 +226,6 @@
   var transferOwner = $("#transfer-owner")
   var insertOwner = $("#insert-owner")
   var insertPet = $("#insert-pet")
-  var insertUser = $("#insert-user")
   var insertParent = $("#insert-parent")
   var petVaccine = $("#pet-vaccine")
   var requestContent = $("#request-content")
@@ -1159,7 +1158,7 @@
           image.addEventListener('load', (e) => {
             userPreview.attr('src', image.src)
           })
-          insertUser.modal('show')
+          $("#insert-user").modal('show')
         }, () => {})
       }
     )

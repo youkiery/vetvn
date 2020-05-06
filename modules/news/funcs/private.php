@@ -743,11 +743,7 @@ if (!empty($action)) {
 			$type = $nv_Request->get_string('type', 'post', '');
 			$keyword = $nv_Request->get_string('keyword', 'post', '');
 
-			$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
-			$query = $db->query($sql);
-			$info = $query->fetch();
-
-			$sql = 'select * from `'. PREFIX .'_pet` where name like "%'. $keyword .'%" and userid = '. $userinfo['id'] .' and sex = '. $type .' order by name limit 20';
+			$sql = 'select * from `'. PREFIX .'_sendinfo` where name like "%'. $keyword .'%" and userid = '. $userinfo['id'] .' and sex = '. $type .' order by name limit 20';
 			$query = $db->query($sql);
 			$xtpl = new XTemplate('pet.tpl', PATH2);
 			$xtpl->assign('type', $type);
