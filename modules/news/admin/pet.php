@@ -603,7 +603,7 @@ if (!empty($action)) {
 			$data['birthtime'] = totime($data['birthtime']);
 
 			// cập nhật bảng
-			$sql = 'update `'. PREFIX .'_sendinfo` set micro = "'. $data['micro'] .'", regno = "'. $data['regno'] .'", name = "'. $data['name'] .'", sex = "'. $data['sex'] .'", birthtime = "'. $data['birthtime'] .'", species = "'. $data['species'] .'", color = "'. $data['color'] .'", type = "'. $data['type'] .'", breeder = "'. $data['breeder'] .'", owner = "'. $data['owner'] .'", father = '. $data['father'] .', mother = '. $data['mother'] .' where id = ' . $id;
+      $sql = 'update `'. PREFIX .'_sendinfo` set userid = "'. $data['petuser'] .'", micro = "'. $data['micro'] .'", regno = "'. $data['regno'] .'", name = "'. $data['name'] .'", sex = "'. $data['sex'] .'", birthtime = "'. $data['birthtime'] .'", species = "'. $data['species'] .'", color = "'. $data['color'] .'", type = "'. $data['type'] .'", breeder = "'. $data['breeder'] .'", owner = "'. $data['owner'] .'", father = '. $data['father'] .', mother = '. $data['mother'] .' where id = ' . $id;
 			if ($db->query($sql)) {
 				// thông báo
 				$result['status'] = 1;
@@ -615,11 +615,7 @@ if (!empty($action)) {
 			$type = $nv_Request->get_string('type', 'post', '');
 			$keyword = $nv_Request->get_string('keyword', 'post', '');
 
-			$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
-			$query = $db->query($sql);
-			$info = $query->fetch();
-
-			$sql = 'select * from `'. PREFIX .'_pet` where name like "%'. $keyword .'%" and userid = '. $info['userid'] .' and sex = '. $type .' order by name limit 20';
+      $sql = 'select * from `'. PREFIX .'_pet` where name like "%'. $keyword .'%" and userid = '. $id .' and sex = '. $type .' order by name limit 20';
 			$query = $db->query($sql);
 			$xtpl = new XTemplate('pet.tpl', PATH2);
 			$xtpl->assign('type', $type);
@@ -669,6 +665,8 @@ if (!empty($action)) {
 			$info['fathername'] = $father;
 			$info['mothername'] = $mother;
 			// đang sửa chỗ này nè má xxx
+      $info['petuser'] = getUserInfo(intval($info['userid']));
+      $info['petuser']['mobile'] = xdecrypt($info['petuser']['mobile']);
 			$info['breeder'] = getContactId(intval($info['breeder']), $info['userid']);
 			$info['owner'] = getContactId(intval($info['owner']), $info['userid']);
 			$info['birthtime'] = date('d/m/Y', $info['birthtime']);
@@ -684,12 +682,8 @@ if (!empty($action)) {
 			$keyword = $nv_Request->get_string('keyword', 'post', '');
 			$type = $nv_Request->get_string('type', 'post', '');
 
-			$sql = 'select * from `'. PREFIX .'_sendinfo` where id = ' . $id;
-			$query = $db->query($sql);
-			$info = $query->fetch();
-
-			$xtpl = new XTemplate("user.tpl", PATH2);
-			$sql = 'select * from `'. PREFIX .'_contact` where (fullname like "%'. $keyword .'%" or address like "%'. $keyword .'%" or mobile like "%'. $keyword .'%") and userid = ' . $info['userid'];
+      $xtpl = new XTemplate("user.tpl", PATH2);
+      $sql = 'select * from `'. PREFIX .'_contact` where (fullname like "%'. $keyword .'%" or address like "%'. $keyword .'%" or mobile like "%'. $keyword .'%") and userid = ' . $id;
 			$query = $db->query($sql);
 			
 			$check = true;
@@ -706,19 +700,61 @@ if (!empty($action)) {
 			$result['status'] = 1;
 			$result['html'] = $xtpl->text();
 		break;
-		case 'insert-user':
+		case 'insert-user2':
 			$data = $nv_Request->get_array('data', 'post');
+			$id = $nv_Request->get_int('id', 'post', 0);
 
 			$sql = 'select * from `'. PREFIX .'_contact` where mobile = "'. $data['mobile'] .'"';
 			$query = $db->query($sql);
 			if (empty($query->fetch)) {
-				$sql = 'insert into `'. PREFIX .'_contact` (fullname, address, mobile, politic, userid) values ("'. $data['name'] .'", "'. $data['address'] .'", "'. $data['mobile'] .'", "'. $data['politic'] .'", '. $userinfo['id'] .')';
+				$sql = 'insert into `'. PREFIX .'_contact` (fullname, address, mobile, politic, userid) values ("'. $data['name'] .'", "'. $data['address'] .'", "'. $data['mobile'] .'", "'. $data['politic'] .'", '. $id .')';
 
 				if ($db->query($sql)) {
 					$result['status'] = 1;
 					$result['id'] = $db->lastInsertId();
 				}
 			}
+    break;
+    case 'send-info':
+			$data = $nv_Request->get_array('data', 'post');
+			$image = $nv_Request->get_array('image', 'post');
+
+			// check các remind
+			$data['species'] = checkRemind($data['species'], 'species2');
+			$data['color'] = checkRemind($data['color'], 'color');
+			$data['type'] = checkRemind($data['type'], 'type');
+			$data['birthtime'] = totime($data['birthtime']);
+
+      // insert vào bảng
+      $sql = 'insert into `'. PREFIX .'_sendinfo` (name, micro, regno, sex, birthtime, species, color, type, breeder, owner, image, userid, active, active2, father, mother, intro, time) values("'. $data['name'] .'", "'. $data['micro'] .'", "'. $data['regno'] .'", "'. $data['sex'] .'", "'. $data['birthtime'] .'", "'. $data['species'] .'", "'. $data['color'] .'", "'. $data['type'] .'", "'. $data['breeder'] .'", "'. $data['owner'] .'", "'. implode(',', $image) .'", "'. $data['petuser'] .'", 0, 1, '. $data['father'] .', '. $data['mother'] .',  "", '. time() .')';
+			if ($db->query($sql)) {
+				// thông báo
+				$result['status'] = 1;
+				$result['html'] = petContent();
+			}
+		break;
+		case 'get-petuser':
+      $keyword = $nv_Request->get_string('keyword', 'post', '');
+      $keyword = deuft8($keyword);
+
+      $sql = 'select * from `'. PREFIX .'_user` where LOWER(username) like "%'. $keyword .'%" or LOWER(fullname) like "%'. $keyword .'%" order by fullname limit 10';
+			$query = $db->query($sql);
+
+			$xtpl = new XTemplate('petuser.tpl', PATH2);
+      
+			$check = true;
+			while ($user = $query->fetch()) {
+        $user['mobile'] = xdecrypt($user['mobile']);
+				$check = false;
+				$xtpl->assign('id', $user['id']);
+				$xtpl->assign('fullname', $user['fullname']);
+				$xtpl->assign('mobile', $user['mobile']);
+				$xtpl->parse('main.row');
+			}
+			if ($check) $xtpl->parse('main.no');
+			$xtpl->parse('main');
+      $result['status'] = 1;
+			$result['html'] = $xtpl->text();
 		break;
   }
   echo json_encode($result);

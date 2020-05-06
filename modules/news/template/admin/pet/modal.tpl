@@ -496,12 +496,9 @@
         </div>
         <div class="xxx rows">
           <div class="col-3"> Số Microchip </div>
-          <div class="col-9"> <input type="text" class="form-control" id="micro"> </div>
-        </div>
-
-        <div class="xxx rows">
+          <div class="col-3"> <input type="text" class="form-control" id="micro"> </div>
           <div class="col-3"> Số đăng ký </div>
-          <div class="col-9"> <input type="text" class="form-control" id="regno"> </div>
+          <div class="col-3"> <input type="text" class="form-control" id="regno"> </div>
         </div>
 
         <div class="xxx rows">
@@ -549,6 +546,31 @@
         </div>
         <div class="text-red" id="color-error"></div>
         <div class="text-red" id="type-error"></div>
+
+        <div class="xxx rows">
+          <div class="col-3"> Chủ tài khoản </div>
+          <div class="col-9">
+            <div class="relative">
+              <input type="text" class="form-control" id="petuser">
+              <div class="suggest" id="petuser-suggest"></div>
+            </div>
+          </div>
+        </div>
+        <div class="xxx rows" style="font-size: 0.8em;">
+          <div class="col-3"> </div>
+          <div class="col-3">
+            Họ tên: <span id="petuser-name"></span>
+          </div>
+          <div class="col-4">
+            SĐT: <span id="petuser-mobile"></span>
+          </div>
+          <div class="col-2" style="text-align: right;">
+            <button class="btn btn-danger" style="min-height: 32px;" onclick="clearUser('petuser')">
+              <span class="glyphicon glyphicon-remove"></span>
+            </button>
+          </div>
+        </div>
+        <div class="text-red" id="petuser-error"></div>
 
         <div class="xxx rows">
           <div class="col-3"> Người nhân giống </div>
@@ -645,7 +667,7 @@
           </div>
         </div>
 
-        <div class="text-center">
+        <div class="text-center form-group">
           <span id="image-list"></span>
           <label class="insert text-center thumb">
             <img style="width: 100px; height: 100px;" src="/assets/images/upload.png">

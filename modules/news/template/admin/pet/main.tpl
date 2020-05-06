@@ -10,6 +10,7 @@
   .btn {
     min-height: 32px;
   }
+
   .btn-xs {
     min-height: unset;
   }
@@ -23,6 +24,25 @@
     height: fit-content;
   }
 
+  .thumb {
+    width: 100px;
+    height: 100px;
+    display: inline-block;
+    line-height: 92px;
+    margin: 2px;
+    padding: 3px;
+  }
+
+  .thumb img {
+    max-width: 100px;
+    max-height: 100px;
+  }
+
+  .text-red {
+    color: red;
+    font-size: 1.2em;
+    font-weight: bold;
+  }
 </style>
 
 {modal}
@@ -67,7 +87,7 @@
   </form>
   <div style="clear: both;"></div>
 
-  <button class="btn btn-success" style="float: right;" onclick="addPet()">
+  <button class="btn btn-success" style="float: right;" onclick="sendinfoModal()">
     <span class="glyphicon glyphicon-plus"> </span>
   </button>
   <button class="btn btn-info" style="float: right;" onclick="selectRow(this)">
@@ -104,7 +124,9 @@
     parent: 'm',
     id: -1,
     userid: -1,
-    owner: {},
+    owner: 0,
+    breeder: 0,
+    petuser: 0,
     petid: 0,
     parentid: 0,
     user_parent: 0,
@@ -118,6 +140,7 @@
     }
   }
   var notify = {
+    'petuser': 'Chọn chủ tài khoản trước khi gửi',
     'name': 'Nhập tên thú cưng trước khi gửi',
     'birthtime': 'Chọn ngày sinh trước khi gửi',
     'species': 'Chọn giống loài trước khi gửi',
@@ -194,7 +217,7 @@
   var file, filename
   var uploadedUrl = ''
   uploaded = {}
-  
+
   var firebaseConfig = {
     apiKey: "AIzaSyAgxaMbHnlYbUorxXuDqr7LwVUJYdL2lZo",
     authDomain: "petcoffee-a3cbc.firebaseapp.com",
@@ -249,6 +272,9 @@
     installRemindSpecies('species')
     installRemindSpecies('species-parent')
     installSelect()
+    vimage.install('image', 640, 640, (list) => {
+      refreshImage(list)
+    })
   })
 
   function installSelect() {
@@ -1089,28 +1115,35 @@
     }, 500, 300)
     vremind.install('#breeder', '#breeder-suggest', (input) => {
       return new Promise(resolve => {
-        vhttp.checkelse('', { action: 'get-user', keyword: input, type: 'breeder', id: global['id'] }).then(data => {
+        vhttp.checkelse('', { action: 'get-user', keyword: input, type: 'breeder', id: global['petuser'] }).then(data => {
           resolve(data['html'])
         })
       })
     }, 500, 300)
     vremind.install('#owner', '#owner-suggest', (input) => {
       return new Promise(resolve => {
-        vhttp.checkelse('', { action: 'get-user', keyword: input, type: 'owner', id: global['id'] }).then(data => {
+        vhttp.checkelse('', { action: 'get-user', keyword: input, type: 'owner', id: global['petuser'] }).then(data => {
           resolve(data['html'])
         })
       })
     }, 500, 300)
     vremind.install('#father', '#father-suggest', (input) => {
       return new Promise(resolve => {
-        vhttp.checkelse('', { action: 'get-pet', type: 0, keyword: input, id: global['id'] }).then(data => {
+        vhttp.checkelse('', { action: 'get-pet', type: 0, keyword: input, id: global['petuser'] }).then(data => {
           resolve(data['html'])
         })
       })
     }, 500, 300)
     vremind.install('#mother', '#mother-suggest', (input) => {
       return new Promise(resolve => {
-        vhttp.checkelse('', { action: 'get-pet', type: 1, keyword: input, id: global['id'] }).then(data => {
+        vhttp.checkelse('', { action: 'get-pet', type: 1, keyword: input, id: global['petuser'] }).then(data => {
+          resolve(data['html'])
+        })
+      })
+    }, 500, 300)
+    vremind.install('#petuser', '#petuser-suggest', (input) => {
+      return new Promise(resolve => {
+        vhttp.checkelse('', { action: 'get-petuser', keyword: input }).then(data => {
           resolve(data['html'])
         })
       })
@@ -1123,14 +1156,27 @@
       html += `
       <div class="thumb">
         <button type="button" class="close insert" onclick="removeImage(`+ index + `)">&times;</button>
-        <img src="`+ item + `">
+        <img src="`+ item + `" style="width: 100%">
       </div>`
     })
     $("#image-list").html(html)
   }
 
+  function removeImage(remove_index) {
+    vimage.data['image'] = vimage.data['image'].filter((item, index) => {
+      return index !== remove_index
+    })
+    refreshImage(vimage.data['image'])
+  }
+
   function selectRemind(name, id) {
     $("#" + id).val(name)
+  }
+
+  function selectPetuser(id, fullname, mobile) {
+    global['petuser'] = id
+    $("#petuser-mobile").text(mobile)
+    $("#petuser-name").text(fullname)
   }
 
   function selectPet(name, type, id) {
@@ -1162,7 +1208,6 @@
     $("#sendinfo-modal").modal('show')
   }
 
-
   function edit(id) {
     vhttp.checkelse('', { action: 'get-info', id: id }).then(data => {
       global['id'] = id
@@ -1171,6 +1216,7 @@
         1: data['data']['mother']
       }
 
+      parseUser('petuser', data['data']['petuser'])
       parseUser('breeder', data['data']['breeder'])
       parseUser('owner', data['data']['owner'])
 
@@ -1194,6 +1240,7 @@
 
   function checkData() {
     data = {
+      petuser: global['petuser'],
       micro: $("#micro").val(),
       regno: $("#regno").val(),
       name: $("#name").val(),
@@ -1210,7 +1257,7 @@
 
     for (const key in notify) {
       if (notify.hasOwnProperty(key)) {
-        if (!data[key].length) return key
+        if (!String(data[key]).length) return key
       }
     }
     return data
@@ -1227,25 +1274,38 @@
     }
   }
 
+  function sendInfo() {
+    sdata = checkData()
+    if (!sdata['name']) textError(sdata)
+    else {
+      upload('image').then(list => {
+        vhttp.checkelse('', { action: 'send-info', data: sdata, image: list }).then(data => {
+          $("#content").html(data['html'])
+          $("#sendinfo-modal").modal('hide')
+        })
+      })
+    }
+  }
+
   function clearUser(name) {
     global[name] = 0
     $("#" + name).val('')
     $("#" + name + "-suggest").html('')
-    $("#" + name + '-name').text(global['user']['name'])
-    $("#" + name + '-mobile').text(global['user']['mobile'])
+    $("#" + name + '-name').text('')
+    $("#" + name + '-mobile').text('')
   }
 
   function parseUser(name, data) {
-    $("#"+ name).val('')
+    $("#" + name).val('')
     if (data['id']) {
       global[name] = data['id']
-      $("#"+ name +"-name").text(data['fullname'])
-      $("#"+ name +"-mobile").text(data['mobile'])
+      $("#" + name + "-name").text(data['fullname'])
+      $("#" + name + "-mobile").text(data['mobile'])
     }
     else {
       global[name] = 0
-      $("#"+ name +"-name").text(global['user']['name'])
-      $("#"+ name +"-mobile").text(global['user']['mobile'])
+      $("#" + name + "-name").text(global['user']['name'])
+      $("#" + name + "-mobile").text(global['user']['mobile'])
     }
   }
 
@@ -1292,11 +1352,11 @@
 
   function insertUserSubmit() {
     sdata = checkUserData()
-    vhttp.checkelse('', { action: 'insert-user', data: sdata }).then(data => {
+    vhttp.checkelse('', { action: 'insert-user2', data: sdata, id: global['petuser'] }).then(data => {
       global[global['modal']] = data['id']
-      $("#"+ global['modal'] +"").val('')
-      $("#"+ global['modal'] +"-name").text(sdata['name'])
-      $("#"+ global['modal'] +"-mobile").text(sdata['mobile'])
+      $("#" + global['modal'] + "").val('')
+      $("#" + global['modal'] + "-name").text(sdata['name'])
+      $("#" + global['modal'] + "-mobile").text(sdata['mobile'])
       $("#user-modal").modal('hide')
     })
   }
@@ -1310,5 +1370,49 @@
     }, 1000);
   }
 
+  function upload(id) {
+    return new Promise((resolve) => {
+      source = vimage.data[id]
+      limit = source.length
+      index = 0
+      checker = 0
+      image_data = []
+      if (!source.length) resolve([])
+      source.forEach(item => {
+        index++
+        name = index + '-' + Math.floor((new Date()).getTime() / 1000)
+        file = item.substr(item.indexOf(',') + 1);
+
+        var uploadTask = storageRef.child('images/' + name).putString(file, 'base64', metadata);
+        uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+          function (snapshot) {
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            switch (snapshot.state) {
+              case firebase.storage.TaskState.PAUSED: // or 'paused'
+                console.log('Upload is paused');
+                break;
+              case firebase.storage.TaskState.RUNNING: // or 'running'
+                console.log('Upload is running');
+                break;
+            }
+          }, function (error) {
+            console.log(error);
+            checker++
+            if (checker == limit) {
+              resolve(image_data)
+            }
+          }, function () {
+            uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
+              image_data.push(downloadURL)
+              checker++
+              if (checker == limit) {
+                resolve(image_data)
+              }
+            });
+          });
+      });
+    })
+  }
 </script>
 <!-- END: main -->

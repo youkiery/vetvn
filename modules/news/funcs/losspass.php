@@ -151,7 +151,7 @@ if (!empty($action)) {
 	die();
 }
 
-$xtpl = new XTemplate("losspass.tpl", "modules/". $module_name ."/template");
+$xtpl = new XTemplate("main.tpl", PATH2);
 $xtpl->assign('origin', '/' . $module_name . '/' . $op . '/');
 $xtpl->assign('module_file', $module_file);
 // var_dump($_SESSION);die();
