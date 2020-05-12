@@ -214,7 +214,6 @@
 
   function ceti(id, price) {
     global['id'] = id
-    global['certify'] = 1
 
     $("#ceti-price").val(price)
     $("#modal-ceti").modal('show')
