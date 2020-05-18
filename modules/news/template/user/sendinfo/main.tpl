@@ -24,6 +24,36 @@
   .suggest_item2 {
     height: 59px !important;
   }
+
+  .image-box {
+    margin: 5px;
+    float: left;
+    width: auto;
+  }
+
+  .image-content {
+    width: 100px;
+    height: 100px;
+    background: white;
+  }
+
+  .image-content img {
+    max-width: 100px;
+    max-height: 100px;
+  }
+
+  .image-function {
+    margin: auto;
+    width: 100px;
+    margin-top: 5px;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+    float: left;
+    margin: 0px 5px;
+  }
 </style>
 
 {modal}
@@ -194,12 +224,42 @@
     html = ''
     list.forEach((item, index) => {
       html += `
-      <div class="thumb">
-        <button type="button" class="close insert" onclick="removeImage(`+ index + `)">&times;</button>
-        <img src="`+ item + `">
+      <div class="image-box">
+        <div class="image-content">
+          <img src="`+ item + `" style="width: 100%">
+        </div>
+        <div class="image-function">
+          <img class="insert icon" src="/assets/images/left.jpg" onclick="rotateImage(`+ index + `, -90)">
+          <img class="insert icon" src="/assets/images/right.jpg" onclick="rotateImage(`+ index + `, 90)">
+          <img class="insert icon" src="/assets/images/close.jpg" onclick="removeImage(`+ index + `)">
+        </div>
       </div>`
     })
     $("#image-list").html(html)
+  }
+
+  function rotateImage(index, angle) {
+    var image = new Image();
+    image.src = vimage.data['image'][index];
+    image.onload = (e) => {
+      var canvas = document.createElement('canvas')
+      var context = canvas.getContext('2d')
+      var max = (image.width > image.height ? image.width : image.height)
+      canvas.width = max
+      canvas.height = max
+
+      context.save()
+      context.fillStyle = '#fff'
+      context.fillRect(0, 0, max, max)
+      context.translate(max / 2, max / 2)
+      context.rotate(angle * Math.PI / 180)
+      context.drawImage(image, -max / 2 + (max - image.width) / 2, -max / 2 + (max - image.height) / 2, image.width, image.height)
+      context.restore()
+
+      url = canvas.toDataURL('image/jpeg')
+      vimage.data['image'][index] = url
+      refreshImage(vimage.data['image'])
+    }
   }
 
   function removeImage(remove_index) {
@@ -293,10 +353,12 @@
     sdata = checkData()
     if (!sdata['name']) textError(sdata)
     else {
+      freeze()
       upload('image').then(list => {
         vhttp.checkelse('', { action: 'send-info', data: sdata, image: list }).then(data => {
           $("#content").html(data['html'])
           $("#sendinfo-modal").modal('hide')
+          defreeze()
         })
       })
     }
@@ -427,6 +489,7 @@
             console.log(error);
             checker++
             if (checker == limit) {
+              defreeze()
               resolve(image_data)
             }
           }, function () {

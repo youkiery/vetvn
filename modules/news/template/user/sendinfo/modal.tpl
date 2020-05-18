@@ -148,9 +148,9 @@
           </div>
         </div>
 
-        <div class="text-center">
+        <div class="text-center" style="overflow: auto; width: fit-content; margin: auto;">
           <span id="image-list"></span>
-          <label class="insert text-center thumb">
+          <label class="insert text-center image-box">
             <img style="width: 100px; height: 100px;" src="/assets/images/upload.png">
             <div style="width: 50px; height: 50px; display: none;" id="image"></div>
           </label>

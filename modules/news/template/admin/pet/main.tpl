@@ -43,7 +43,6 @@
   }
 
   .image-box {
-    height: 160px;
     margin: 5px;
     float: left;
     width: auto;
@@ -51,6 +50,30 @@
 
   .fc-icon {
     display: inline-block;
+  }
+
+  .image-content {
+    width: 100px;
+    height: 100px;
+    background: white;
+  }
+
+  .image-content img {
+    max-width: 100px;
+    max-height: 100px;
+  }
+
+  .image-function {
+    margin: auto;
+    width: 100px;
+    margin-top: 5px;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+    float: left;
+    margin: 0px 5px;
   }
 </style>
 
@@ -437,56 +460,6 @@
         }, () => { })
       }
     )
-  }
-
-  function onselected(input, previewname) {
-    if (input.files && input.files[0]) {
-      var reader = new FileReader();
-      var fullname = input.files[0].name
-      var name = Math.round(new Date().getTime() / 1000) + '_' + fullname.substr(0, fullname.lastIndexOf('.'))
-      var extension = fullname.substr(fullname.lastIndexOf('.') + 1)
-      uploaded[previewname] = {}
-      filename = name + '.' + extension
-
-      reader.onload = function (e) {
-        var type = e.target["result"].split('/')[1].split(";")[0];
-        if (["jpeg", "jpg", "png", "bmp", "gif"].indexOf(type) >= 0) {
-          var image = new Image();
-          image.src = e.target["result"];
-          image.onload = (e2) => {
-            var c = document.createElement("canvas")
-            var ctx = c.getContext("2d");
-            var ratio = 1;
-            if (image.width > maxWidth)
-              ratio = maxWidth / image.width;
-            else if (image.height > maxHeight)
-              ratio = maxHeight / image.height;
-            c.width = image["width"];
-            c.height = image["height"];
-            ctx.drawImage(image, 0, 0);
-            var cc = document.createElement("canvas")
-            var cctx = cc.getContext("2d");
-            cc.width = image.width * ratio;
-            cc.height = image.height * ratio;
-            cctx.fillStyle = "#fff";
-            cctx.fillRect(0, 0, cc.width, cc.height);
-            cctx.drawImage(c, 0, 0, c.width, c.height, 0, 0, cc.width, cc.height);
-            file = cc.toDataURL("image/jpeg")
-            $("#" + previewname + "-preview").attr('src', file)
-            file = file.substr(file.indexOf(',') + 1);
-            uploaded[previewname] = {
-              url: '',
-              file: file,
-              name: filename
-            }
-          }
-        };
-      };
-
-      if (imageType.indexOf(extension) >= 0) {
-        reader.readAsDataURL(input.files[0]);
-      }
-    }
   }
 
   function deletePet(id) {
@@ -1164,12 +1137,14 @@
     list.forEach((item, index) => {
       html += `
       <div class="image-box">
-        <button type="button" class="close" onclick="removeImage(`+ index + `)">&times;</button>
-        <div class="thumb">
+        <div class="image-content">
           <img src="`+ item + `" style="width: 100%">
         </div>
-        <img class="insert fc-icon" src="/assets/images/left.jpg" onclick="rotateImage(`+ index + `, -90)">
-        <img class="insert fc-icon" src="/assets/images/right.jpg" onclick="rotateImage(`+ index + `, 90)">
+        <div class="image-function">
+          <img class="insert icon" src="/assets/images/left.jpg" onclick="rotateImage(`+ index + `, -90)">
+          <img class="insert icon" src="/assets/images/right.jpg" onclick="rotateImage(`+ index + `, 90)">
+          <img class="insert icon" src="/assets/images/close.jpg" onclick="removeImage(`+ index + `)">
+        </div>
       </div>`
     })
     $("#image-list").html(html)
@@ -1185,13 +1160,15 @@
       canvas.width = max
       canvas.height = max
 
-      context.save();
+      context.save()
+      context.fillStyle = '#fff'
+      context.fillRect(0, 0, max, max)
       context.translate(max / 2, max / 2)
-      context.rotate(angle * Math.PI / 180);
-      context.drawImage(image, -max / 2 + (max - image.width) / 2, -max / 2 + (max - image.height) / 2, image.width, image.height);
-      context.restore();
+      context.rotate(angle * Math.PI / 180)
+      context.drawImage(image, -max / 2 + (max - image.width) / 2, -max / 2 + (max - image.height) / 2, image.width, image.height)
+      context.restore()
 
-      url = canvas.toDataURL('image/jpeg') 
+      url = canvas.toDataURL('image/jpeg')
       vimage.data['image'][index] = url
       refreshImage(vimage.data['image'])
     }
