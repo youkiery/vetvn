@@ -25,12 +25,10 @@
   }
 
   .thumb {
+    margin: 2px;
     width: 100px;
     height: 100px;
-    display: inline-block;
-    line-height: 92px;
-    margin: 2px;
-    padding: 3px;
+    line-height: 100px;
   }
 
   .thumb img {
@@ -42,6 +40,17 @@
     color: red;
     font-size: 1.2em;
     font-weight: bold;
+  }
+
+  .image-box {
+    height: 160px;
+    margin: 5px;
+    float: left;
+    width: auto;
+  }
+
+  .fc-icon {
+    display: inline-block;
   }
 </style>
 
@@ -1154,12 +1163,38 @@
     html = ''
     list.forEach((item, index) => {
       html += `
-      <div class="thumb">
-        <button type="button" class="close insert" onclick="removeImage(`+ index + `)">&times;</button>
-        <img src="`+ item + `" style="width: 100%">
+      <div class="image-box">
+        <button type="button" class="close" onclick="removeImage(`+ index + `)">&times;</button>
+        <div class="thumb">
+          <img src="`+ item + `" style="width: 100%">
+        </div>
+        <img class="insert fc-icon" src="/assets/images/left.jpg" onclick="rotateImage(`+ index + `, -90)">
+        <img class="insert fc-icon" src="/assets/images/right.jpg" onclick="rotateImage(`+ index + `, 90)">
       </div>`
     })
     $("#image-list").html(html)
+  }
+
+  function rotateImage(index, angle) {
+    var image = new Image();
+    image.src = vimage.data['image'][index];
+    image.onload = (e) => {
+      var canvas = document.createElement('canvas')
+      var context = canvas.getContext('2d')
+      var max = (image.width > image.height ? image.width : image.height)
+      canvas.width = max
+      canvas.height = max
+
+      context.save();
+      context.translate(max / 2, max / 2)
+      context.rotate(angle * Math.PI / 180);
+      context.drawImage(image, -max / 2 + (max - image.width) / 2, -max / 2 + (max - image.height) / 2, image.width, image.height);
+      context.restore();
+
+      url = canvas.toDataURL('image/jpeg') 
+      vimage.data['image'][index] = url
+      refreshImage(vimage.data['image'])
+    }
   }
 
   function removeImage(remove_index) {

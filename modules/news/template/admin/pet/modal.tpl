@@ -667,9 +667,9 @@
           </div>
         </div>
 
-        <div class="text-center form-group">
+        <div class="text-center form-group" style="overflow: auto; width: fit-content; margin: auto;">
           <span id="image-list"></span>
-          <label class="insert text-center thumb">
+          <label class="text-center image-box">
             <img style="width: 100px; height: 100px;" src="/assets/images/upload.png">
             <div style="width: 50px; height: 50px; display: none;" id="image"></div>
           </label>
